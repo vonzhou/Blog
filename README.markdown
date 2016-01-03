@@ -14,5 +14,7 @@
 ### ☆ Life
 [2015简单总结](Life/2015-big-events.markdown)
 
+[2016计划](Life/2016-plan.markdown)
+
 ### ☆ About Me
 
