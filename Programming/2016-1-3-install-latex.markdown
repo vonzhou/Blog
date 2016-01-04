@@ -29,7 +29,7 @@ Tag:latex, tool
 ```
  
 %!TEX program = xelatex
-\documentclass[UTP-8]{ctexart}
+\documentclass[UTF-8]{ctexart}
 \begin{document}
 
 你好，LaTeX？
@@ -42,5 +42,3 @@ Tag:latex, tool
 
 
 
-[]()
-![]()
