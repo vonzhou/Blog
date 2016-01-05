@@ -1,7 +1,7 @@
 # 初次使用MacDown
 
 
-代码高亮：
+**代码高亮：**
 
 ```haskell
 firstTo :: Int -> Maybe Int
@@ -11,13 +11,13 @@ findKey :: (Eq k) => k -> [(k,v)] -> v
 findKey key xs = snd . head . filter (\(k,v) -> k == key) $ xs
 ```
 
-GFM task list的支持：
+**GFM task list的支持：**
 
 - [x] learn haskell
 - [ ] write blog
 
 
-Tex数学公式：
+**Tex数学公式：**(GFM不支持)
 
 $$
 \begin{align*}
@@ -29,6 +29,33 @@ $$
 \end{align*} 
 $$
 
+**可以导出**
 
-[](http)
+* PDF （不错）
+* HTML
+
+~~这是删除线~~
+
+
+你好世界
+====
+是的
+---
+
+**列表**
+
+*   Red
+*   Green
+*   Blue
+
++   Red
++   Green
++   Blue
+
+-   Red
+-   Green
+-   Blue
+
+
+基本上，这些够用了!
 
