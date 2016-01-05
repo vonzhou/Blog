@@ -7,6 +7,8 @@
 ### ☆ Programming
 [Hello LaTex - 安装](Programming/2016-1-3-install-latex.markdown)
 
+[MacDown初次使用](Programming/2016-1-5-macdown.markdown)
+
 ### ☆ Reading
 [我的2015阅读书单](Reading/2015-books-read.markdown)
 
