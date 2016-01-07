@@ -9,8 +9,15 @@
 
 [MacDown初次使用](Programming/2016-1-5-macdown.markdown)
 
+
+### ☆ Math
+[二项式定理](Math/2016-1-6-binomial-theorem.md) 
+
+
 ### ☆ Reading
 [我的2015阅读书单](Reading/2015-books-read.markdown)
+
+
 
 
 ### ☆ Life
