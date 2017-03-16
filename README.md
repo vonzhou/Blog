@@ -7,6 +7,7 @@
 
 [使用 redis pipeline优化查询](./Contents/Java/使用redis-pipeline优化查询.md)
 
+[Java中动态加载配置文件的方法](./Contents/Java/动态加载配置文件的实现.md)
 
 ## Linux
 
