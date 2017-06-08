@@ -3,6 +3,10 @@
 
 ## Java
 
+[Cipher非线程安全](./Contents/Java/Cipher非线程安全.md)
+
+[getGenericSuperclass获取泛型类型](./Contents/Java/getGenericSuperclass获取泛型类型.md)
+
 [Spring 常用工具之 StopWatch](./Contents/Java/Spring常用工具之StopWatch.md)
 
 [使用 redis pipeline优化查询](./Contents/Java/使用redis-pipeline优化查询.md)
