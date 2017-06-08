@@ -15,7 +15,7 @@ public class StringBuilderTest {
 }
 ```
 
-![](./image/string-builer.jpg)
+![](./image/string-builder.jpg)
 
 
 可以简单的做个性能对比：
