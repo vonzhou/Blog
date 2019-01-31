@@ -5,13 +5,13 @@
 
 ## Linux
 
-* [curl URL是否加单引号引发的问题]() 2018.12.7
-* [Linux常用命令总结]()   2018.8.31
+* [curl URL是否加单引号引发的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/curl/singlequote/curl-single-quote.md) 2018.12.7
+* [Linux常用命令总结](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/linux-commands.md)   2018.8.31
 
 
 ## Scala
 
-* [《快学Scala》读书笔记]()  2018.12.31
+* [《快学Scala》读书笔记](https://github.com/vonzhou/ScalaImpatient#%E5%BF%AB%E5%AD%A6scala%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0)  2018.12.31
 
 ## Java
 
@@ -32,25 +32,25 @@
 
 ## Spring/SpringBoot/SpringCloud
 
-* [解决Zuul无法同时转发Multipart和JSON请求的问题]()  2018.10.10
-* [如何加快 Spring Boot 项目的启动速度？]() 2018.9.4
+* [解决Zuul无法同时转发Multipart和JSON请求的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Spring/zuul-forward-multipart-and-json.md)  2018.10.10
+* [如何加快 Spring Boot 项目的启动速度？](https://github.com/vonzhou/Blog/blob/master/Contents/Spring/spring-boot-speedup.md) 2018.9.4
 * [Spring Boot 执行初始化逻辑的方法](https://github.com/vonzhou/spring-boot-examples/tree/master/spring-boot-init-method)  2018.9.18
 
 ## BigData 大数据
 
-* [Kafka源码阅读环境搭建]()  2018.11.7
-* [Kafka中的2种日志清理策略]() 2018.914
-* [《HBase权威指南》读书笔记]() 2018.12.20
-* [运行《HBase权威指南》书中代码]() 2018.12.18
+* [Kafka源码阅读环境搭建](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-source-begin.md)  2018.11.7
+* [Kafka中的2种日志清理策略](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-cleanup-policy.md) 2018.914
+* [《HBase权威指南》读书笔记](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/hbase-definitive.md) 2018.12.20
+* [运行《HBase权威指南》书中代码](https://github.com/vonzhou/hbase-book#%E8%BF%90%E8%A1%8Chbase%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%E4%B9%A6%E4%B8%AD%E4%BB%A3%E7%A0%81) 2018.12.18
 
 ## Nginx
 
-* [Nginx后端响应不完整问题分析]()  2019.1.4
+* [Nginx后端响应不完整问题分析](https://github.com/vonzhou/Blog/blob/master/Contents/Nginx/nginx-temp-file.md)  2019.1.4
 
 ## Reading
 
 * [何为整洁架构？](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/cleanarch/clean-arch.md) 2019.1.8
-* [《非暴力沟通》读书笔记]()
+* [《非暴力沟通》读书笔记](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/nonviolent-communication.md)
 * [2018阅读书单](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/2018-read-book.md)  2018.12.16
 * [2017阅读书单](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/2017-read-book.md) 2018.1.3
 * [2016阅读书单](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/2016-read-book.md) 2016.12.10
@@ -62,7 +62,7 @@
 
 ## Other 其他
 
-* [历史文章列表]()  2018.12.14
+* [历史文章列表](https://github.com/vonzhou/Blog/blob/master/Contents/Other/history-blogs.md)  2018.12.14
 
 
 

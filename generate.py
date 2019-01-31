@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import platform
 import subprocess
 
@@ -11,8 +14,8 @@ if "Windows" not in p:
 
 
 # 处理写UTF-8到文件，需要这样
-file = codecs.open("index.html","w", "utf-8") 
-start = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta http-equiv="X-UA-Compatible" content="ie=edge" /><title>编程之路 by vonzhou</title></head><body>""" 
+file = codecs.open("index.html","w", "utf-8")
+start = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta http-equiv="X-UA-Compatible" content="ie=edge" /><title>编程之路 by vonzhou</title></head><body>"""
 end = """</body></html>"""
 
 # 1.写头部
@@ -28,4 +31,4 @@ file.write(out.decode('utf-8'))
 # 3.写尾部
 file.write(end)
 
-file.close() 
+file.close()
