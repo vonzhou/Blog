@@ -1,9 +1,7 @@
-
-[Home Page](https://github.com/vonzhou/Blog/blob/master/README.md)            [知乎](https://www.zhihu.com/people/vonzhou/activities)
+[主页](http://vonzhou.com)  | [读书](https://github.com/vonzhou/readings)  | [知乎](https://www.zhihu.com/people/vonzhou) | [GitHub](https://github.com/vonzhou)
 ---
-
 # 2016阅读书单
-
+---
 
 2016这一年接近尾声了，列出今年阅读的书。
 
