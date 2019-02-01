@@ -26,9 +26,19 @@
 * [Disruptor中的事件消费模式](https://github.com/vonzhou/learning-java/tree/master/src/framework/disruptor)  2018.9.28
 * [Disruptor 快速入门](https://github.com/vonzhou/learning-java/blob/master/src/framework/disruptor/DisruptorHello.md)  2018.9.21
 * [ArrayBlockingQueue与Disruptor的性能对比](https://github.com/vonzhou/learning-java/tree/master/src/framework/disruptor/threadpoolvsdisruptor)   2018.12.1
-* [可重入锁 ReentrantLock 源码阅读](https://github.com/vonzhou/learning-java/blob/master/src/concurrent/ReentrantLock.md)  
 * [IntegerCache源码阅读](https://github.com/vonzhou/learning-java/blob/master/src/lang/IntegerCache.md) 2018.12.19
 * [深入理解条件变量Condition](https://github.com/vonzhou/learning-java/blob/master/src/concurrent/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8FCondition.md) 2018.11.11
+* [Hashtable 和 HashMap 的对比](https://github.com/vonzhou/learning-java/blob/master/src/collection/HashtableVsHashMap.md)
+
+
+### 源码阅读
+
+* [ThreadLocal](https://github.com/vonzhou/learning-java/blob/master/src/lang/ThreadLocal.md)
+* [ArrayList](https://github.com/vonzhou/learning-java/blob/master/src/collection/ArrayList.md)
+* [Collections](https://github.com/vonzhou/learning-java/blob/master/src/collection/Collections.md)
+* [ConcurrentHashMap](https://github.com/vonzhou/learning-java/blob/master/src/collection/ConcurrentHashMap.md)
+* [可重入锁 ReentrantLock](https://github.com/vonzhou/learning-java/blob/master/src/concurrent/ReentrantLock.md)  
+
 
 ## Spring/SpringBoot/SpringCloud
 
