@@ -5,7 +5,7 @@
 
 ## 订阅
 
-点击本页面右上角的 `Watch` ->  `Watching` 订阅本博客，这样本博客的更新会在你的`GitHub`首页出现。
+点击 [Blog](https://github.com/vonzhou/Blog) 页面右上角的 `Watch` ->  `Watching` 订阅本博客，这样本博客的更新后你会收到通知。
 
 ## Linux
 
@@ -35,7 +35,7 @@
 * [Hashtable 和 HashMap 的对比](https://github.com/vonzhou/learning-java/blob/master/src/collection/HashtableVsHashMap.md)
 
 
-### 源码阅读
+### JDK源码阅读
 
 * [ThreadLocal](https://github.com/vonzhou/learning-java/blob/master/src/lang/ThreadLocal.md)
 * [ArrayList](https://github.com/vonzhou/learning-java/blob/master/src/collection/ArrayList.md)
