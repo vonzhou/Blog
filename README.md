@@ -3,6 +3,10 @@
 # 编程之路 - Build Your Programming Culture
 ---
 
+## 订阅
+
+点击本页面右上角的 `Watch` ->  `Watching` 订阅本博客，这样本博客的更新会在你的`GitHub`首页出现。
+
 ## Linux
 
 * [curl URL是否加单引号引发的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/curl/singlequote/curl-single-quote.md) 2018.12.7
