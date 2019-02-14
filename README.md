@@ -22,7 +22,7 @@
 
 ## Java
 
-
+* [为什么枚举是实现单例最好的方式？](https://github.com/vonzhou/learning-java/blob/master/src/lang/enumsingleton/Enum.md)  2019.2.14
 * [大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题](https://github.com/vonzhou/learning-java/blob/master/src/framework/kafka/rebalancejitter/README.md) 2019.1.30
 * [从连接池(JedisPool)获取Redis连接源码分析](https://github.com/vonzhou/learning-java/tree/master/src/framework/redis/jedispoolget) 2018.12.14
 * [Redis中键的过期删除策略](https://github.com/vonzhou/learning-java/blob/master/src/framework/redis/redisexpire/) 2018.9.9
