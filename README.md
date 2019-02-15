@@ -7,18 +7,7 @@
 
 点击 [Blog](https://github.com/vonzhou/Blog) 页面右上角的 `Watch` ->  `Watching` 订阅本博客，这样本博客的更新后你会收到通知。
 
-## Linux
 
-* [curl URL是否加单引号引发的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/curl/singlequote/curl-single-quote.md) 2018.12.7
-* [Linux常用命令总结](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/linux-commands.md)   2018.8.31
-* [netstat 命令](https://github.com/vonzhou/Blog/tree/master/Contents/Linux/netstat)  2017.5.16
-* [tcpdump 命令](https://github.com/vonzhou/Blog/tree/master/Contents/Linux/tcpdump)  2017.5.16
-* [《深入理解计算机系统结构》实战](https://github.com/vonzhou/CSAPP)   2015.3.24
-
-
-## Scala
-
-* [《快学Scala》读书笔记](https://github.com/vonzhou/ScalaImpatient#%E5%BF%AB%E5%AD%A6scala%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0)  2018.12.31
 
 ## Java
 
@@ -52,6 +41,9 @@
 * [解决Zuul无法同时转发Multipart和JSON请求的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Spring/zuul-forward-multipart-and-json.md)  2018.10.10
 * [如何加快 Spring Boot 项目的启动速度？](https://github.com/vonzhou/Blog/blob/master/Contents/Spring/spring-boot-speedup.md) 2018.9.4
 * [Spring Boot 执行初始化逻辑的方法](https://github.com/vonzhou/spring-boot-examples/tree/master/spring-boot-init-method)  2018.9.18
+* [Spring源码阅读 - bean实例化浅析](https://github.com/vonzhou/learning-spring/blob/master/sourcereading/bean%E5%AE%9E%E4%BE%8B%E5%8C%96%E6%B5%85%E6%9E%90.md) 2016.9.2
+* [Spring源码阅读 - bean解析初体验](https://github.com/vonzhou/learning-spring/blob/master/sourcereading/bean%E8%A7%A3%E6%9E%90%E5%88%9D%E4%BD%93%E9%AA%8C.md)  2016.9.1
+
 
 ## BigData 大数据
 
@@ -63,6 +55,19 @@
 ## Nginx
 
 * [Nginx后端响应不完整问题分析](https://github.com/vonzhou/Blog/blob/master/Contents/Nginx/nginx-temp-file.md)  2019.1.4
+
+## Linux
+
+* [curl URL是否加单引号引发的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/curl/singlequote/curl-single-quote.md) 2018.12.7
+* [Linux常用命令总结](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/linux-commands.md)   2018.8.31
+* [netstat 命令](https://github.com/vonzhou/Blog/tree/master/Contents/Linux/netstat)  2017.5.16
+* [tcpdump 命令](https://github.com/vonzhou/Blog/tree/master/Contents/Linux/tcpdump)  2017.5.16
+* [《深入理解计算机系统结构》实战](https://github.com/vonzhou/CSAPP)   2015.3.24
+
+
+## Scala
+
+* [《快学Scala》读书笔记](https://github.com/vonzhou/ScalaImpatient#%E5%BF%AB%E5%AD%A6scala%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0)  2018.12.31
 
 ## Reading
 
