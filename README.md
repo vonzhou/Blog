@@ -1,7 +1,6 @@
-[主页](http://vonzhou.com)  | [读书](https://github.com/vonzhou/readings)  | [知乎](https://www.zhihu.com/people/vonzhou) | [GitHub](https://github.com/vonzhou)
+[主页](https://github.com/vonzhou/Blog)  | [读书](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/readings.md)  | [知乎](https://www.zhihu.com/people/vonzhou) 
 ---
 # 编程之路 - Build Your Programming Culture
----
 
 ## 订阅
 
@@ -11,8 +10,8 @@
 
 ## Java
 
+* [JVM GC 总结](https://github.com/vonzhou/learning-java/blob/master/src/javavirtualmachine/gc/GC.md) 2019.2.21
 * [为什么枚举是实现单例最好的方式？](https://github.com/vonzhou/learning-java/blob/master/src/lang/enumsingleton/Enum.md)  2019.2.14
-* [大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题](https://github.com/vonzhou/learning-java/blob/master/src/framework/kafka/rebalancejitter/README.md) 2019.1.30
 * [从连接池(JedisPool)获取Redis连接源码分析](https://github.com/vonzhou/learning-java/tree/master/src/framework/redis/jedispoolget) 2018.12.14
 * [Redis中键的过期删除策略](https://github.com/vonzhou/learning-java/blob/master/src/framework/redis/redisexpire/) 2018.9.9
 * [如何保证ArrayList在多线程环境下的线程安全性](https://github.com/vonzhou/learning-java/tree/master/src/collection/arraylistthreadsafe2) 2018.9.7
@@ -37,6 +36,13 @@
 * [条件变量 Condition/ConditionObject](https://github.com/vonzhou/learning-java/blob/master/src/concurrent/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8FCondition.md#condition-%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90)
 
 
+## Kafka
+
+* [大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题](https://github.com/vonzhou/learning-java/blob/master/src/framework/kafka/rebalancejitter/README.md) 2019.1.30
+* [Kafka源码阅读环境搭建](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-source-begin.md)  2018.11.7
+* [Kafka中的2种日志清理策略](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-cleanup-policy.md) 2018.914
+
+
 ## Spring/SpringBoot/SpringCloud
 
 * [解决Zuul无法同时转发Multipart和JSON请求的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Spring/zuul-forward-multipart-and-json.md)  2018.10.10
@@ -48,8 +54,6 @@
 
 ## BigData 大数据
 
-* [Kafka源码阅读环境搭建](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-source-begin.md)  2018.11.7
-* [Kafka中的2种日志清理策略](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-cleanup-policy.md) 2018.914
 * [《HBase权威指南》读书笔记](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/hbase-definitive.md) 2018.12.20
 * [运行《HBase权威指南》书中代码](https://github.com/vonzhou/hbase-book#%E8%BF%90%E8%A1%8Chbase%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%E4%B9%A6%E4%B8%AD%E4%BB%A3%E7%A0%81) 2018.12.18
 
@@ -73,7 +77,7 @@
 
 ## Database 数据库
 
-* [InnoDB 行锁的实现](https://github.com/vonzhou/Blog/blob/master/Contents/Database/innodb-row-lock)
+* [InnoDB 行锁的实现](https://github.com/vonzhou/Blog/blob/master/Contents/Database/innodb-row-lock) 2019.2.16
 
 ## Reading
 
