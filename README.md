@@ -1,4 +1,4 @@
-[主页](https://github.com/vonzhou/Blog)  | [读书](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/readings.md)  | [知乎](https://www.zhihu.com/people/vonzhou) 
+[主页](https://github.com/vonzhou/Blog)  | [读书](https://github.com/vonzhou/readings)  | [知乎](https://www.zhihu.com/people/vonzhou) 
 ---
 # 编程之路 - Build Your Programming Culture
 
@@ -45,6 +45,7 @@
 
 ## Spring/SpringBoot/SpringCloud
 
+* [BeanUtils.copyProperties 源码分析](https://github.com/vonzhou/learning-spring/tree/master/src/main/java/com/vonzhou/learningspring/copyproperties) 2019.2.27
 * [解决Zuul无法同时转发Multipart和JSON请求的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Spring/zuul-forward-multipart-and-json.md)  2018.10.10
 * [如何加快 Spring Boot 项目的启动速度？](https://github.com/vonzhou/Blog/blob/master/Contents/Spring/spring-boot-speedup.md) 2018.9.4
 * [Spring Boot 执行初始化逻辑的方法](https://github.com/vonzhou/spring-boot-examples/tree/master/spring-boot-init-method)  2018.9.18
