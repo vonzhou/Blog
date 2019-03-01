@@ -454,7 +454,13 @@ mkdir -p /path/to/dir
 
 -p: 父目录不存在则会创建
 
+## chattr
 
+设置一个目录用户不能删除，`-a` 可以取消这个权限保护。
+
+```
+sudo chattr +a /home/user1/protected
+```
 
 
 
