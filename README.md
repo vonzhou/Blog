@@ -38,6 +38,7 @@
 
 ## Kafka
 
+* [记一次使用KafkaProducer引发的Full GC问题](https://github.com/vonzhou/learning-java/tree/master/src/framework/kafka/producerfullgc)    2019.3.1
 * [大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题](https://github.com/vonzhou/learning-java/blob/master/src/framework/kafka/rebalancejitter/README.md) 2019.1.30
 * [Kafka源码阅读环境搭建](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-source-begin.md)  2018.11.7
 * [Kafka中的2种日志清理策略](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/kafka-cleanup-policy.md) 2018.914
