@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>JDK源码 on 编程之路</title>
+    <link>http://vonzhou.com/tags/jdk%E6%BA%90%E7%A0%81/</link>
+    <description>Recent content in JDK源码 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 19 Dec 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/jdk%E6%BA%90%E7%A0%81/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>IntegerCache源码阅读</title>
+      <link>http://vonzhou.com/2018/integercache/</link>
+      <pubDate>Wed, 19 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/integercache/</guid>
+      <description>先从一个思考题开始，考虑下面的代码输出是什么？
+*例1*：
+public static void test1() { Integer a = 1; // 等价于 Integer a = valueOf(1) Integer b = 1; System.out.println(a == b); Integer c = 128; Integer d = 128; System.out.println(c == d); System.out.println(c.equals(d)); }  输出：
+true false true  把整数常量赋值给整数包装类型，实际上调用了Integer.valueOf方法，通过指令可以看到：
+public static Integer valueOf(int i) { if (i &amp;gt;= IntegerCache.low &amp;amp;&amp;amp; i &amp;lt;= IntegerCache.high) return IntegerCache.cache[i + (-IntegerCache.low)]; return new Integer(i); }  初次访问IntegerCache类，会触发其初始化。
+private static class IntegerCache { static final int low = -128; static final int high; static final Integer cache[]; static { // high value may be configured by property int h = 127; String integerCacheHighPropValue = sun.</description>
+    </item>
+    
+  </channel>
+</rss>

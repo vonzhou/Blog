@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kafka on 编程之路</title>
+    <link>http://vonzhou.com/categories/kafka/</link>
+    <description>Recent content in Kafka on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 01 Mar 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/categories/kafka/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>记一次使用KafkaProducer引发的Full GC问题</title>
+      <link>http://vonzhou.com/2019/kafka-producer-fullgc-story/</link>
+      <pubDate>Fri, 01 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/kafka-producer-fullgc-story/</guid>
+      <description> 场景 一个模块接收数据，然后投到Kafka中，实现削峰填谷。突然有一天频繁出现Full GC问题。
+初步尝试 查看JVM的配置，发现最大堆配置的太小，推测：堆内存不足，导致频繁gc，内存不足，导致往kafka发送消息的时候阻塞，所以线程都会卡住。
+15302 com.xxxx.AppRunner -Dlog.dir=/path/to/logs -Xms1024m -Xmx1024m -XX:MaxPermSize=256m -verbose:gc -XX:+PrintGCDetails  调整堆大小配置后，Full GC 问题并没有得到缓解。
+MAT分析 heap dump出现使用MAT分析。
+这里的大对象都是我们发送的批量消息对象，推测：是不是batch.size设置的过大？（设置的是40MB）
+解决方法 调小batch.size，设置为20MB：
+props.put(&amp;quot;buffer.memory&amp;quot;, 100 * 1024 * 1024); // 批量发送的字节大小， 20MB props.put(&amp;quot;batch.size&amp;quot;, 2 * 10 * 1024 * 1024);  最终问题得以解决，连Minor GC也很少了：
+KafkaProducer消息发送过程 KafkaProducer发送消息的过程是：消息追加到一个内部的队列中，有一个异步线程负责从中取出，将消息发送给Broker。
+在了解kafka消息发送过程的基础上，通过MAT大对象图还可以看到：
+ buffer.memory配置的是客户端发送消息时BufferPool的内存大小，至少要比batch.size大，否则连一个RecordBatch也放不进去。 实际占用的内存可能是buffer.memory的好几倍（4~5倍？），流转多个环节，底层存储都是ByteBuffer  </description>
+    </item>
+    
+    <item>
+      <title>大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题</title>
+      <link>http://vonzhou.com/2019/kafka-consumer-rebalance-jitter/</link>
+      <pubDate>Wed, 30 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/kafka-consumer-rebalance-jitter/</guid>
+      <description>场景 使用spring-kafka，Listener方法中把收到的消息投递到Disruptor队列中，然后Disruptor单Consumer把消息插入到DB中。
+采用的手动ACK。
+严重问题的出现 新版本发布之时，接到大量的报警异常，Consumer不停的进行Rebalance，不停的进行分区重分配，offset提交失败。
+2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] ERROR o.a.k.c.c.i.ConsumerCoordinator.handle 550 - Error UNKNOWN_MEMBER_ID occurred while committing offsets for group xxxxx_group 2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] ERROR o.a.k.c.c.i.ConsumerCoordinator.onJoinPrepare 254 - User provided listener org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer$1 failed on partition revocation: org.apache.kafka.clients.consumer.CommitFailedException: Commit cannot be completed due to group rebalance at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:552) at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:493) at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:665) at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:644) at org.apache.kafka.clients.consumer.internals.RequestFuture$1.onSuccess(RequestFuture.java:167) at org.apache.kafka.clients.consumer.internals.RequestFuture.fireSuccess(RequestFuture.java:133) at org.apache.kafka.clients.consumer.internals.RequestFuture.complete(RequestFuture.java:107) at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient$RequestFutureCompletionHandler.onComplete(ConsumerNetworkClient.java:380) at org.apache.kafka.clients.NetworkClient.poll(NetworkClient.java:274) at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.clientPoll(ConsumerNetworkClient.java:320) at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:213) at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:193) at org.</description>
+    </item>
+    
+    <item>
+      <title>Kafka源码阅读环境搭建</title>
+      <link>http://vonzhou.com/2018/kafka-source-begin/</link>
+      <pubDate>Wed, 07 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/kafka-source-begin/</guid>
+      <description>记录Kafka源码阅读环境的搭建过程。
+序 在大数据系统中Kafka应用广泛，借助源码阅读可以加深对组件的理解，同时可以拾起Scala语言。
+安装依赖软件  JDK Scala Gradle  构建IDEA工程 在源码目录下运行 gradle idea。
+遇到的问题：
+* What went wrong: A problem occurred evaluating root project &#39;kafka-0.10.0.1-src&#39;. &amp;gt; Failed to apply plugin [class &#39;org.gradle.api.plugins.scala.ScalaBasePlugin&#39;] &amp;gt; No such property: useAnt for class: org.gradle.api.tasks.scala.ScalaCompileOptions  需要在build.gradle开头加入：
+ScalaCompileOptions.metaClass.daemonServer = true ScalaCompileOptions.metaClass.fork = true ScalaCompileOptions.metaClass.useAnt = false ScalaCompileOptions.metaClass.useCompileDaemon = false  然后构建完成。
+打开工程 然后用IDEA打开工程，kafka server的启动类是 kafka.Kafka，启动时需要指定配置文件 config/server.properties。
+这里我修改了日志路径和ZK的地址。
+log.dirs=D:\\dev\\kafka-logs zookeeper.connect=ubuntu:2181  配置启动选项，指定server.properties配置文件。
+运行后可以看到kafka成功启动的日志：
+[2018-11-07 14:17:20,673] INFO Initiating client connection, connectString=ubuntu:2181 sessionTimeout=6000 watcher=org.</description>
+    </item>
+    
+    <item>
+      <title>Kafka中的2种日志清理策略</title>
+      <link>http://vonzhou.com/2018/kafka-cleanup-policy/</link>
+      <pubDate>Fri, 14 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/kafka-cleanup-policy/</guid>
+      <description>初体验Kafka中的两种日志清理策略：log compaction和delete。
+序 Kafka是一个基于日志的流处理平台，一个topic可以有多个分区（partition），分区是复制的基本单元，在单节点上，一个分区的数据文件可以存储在多个磁盘目录中，配置项是：
+# A comma separated list of directories under which to store log files log.dirs=/home/storm/dev/kafka-logs  每个分区的日志文件存储的时候又会分成一个个的segment，默认日志段（segment）的大小是1GB，segment是日志清理的基本单元，当前正在使用的segment是不会被清理的。
+# The maximum size of a log segment file. When this size is reached a new log segment will be created. log.segment.bytes=1073741824  日志清理 Kafka Broker 的日志清理功能在配置 log.cleaner.enable=true 后会开启一些清理线程，执行定时清理任务。在kafka 0.9.0之后 log.cleaner.enable 默认是true。 支持的清理策略（log.cleanup.policy）有2种：delete和compact，默认是delete。
+compact 清理策略（log compaction） log compaction 实现的是一个topic的一个分区中，只保留最近的某个key对应的value，如果要删除某个消息可以发送一个墓碑消息（tomestone）：(key, null)。为了展示这个过程，修改 Broker 的配置：把segment的大小调小点，清理策略改为 compact。
+# 25KB log.segment.bytes=25600 log.cleanup.policy=compact  批量发送一些带有key的消息。</description>
+    </item>
+    
+  </channel>
+</rss>

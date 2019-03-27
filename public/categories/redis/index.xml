@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Redis on 编程之路</title>
+    <link>http://vonzhou.com/categories/redis/</link>
+    <description>Recent content in Redis on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/categories/redis/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Redis中键的过期删除策略</title>
+      <link>http://vonzhou.com/2018/redis-expire/</link>
+      <pubDate>Sun, 09 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/redis-expire/</guid>
+      <description>Redis处理过期key的策略有定期删除和惰性删除。
+使用Redis时我们可以使用EXPIRE或EXPIREAT命令给key设置过期删除时间，结构体redisDb中的expires字典保存了所有key的过期时间，这个字典（dict）的key是一个指针，指向redis中的某个key对象，过期字典的value是一个保存过期时间的整数。
+/* Redis database representation. There are multiple databases identified * by integers from 0 (the default database) up to the max configured * database. The database number is the &#39;id&#39; field in the structure. */ typedef struct redisDb { dict *dict; /* The keyspace for this DB */ dict *expires; /* 过期字典*/ dict *blocking_keys; /* Keys with clients waiting for data (BLPOP) */ dict *ready_keys; /* Blocked keys that received a PUSH */ dict *watched_keys; /* WATCHED keys for MULTI/EXEC CAS */ struct evictionPoolEntry *eviction_pool; /* Eviction pool of keys */ int id; /* Database ID */ long long avg_ttl; /* Average TTL, just for stats */ } redisDb;  设置过期时间 不论是EXPIRE，EXPIREAT，还是PEXPIRE，PEXPIREAT，底层的具体实现是一样的。在Redis的key空间中找到要设置过期时间的这个key，然后将这个entry（key的指针，过期时间）加入到过期字典中。</description>
+    </item>
+    
+  </channel>
+</rss>

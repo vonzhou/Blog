@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/make-arraylist-thread-safe/" />
+  <link rel="next" href="http://vonzhou.com/2018/kafka-cleanup-policy/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/redis-expire/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Redis中键的过期删除策略 | 编程之路
+       
+  </title>
+  <meta name="title" content="Redis中键的过期删除策略 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Redis中键的过期删除策略",
+    "headline" : "Redis中键的过期删除策略",
+    "description" : "Redis处理过期key的策略有定期删除和惰性删除。
+使用Redis时我们可以使用EXPIRE或EXPIREAT命令给key设置过期删除时间，结构体redisDb中的expires字典保存了所有key的过期时间，这个字典（dict）的key是一个指针，指向redis中的某个key对象，过期字典的value是一个保存过期时间的整数。
+/* Redis database representation. There are multiple databases identified * by integers from 0 (the default database) up to the max configured * database. The database number is the 'id' field in the structure. */ typedef struct redisDb { dict *dict; /* The keyspace for this DB */ dict *expires; /* 过期字典*/ dict *blocking_keys; /* Keys with clients waiting for data (BLPOP) */ dict *ready_keys; /* Blocked keys that received a PUSH */ dict *watched_keys; /* WATCHED keys for MULTI/EXEC CAS */ struct evictionPoolEntry *eviction_pool; /* Eviction pool of keys */ int id; /* Database ID */ long long avg_ttl; /* Average TTL, just for stats */ } redisDb;  设置过期时间 不论是EXPIRE，EXPIREAT，还是PEXPIRE，PEXPIREAT，底层的具体实现是一样的。在Redis的key空间中找到要设置过期时间的这个key，然后将这个entry（key的指针，过期时间）加入到过期字典中。",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-09-09 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-09-09 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/redis-expire/",
+    "wordCount" : "550",
+    "keywords" : [ "Redis", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Redis中键的过期删除策略</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-09-09 itemprop="datePublished">September 9, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/redis/"> Redis </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>Redis处理过期key的策略有定期删除和惰性删除。</p>
+
+<p>使用Redis时我们可以使用<code>EXPIRE</code>或<code>EXPIREAT</code>命令给key设置过期删除时间，结构体<code>redisDb</code>中的<code>expires</code>字典保存了所有key的过期时间，这个字典（dict）的key是一个指针，指向redis中的某个key对象，过期字典的value是一个保存过期时间的整数。</p>
+
+<pre><code class="language-c">/* Redis database representation. There are multiple databases identified
+ * by integers from 0 (the default database) up to the max configured
+ * database. The database number is the 'id' field in the structure. */
+typedef struct redisDb {
+    dict *dict;                 /* The keyspace for this DB */
+    dict *expires;              /* 过期字典*/
+    dict *blocking_keys;        /* Keys with clients waiting for data (BLPOP) */
+    dict *ready_keys;           /* Blocked keys that received a PUSH */
+    dict *watched_keys;         /* WATCHED keys for MULTI/EXEC CAS */
+    struct evictionPoolEntry *eviction_pool;    /* Eviction pool of keys */
+    int id;                     /* Database ID */
+    long long avg_ttl;          /* Average TTL, just for stats */
+} redisDb;
+</code></pre>
+
+<h2 id="设置过期时间">设置过期时间</h2>
+
+<p>不论是<code>EXPIRE，EXPIREAT</code>，还是<code>PEXPIRE，PEXPIREAT</code>，底层的具体实现是一样的。在Redis的key空间中找到要设置过期时间的这个key，然后将这个entry（key的指针，过期时间）加入到过期字典中。</p>
+
+<pre><code class="language-c">void setExpire(redisDb *db, robj *key, long long when) {
+    dictEntry *kde, *de;
+
+    /* Reuse the sds from the main dict in the expire dict */
+    kde = dictFind(db-&gt;dict,key-&gt;ptr);
+    redisAssertWithInfo(NULL,key,kde != NULL);
+    de = dictReplaceRaw(db-&gt;expires,dictGetKey(kde));
+    dictSetSignedIntegerVal(de,when);
+}
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/redis-expire-1.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<h2 id="过期删除策略">过期删除策略</h2>
+
+<p>如果一个key过期了，何时会被删除呢？在Redis中有两种过期删除策略：（1）惰性过期删除；（2）定期删除。接下来具体看看。</p>
+
+<h2 id="惰性过期删除">惰性过期删除</h2>
+
+<p>Redis在执行任何读写命令时都会先找到这个key，惰性删除就作为一个切入点放在查找key之前，如果key过期了就删除这个key。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/redis-expire-2.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<pre><code class="language-c">robj *lookupKeyRead(redisDb *db, robj *key) {
+    robj *val;
+
+    expireIfNeeded(db,key); // 切入点
+    val = lookupKey(db,key);
+    if (val == NULL)
+        server.stat_keyspace_misses++;
+    else
+        server.stat_keyspace_hits++;
+    return val;
+}
+</code></pre>
+
+<h2 id="定期删除">定期删除</h2>
+
+<p>key的定期删除会在Redis的周期性执行任务（serverCron，默认每100ms执行一次）中进行，而且是发生Redis的master节点，因为slave节点会通过主节点的DEL命令同步过来达到删除key的目的。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/redis-expire-3.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>依次遍历每个db（默认配置数是16），针对每个db，每次循环随机选择20个（ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP）key判断是否过期，如果一轮所选的key少于25%过期，则终止迭次，此外在迭代过程中如果超过了一定的时间限制则终止过期删除这一过程。</p>
+
+<pre><code class="language-c">for (j = 0; j &lt; dbs_per_call; j++) {
+    int expired;
+    redisDb *db = server.db+(current_db % server.dbnum);
+
+    /* Increment the DB now so we are sure if we run out of time
+     * in the current DB we'll restart from the next. This allows to
+     * distribute the time evenly across DBs. */
+    current_db++;
+
+    /* Continue to expire if at the end of the cycle more than 25%
+     * of the keys were expired. */
+    do {
+        unsigned long num, slots;
+        long long now, ttl_sum;
+        int ttl_samples;
+
+        /* 如果该db没有设置过期key，则继续看下个db*/
+        if ((num = dictSize(db-&gt;expires)) == 0) {
+            db-&gt;avg_ttl = 0;
+            break;
+        }
+        slots = dictSlots(db-&gt;expires);
+        now = mstime();
+
+        /* When there are less than 1% filled slots getting random
+         * keys is expensive, so stop here waiting for better times...
+         * The dictionary will be resized asap. */
+        if (num &amp;&amp; slots &gt; DICT_HT_INITIAL_SIZE &amp;&amp;
+            (num*100/slots &lt; 1)) break;
+
+        /* The main collection cycle. Sample random keys among keys
+         * with an expire set, checking for expired ones. */
+        expired = 0;
+        ttl_sum = 0;
+        ttl_samples = 0;
+
+        if (num &gt; ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP)
+            num = ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP;// 20
+
+        while (num--) {
+            dictEntry *de;
+            long long ttl;
+
+            if ((de = dictGetRandomKey(db-&gt;expires)) == NULL) break;
+            ttl = dictGetSignedIntegerVal(de)-now;
+            if (activeExpireCycleTryExpire(db,de,now)) expired++;
+            if (ttl &gt; 0) {
+                /* We want the average TTL of keys yet not expired. */
+                ttl_sum += ttl;
+                ttl_samples++;
+            }
+        }
+
+        /* Update the average TTL stats for this database. */
+        if (ttl_samples) {
+            long long avg_ttl = ttl_sum/ttl_samples;
+
+            /* Do a simple running average with a few samples.
+             * We just use the current estimate with a weight of 2%
+             * and the previous estimate with a weight of 98%. */
+            if (db-&gt;avg_ttl == 0) db-&gt;avg_ttl = avg_ttl;
+            db-&gt;avg_ttl = (db-&gt;avg_ttl/50)*49 + (avg_ttl/50);
+        }
+
+        /* We can't block forever here even if there are many keys to
+         * expire. So after a given amount of milliseconds return to the
+         * caller waiting for the other active expire cycle. */
+        iteration++;
+        if ((iteration &amp; 0xf) == 0) { /* 每迭代16次检查一次 */
+            long long elapsed = ustime()-start;
+
+            latencyAddSampleIfNeeded(&quot;expire-cycle&quot;,elapsed/1000);
+            if (elapsed &gt; timelimit) timelimit_exit = 1;
+        }
+        // 超过时间限制则退出
+        if (timelimit_exit) return;
+        /* 在当前db中，如果少于25%的key过期，则停止继续删除过期key */
+    } while (expired &gt; ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP/4);
+}
+</code></pre>
+
+<h2 id="总结">总结</h2>
+
+<ul>
+<li>惰性删除：读写之前判断key是否过期</li>
+<li>定期删除：定期抽样key，判断是否过期</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/redis-expire/>http://vonzhou.com/2018/redis-expire/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/redis/">
+                    #Redis</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/make-arraylist-thread-safe/" class="prev" rel="prev" title="如何保证ArrayList在多线程环境下的线程安全性"><i class="iconfont icon-left"></i>&nbsp;如何保证ArrayList在多线程环境下的线程安全性</a>
+         
+        
+        <a href="http://vonzhou.com/2018/kafka-cleanup-policy/" class="next" rel="next" title="Kafka中的2种日志清理策略">Kafka中的2种日志清理策略&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

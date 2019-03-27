@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>InnoDB on 编程之路</title>
+    <link>http://vonzhou.com/tags/innodb/</link>
+    <description>Recent content in InnoDB on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 16 Feb 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/innodb/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>InnoDB 行锁的实现</title>
+      <link>http://vonzhou.com/2019/innodb-row-lock/</link>
+      <pubDate>Sat, 16 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/innodb-row-lock/</guid>
+      <description>InnoDB 实现行锁（row lock）的3种算法：
+ Record Lock：单行记录上锁 Gap Lock：间隙锁，锁定一个范围，不包括记录本身 Next-key Lock：等价于Gap Lock + Record Lock，即锁定一个范围同时锁定记录本身，为了解决Phantom Problem。  行加锁过程 InnoDB的行锁其实是索引记录锁，InnoDB存储引擎下每个表有一个主键（聚集索引），辅助索引中包含主键，根据查询使用的索引不同加锁也不同。
+ 通过主键加锁，仅对聚集索引记录进行加锁，Record Lock 通过辅助索引进行加锁，需要先对辅助索引加锁 Gap Lock，再对聚集索引加锁 Record Lock 当辅助索引是唯一索引的时候，Next-key Lock会降级为 Record Lock  实例 唯一索引行锁定 create table t (a int primary key); insert into t values(1),(2),(5);  会话A会对a=5的行进行X锁定，由于a是主键且唯一，所以只会对这一行进行锁定，所以在会话B中插入a=4不会阻塞。
+辅助索引行锁定 create table t2 (a int, b int, primary key(a), key(b)); insert into t2 values(1,1),(3,1),(5,3),(7,6),(10,8);  会话A对a=5的聚簇索引行加了Record Lock，所以会话B会阻塞。
+会话A不仅对a=5的聚簇索引行加了Record Lock，也会对辅助索引加 Next-Key Lock，锁定的范围是 (1,3],(3,6)。</description>
+    </item>
+    
+  </channel>
+</rss>

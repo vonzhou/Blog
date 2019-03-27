@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2016/2016-read-book/" />
+  <link rel="next" href="http://vonzhou.com/2017/java-watchservice/" />
+  <link rel="canonical" href="http://vonzhou.com/2017/spring-exception-handler/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           ExceptionHandler 异常处理过程分析 | 编程之路
+       
+  </title>
+  <meta name="title" content="ExceptionHandler 异常处理过程分析 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "ExceptionHandler 异常处理过程分析",
+    "headline" : "ExceptionHandler 异常处理过程分析",
+    "description" : "ExceptionHandler 的使用场景就是在 Controller 中捕获异常，全局统一处理，而不是在每个 handler 中都进行繁琐的异常捕获操作，优点就是代码整洁。
+ExceptionHandler 异常处理过程大体为：执行 handler 方法如果抛出了异常，就根据异常类型查找到对应的异常处理方法，然后执行对应的方法，上图展示了这一过程。下面列出异常处理方法解析的过程。
+getExceptionHandlerMethod 根据特定的异常找到匹配的 @ExceptionHandler 方法，这里只关注在 Controller 查找有 ExceptionHandler 方法的路径，先忽略 ControllerAdvice 的情况。通过如下代码可以看到，对于每一个 handler 都有一个异常处理器缓存（exceptionHandlerCache），局部性原理。初次会进行 ExceptionHandlerMethodResolver 的构造，获取到 ExceptionHandlerMethodResolver 之后，根据异常获取到响应的方法，包装成一个 InvocableHandlerMethod 返回。
+protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) { Class&lt;?&gt; handlerType = (handlerMethod != null ? handlerMethod.getBeanType() : null); if (handlerMethod != null) { ExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache.get(handlerType); // 关键点1 if (resolver == null) { resolver = new ExceptionHandlerMethodResolver(handlerType); // 关键点2 this.exceptionHandlerCache.put(handlerType, resolver); } Method method = resolver.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2017",
+    "datePublished": "2017-08-10 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2017-08-10 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2017/spring-exception-handler/",
+    "wordCount" : "404",
+    "keywords" : [ "Spring","Spring MVC", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">ExceptionHandler 异常处理过程分析</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2017-08-10 itemprop="datePublished">August 10, 2017</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/spring/"> Spring </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p><code>ExceptionHandler</code> 的使用场景就是在 Controller 中捕获异常，全局统一处理，而不是在每个 handler 中都进行繁琐的异常捕获操作，优点就是代码整洁。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-exception-handler.jpg" alt="执行流程" class="lazyload"><figcaption class="image-caption">执行流程</figcaption></figure></p>
+
+<p>ExceptionHandler 异常处理过程大体为：执行 handler 方法如果抛出了异常，就根据异常类型查找到对应的异常处理方法，然后执行对应的方法，上图展示了这一过程。下面列出异常处理方法解析的过程。</p>
+
+<p><code>getExceptionHandlerMethod</code> 根据特定的异常找到匹配的 <code>@ExceptionHandler</code> 方法，这里只关注在 Controller 查找有 ExceptionHandler 方法的路径，先忽略 ControllerAdvice 的情况。通过如下代码可以看到，对于每一个 handler 都有一个异常处理器缓存（exceptionHandlerCache），局部性原理。初次会进行 ExceptionHandlerMethodResolver 的构造，获取到 ExceptionHandlerMethodResolver 之后，根据异常获取到响应的方法，包装成一个 InvocableHandlerMethod 返回。</p>
+
+<pre><code class="language-java">protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) {
+    Class&lt;?&gt; handlerType = (handlerMethod != null ? handlerMethod.getBeanType() : null);
+
+    if (handlerMethod != null) {
+        ExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache.get(handlerType); // 关键点1
+        if (resolver == null) {
+            resolver = new ExceptionHandlerMethodResolver(handlerType); // 关键点2
+            this.exceptionHandlerCache.put(handlerType, resolver);
+        }
+        Method method = resolver.resolveMethod(exception); // 关键点3
+        if (method != null) {
+            return new ServletInvocableHandlerMethod(handlerMethod.getBean(), method);
+        }
+    }
+    // 忽略 ....
+    for (Entry&lt;ControllerAdviceBean, ExceptionHandlerMethodResolver&gt; entry : this.exceptionHandlerAdviceCache.entrySet()) {
+        if (entry.getKey().isApplicableToBeanType(handlerType)) {
+            ExceptionHandlerMethodResolver resolver = entry.getValue();
+            Method method = resolver.resolveMethod(exception);
+            if (method != null) {
+                return new ServletInvocableHandlerMethod(entry.getKey().resolveBean(), method);
+            }
+        }
+    }
+
+    return null;
+}
+</code></pre>
+
+<h2 id="exceptionhandlermethodresolver-构造">ExceptionHandlerMethodResolver 构造</h2>
+
+<p>在 ExceptionHandlerMethodResolver 构造函数中会解析有 ExceptionHandler 注解的方法，然后放置到缓存中，便于根据异常类型获取对应的处理方法。具体地，先看 ExceptionHandler 注解的 value 值，如果没有的话就看异常处理方法的参数中是否有表示异常类型的参数，这样就可以确定这个异常处理方法可以处理哪些异常类型。后续在出现具体异常的时候就可以根据异常类型直接查找这个映射表。</p>
+
+<pre><code class="language-java">private final Map&lt;Class&lt;? extends Throwable&gt;, Method&gt; mappedMethods =
+            new ConcurrentHashMap&lt;Class&lt;? extends Throwable&gt;, Method&gt;(16);
+            
+
+public ExceptionHandlerMethodResolver(Class&lt;?&gt; handlerType) {
+    for (Method method : MethodIntrospector.selectMethods(handlerType, EXCEPTION_HANDLER_METHODS)) {
+        for (Class&lt;? extends Throwable&gt; exceptionType : detectExceptionMappings(method)) {
+            addExceptionMapping(exceptionType, method);  // 保存到map中
+        }
+    }
+}
+
+// 确定这个异常处理方法可以处理哪些异常类型
+private List&lt;Class&lt;? extends Throwable&gt;&gt; detectExceptionMappings(Method method) {
+    List&lt;Class&lt;? extends Throwable&gt;&gt; result = new ArrayList&lt;Class&lt;? extends Throwable&gt;&gt;();
+    detectAnnotationExceptionMappings(method, result);  // 关键点1
+    if (result.isEmpty()) {
+        for (Class&lt;?&gt; paramType : method.getParameterTypes()) {  // 关键点2
+            if (Throwable.class.isAssignableFrom(paramType)) {
+                result.add((Class&lt;? extends Throwable&gt;) paramType);
+            }
+        }
+    }
+    Assert.notEmpty(result, &quot;No exception types mapped to {&quot; + method + &quot;}&quot;);
+    return result;
+}
+
+protected void detectAnnotationExceptionMappings(Method method, List&lt;Class&lt;? extends Throwable&gt;&gt; result) {
+    ExceptionHandler ann = AnnotationUtils.findAnnotation(method, ExceptionHandler.class); // 寻找 ExceptionHandler 注解并返回
+    result.addAll(Arrays.asList(ann.value()));  // ExceptionHandler 的 value 表示的是要处理的异常类型
+}
+
+// 有 @ExceptionHandler 注解的方法过滤器
+public static final MethodFilter EXCEPTION_HANDLER_METHODS = new MethodFilter() {
+    @Override
+    public boolean matches(Method method) {
+        return (AnnotationUtils.findAnnotation(method, ExceptionHandler.class) != null);
+    }
+};
+</code></pre>
+
+<h2 id="确定异常的处理方法">确定异常的处理方法</h2>
+
+<p>可以看到最终是从上述解析到的 mappedMethods 中查找，并且维护一个本地缓存。</p>
+
+<pre><code class="language-java">public Method resolveMethod(Exception exception) {
+    Method method = resolveMethodByExceptionType(exception.getClass());
+    if (method == null) {
+        Throwable cause = exception.getCause();
+        if (cause != null) {
+            method = resolveMethodByExceptionType(cause.getClass());
+        }
+    }
+    return method;
+}
+
+public Method resolveMethodByExceptionType(Class&lt;? extends Throwable&gt; exceptionType) {
+    Method method = this.exceptionLookupCache.get(exceptionType);
+    if (method == null) {
+        method = getMappedMethod(exceptionType);
+        this.exceptionLookupCache.put(exceptionType, (method != null ? method : NO_METHOD_FOUND)); // 缓存
+    }
+    return (method != NO_METHOD_FOUND ? method : null);
+}
+
+private Method getMappedMethod(Class&lt;? extends Throwable&gt; exceptionType) {
+    List&lt;Class&lt;? extends Throwable&gt;&gt; matches = new ArrayList&lt;Class&lt;? extends Throwable&gt;&gt;();
+    for (Class&lt;? extends Throwable&gt; mappedException : this.mappedMethods.keySet()) { // 最终查找
+        if (mappedException.isAssignableFrom(exceptionType)) {
+            matches.add(mappedException);
+        }
+    }
+    if (!matches.isEmpty()) {
+        Collections.sort(matches, new ExceptionDepthComparator(exceptionType));  // 有多个则排序
+        return this.mappedMethods.get(matches.get(0));
+    }
+    else {
+        return null;
+    }
+}
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2017/spring-exception-handler/>http://vonzhou.com/2017/spring-exception-handler/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring-mvc/">
+                    #Spring MVC</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2016/2016-read-book/" class="prev" rel="prev" title="2016阅读书单"><i class="iconfont icon-left"></i>&nbsp;2016阅读书单</a>
+         
+        
+        <a href="http://vonzhou.com/2017/java-watchservice/" class="next" rel="next" title="使用WatchService监控文件变化">使用WatchService监控文件变化&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

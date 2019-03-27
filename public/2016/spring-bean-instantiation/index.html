@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2016/spring-bean-parse/" />
+  <link rel="next" href="http://vonzhou.com/2016/2016-read-book/" />
+  <link rel="canonical" href="http://vonzhou.com/2016/spring-bean-instantiation/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Spring源码阅读 - bean实例化浅析 | 编程之路
+       
+  </title>
+  <meta name="title" content="Spring源码阅读 - bean实例化浅析 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Spring源码阅读 - bean实例化浅析",
+    "headline" : "Spring源码阅读 - bean实例化浅析",
+    "description" : "继续！
+开始 承上，我们知道XmlBeanFactory继承自AbstractBeanFactory，AbstractBeanFactory实现了BeanFactory接口，完成根据bean的name获取对象的工作。doGetBean 代码很长，我们慢慢分析，不清楚的地方就debug一下，刚开始我们就着眼于最常见的情况，最简单的情况，复杂的情况只不过加了很多额外的控制判断。
+public Object getBean(String name) throws BeansException { return doGetBean(name, null, null, false); } protected &lt;T&gt; T doGetBean( final String name, final Class&lt;T&gt; requiredType, final Object[] args, boolean typeCheckOnly) throws BeansException { final String beanName = transformedBeanName(name); Object bean; // Eagerly check singleton cache for manually registered singletons. // 先检查单例的缓存有没有我们需要的对象实例 -- （1） Object sharedInstance = getSingleton(beanName); if (sharedInstance != null &amp;&amp; args == null) { if (logger.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2016",
+    "datePublished": "2016-09-02 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2016-09-02 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2016/spring-bean-instantiation/",
+    "wordCount" : "1639",
+    "keywords" : [ "Spring","单例模式", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Spring源码阅读 - bean实例化浅析</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2016-09-02 itemprop="datePublished">September 2, 2016</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/spring/"> Spring </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>继续！</p>
+
+<h2 id="开始">开始</h2>
+
+<p>承上，我们知道XmlBeanFactory继承自AbstractBeanFactory，AbstractBeanFactory实现了BeanFactory接口，完成根据bean的name获取对象的工作。doGetBean 代码很长，我们慢慢分析，不清楚的地方就debug一下，刚开始我们就着眼于最常见的情况，最简单的情况，复杂的情况只不过加了很多额外的控制判断。</p>
+
+<pre><code class="language-java">public Object getBean(String name) throws BeansException {
+        return doGetBean(name, null, null, false);
+    }
+protected &lt;T&gt; T doGetBean(
+            final String name, final Class&lt;T&gt; requiredType, final Object[] args, boolean typeCheckOnly)
+            throws BeansException {
+
+               final String beanName = transformedBeanName(name);
+        Object bean;
+
+        // Eagerly check singleton cache for manually registered singletons.
+        // 先检查单例的缓存有没有我们需要的对象实例  --  （1）
+        Object sharedInstance = getSingleton(beanName);
+        if (sharedInstance != null &amp;&amp; args == null) {
+            if (logger.isDebugEnabled()) {
+                if (isSingletonCurrentlyInCreation(beanName)) {
+                    logger.debug(&quot;Returning eagerly cached instance of singleton bean '&quot; + beanName +
+                            &quot;' that is not fully initialized yet - a consequence of a circular reference&quot;);
+                }
+                else {
+                    logger.debug(&quot;Returning cached instance of singleton bean '&quot; + beanName + &quot;'&quot;);
+                }
+            }
+            // 缓存命中
+            bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
+        }
+
+        else {
+            // Fail if we're already creating this bean instance:
+            // We're assumably within a circular reference.  循环引用问题的处理
+            if (isPrototypeCurrentlyInCreation(beanName)) {
+                throw new BeanCurrentlyInCreationException(beanName);
+            }
+
+            // Check if bean definition exists in this factory.
+            BeanFactory parentBeanFactory = getParentBeanFactory();
+            if (parentBeanFactory != null &amp;&amp; !containsBeanDefinition(beanName)) {
+                // Not found -&gt; check parent.
+                String nameToLookup = originalBeanName(name);
+                if (args != null) {
+                    // Delegation to parent with explicit args.
+                    return (T) parentBeanFactory.getBean(nameToLookup, args);
+                }
+                else {
+                    // No args -&gt; delegate to standard getBean method.
+                    return parentBeanFactory.getBean(nameToLookup, requiredType);
+                }
+            }
+
+            if (!typeCheckOnly) {
+                markBeanAsCreated(beanName);
+            }
+
+            final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+            checkMergedBeanDefinition(mbd, beanName, args);
+
+            // Guarantee initialization of beans that the current bean depends on.
+            String[] dependsOn = mbd.getDependsOn();
+            if (dependsOn != null) {
+                for (String dependsOnBean : dependsOn) {
+                    getBean(dependsOnBean);
+                    registerDependentBean(dependsOnBean, beanName);
+                }
+            }
+
+            // Create bean instance. 我们重点看这里 （2）
+            if (mbd.isSingleton()) {
+                sharedInstance = getSingleton(beanName, new ObjectFactory() {
+                    public Object getObject() throws BeansException {
+                        try {
+                            return createBean(beanName, mbd, args);
+                        }
+                        catch (BeansException ex) {
+                            // Explicitly remove instance from singleton cache: It might have been put there
+                            // eagerly by the creation process, to allow for circular reference resolution.
+                            // Also remove any beans that received a temporary reference to the bean.
+                            destroySingleton(beanName);
+                            throw ex;
+                        }
+                    }
+                });
+                bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
+            }
+
+            else if (mbd.isPrototype()) {
+                // It's a prototype -&gt; create a new instance.
+                Object prototypeInstance = null;
+                try {
+                    beforePrototypeCreation(beanName);
+                    prototypeInstance = createBean(beanName, mbd, args);
+                }
+                finally {
+                    afterPrototypeCreation(beanName);
+                }
+                bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
+            }
+
+            else {
+                String scopeName = mbd.getScope();
+                final Scope scope = this.scopes.get(scopeName);
+                if (scope == null) {
+                    throw new IllegalStateException(&quot;No Scope registered for scope '&quot; + scopeName + &quot;'&quot;);
+                }
+                try {
+                    Object scopedInstance = scope.get(beanName, new ObjectFactory() {
+                        public Object getObject() throws BeansException {
+                            beforePrototypeCreation(beanName);
+                            try {
+                                return createBean(beanName, mbd, args);
+                            }
+                            finally {
+                                afterPrototypeCreation(beanName);
+                            }
+                        }
+                    });
+                    bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
+                }
+                catch (IllegalStateException ex) {
+                    throw new BeanCreationException(beanName,
+                            &quot;Scope '&quot; + scopeName + &quot;' is not active for the current thread; &quot; +
+                            &quot;consider defining a scoped proxy for this bean if you intend to refer to it from a singleton&quot;,
+                            ex);
+                }
+            }
+        }
+
+        // Check if required type matches the type of the actual bean instance.
+        if (requiredType != null &amp;&amp; bean != null &amp;&amp; !requiredType.isAssignableFrom(bean.getClass())) {
+            throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+        }
+        return (T) bean;
+    }
+</code></pre>
+
+<h2 id="根据bean-name获得单例">根据bean name获得单例</h2>
+
+<p>假如“foo”这个bean是初次获取，那么显然不会命中缓存，而且我们简单例子中foo没有parentBeanFactory，接着往下看，markBeanAsCreated将当前正在创建的bean放到一个Set中，bean工厂缓存优化会用到，然后得到一个合并后的 root bean definition，暂时理解RootBeanDefinition是运行时关于bean definition的统一视图，细节先略过。</p>
+
+<p>接下来根据这个 merged bean definition （就理解为一个BeanDefinition）创建单例（常见情况，因为bean默认就是），我们重点学习下这里的getSingleton方法，学习这种技巧，先查缓存，因为说不定当你在苦苦创建这个对象的时候，其他线程已经创建了，当缓存不存在时再根据传入的ObjectFactory创建实例，使得这个方法具有很强的通用性。</p>
+
+<pre><code class="language-java">public Object getSingleton(String beanName, ObjectFactory singletonFactory) {
+        Assert.notNull(beanName, &quot;'beanName' must not be null&quot;);
+        synchronized (this.singletonObjects) {
+            Object singletonObject = this.singletonObjects.get(beanName);
+            if (singletonObject == null) {
+                if (this.singletonsCurrentlyInDestruction) {
+                    throw new BeanCreationNotAllowedException(beanName,
+                            &quot;Singleton bean creation not allowed while the singletons of this factory are in destruction &quot; +
+                            &quot;(Do not request a bean from a BeanFactory in a destroy method implementation!)&quot;);
+                }
+                if (logger.isDebugEnabled()) {
+                    logger.debug(&quot;Creating shared instance of singleton bean '&quot; + beanName + &quot;'&quot;);
+                }
+                beforeSingletonCreation(beanName);
+                boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
+                if (recordSuppressedExceptions) {
+                    this.suppressedExceptions = new LinkedHashSet&lt;Exception&gt;();
+                }
+                try {
+                    singletonObject = singletonFactory.getObject();
+                }
+                catch (BeanCreationException ex) {
+                    if (recordSuppressedExceptions) {
+                        for (Exception suppressedException : this.suppressedExceptions) {
+                            ex.addRelatedCause(suppressedException);
+                        }
+                    }
+                    throw ex;
+                }
+                finally {
+                    if (recordSuppressedExceptions) {
+                        this.suppressedExceptions = null;
+                    }
+                    afterSingletonCreation(beanName);
+                }
+                addSingleton(beanName, singletonObject);
+            }
+            return (singletonObject != NULL_OBJECT ? singletonObject : null);
+        }
+    }
+</code></pre>
+
+<p>所以回到我们的创建单例这个主线上，createBean！这个函数声明在AbstractBeanFactory中，实现在具体的子类AbstractAutowireCapableBeanFactory中，先是解析bean class，当传入了匹配类型时，这里略过，直接看创建bean的主要部分。</p>
+
+<pre><code class="language-java">protected Object createBean(final String beanName, final RootBeanDefinition mbd, final Object[] args)
+            throws BeanCreationException {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(&quot;Creating instance of bean '&quot; + beanName + &quot;'&quot;);
+        }
+        // Make sure bean class is actually resolved at this point.
+        resolveBeanClass(mbd, beanName);
+
+        // Prepare method overrides.
+        try {
+            mbd.prepareMethodOverrides();
+        }
+        catch (BeanDefinitionValidationException ex) {
+            throw new BeanDefinitionStoreException(mbd.getResourceDescription(),
+                    beanName, &quot;Validation of method overrides failed&quot;, ex);
+        }
+
+        try {
+            // Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+            Object bean = resolveBeforeInstantiation(beanName, mbd);
+            if (bean != null) {
+                return bean;
+            }
+        }
+        catch (Throwable ex) {
+            throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                    &quot;BeanPostProcessor before instantiation of bean failed&quot;, ex);
+        }
+
+        Object beanInstance = doCreateBean(beanName, mbd, args);  // 核心
+        if (logger.isDebugEnabled()) {
+            logger.debug(&quot;Finished creating instance of bean '&quot; + beanName + &quot;'&quot;);
+        }
+        return beanInstance;
+    }
+</code></pre>
+
+<h2 id="创建bean实例">创建bean实例</h2>
+
+<p>我们离真相越来越近了，doCreateBean开始部分就是要得到一个BeanWrapper对象，顾名思义，我们最终要得到的bean实例就是由其包装，显然也有bean对应的Class对象。分别称之为 wrapper instance 和 wrapper class, 后续的所有行为都是基于这二者的。</p>
+
+<pre><code class="language-java">protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final Object[] args) {
+        // Instantiate the bean.
+        BeanWrapper instanceWrapper = null;
+        if (mbd.isSingleton()) {
+            instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
+        }
+        if (instanceWrapper == null) {
+            // 真正实现了创建对象   -- （1）
+            instanceWrapper = createBeanInstance(beanName, mbd, args);
+        }
+        final Object bean = (instanceWrapper != null ? instanceWrapper.getWrappedInstance() : null);
+        Class beanType = (instanceWrapper != null ? instanceWrapper.getWrappedClass() : null);
+
+        // Allow post-processors to modify the merged bean definition.
+        synchronized (mbd.postProcessingLock) {
+            if (!mbd.postProcessed) {
+                applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+                mbd.postProcessed = true;
+            }
+        }
+
+        // Eagerly cache singletons to be able to resolve circular references
+        // even when triggered by lifecycle interfaces like BeanFactoryAware.
+        boolean earlySingletonExposure = (mbd.isSingleton() &amp;&amp; this.allowCircularReferences &amp;&amp;
+                isSingletonCurrentlyInCreation(beanName));
+        if (earlySingletonExposure) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(&quot;Eagerly caching bean '&quot; + beanName +
+                        &quot;' to allow for resolving potential circular references&quot;);
+            }
+            addSingletonFactory(beanName, new ObjectFactory() {
+                public Object getObject() throws BeansException {
+                    return getEarlyBeanReference(beanName, mbd, bean);
+                }
+            });
+        }
+
+        // Initialize the bean instance.
+        Object exposedObject = bean;
+        try {
+            //
+            populateBean(beanName, mbd, instanceWrapper);
+            if (exposedObject != null) {
+                exposedObject = initializeBean(beanName, exposedObject, mbd);
+            }
+        }
+        catch (Throwable ex) {
+            if (ex instanceof BeanCreationException &amp;&amp; beanName.equals(((BeanCreationException) ex).getBeanName())) {
+                throw (BeanCreationException) ex;
+            }
+            else {
+                throw new BeanCreationException(mbd.getResourceDescription(), beanName, &quot;Initialization of bean failed&quot;, ex);
+            }
+        }
+
+        if (earlySingletonExposure) {
+            Object earlySingletonReference = getSingleton(beanName, false);
+            if (earlySingletonReference != null) {
+                if (exposedObject == bean) {
+                    exposedObject = earlySingletonReference;
+                }
+                else if (!this.allowRawInjectionDespiteWrapping &amp;&amp; hasDependentBean(beanName)) {
+                    String[] dependentBeans = getDependentBeans(beanName);
+                    Set&lt;String&gt; actualDependentBeans = new LinkedHashSet&lt;String&gt;(dependentBeans.length);
+                    for (String dependentBean : dependentBeans) {
+                        if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+                            actualDependentBeans.add(dependentBean);
+                        }
+                    }
+                    if (!actualDependentBeans.isEmpty()) {
+                        throw new BeanCurrentlyInCreationException(beanName,
+                                &quot;Bean with name '&quot; + beanName + &quot;' has been injected into other beans [&quot; +
+                                StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +
+                                &quot;] in its raw version as part of a circular reference, but has eventually been &quot; +
+                                &quot;wrapped. This means that said other beans do not use the final version of the &quot; +
+                                &quot;bean. This is often the result of over-eager type matching - consider using &quot; +
+                                &quot;'getBeanNamesOfType' with the 'allowEagerInit' flag turned off, for example.&quot;);
+                    }
+                }
+            }
+        }
+
+        // Register bean as disposable.
+        try {
+            registerDisposableBeanIfNecessary(beanName, bean, mbd);
+        }
+        catch (BeanDefinitionValidationException ex) {
+            throw new BeanCreationException(mbd.getResourceDescription(), beanName, &quot;Invalid destruction signature&quot;, ex);
+        }
+
+        return exposedObject;
+    }
+</code></pre>
+
+<p>上面说到创建BeanWrapper至关总要，来看看。</p>
+
+<pre><code class="language-java">protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, Object[] args) {
+        // Make sure bean class is actually resolved at this point.
+        Class beanClass = resolveBeanClass(mbd, beanName);
+
+        if (beanClass != null &amp;&amp; !Modifier.isPublic(beanClass.getModifiers()) &amp;&amp; !mbd.isNonPublicAccessAllowed()) {
+            throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                    &quot;Bean class isn't public, and non-public access not allowed: &quot; + beanClass.getName());
+        }
+
+        if (mbd.getFactoryMethodName() != null)  {
+            return instantiateUsingFactoryMethod(beanName, mbd, args);
+        }
+
+        // Shortcut when re-creating the same bean...
+        boolean resolved = false;
+        boolean autowireNecessary = false;
+        if (args == null) {
+            synchronized (mbd.constructorArgumentLock) {
+                if (mbd.resolvedConstructorOrFactoryMethod != null) {
+                    resolved = true;
+                    autowireNecessary = mbd.constructorArgumentsResolved;
+                }
+            }
+        }
+        if (resolved) {
+            if (autowireNecessary) {
+                return autowireConstructor(beanName, mbd, null, null);
+            }
+            else {
+                return instantiateBean(beanName, mbd);
+            }
+        }
+
+        // Need to determine the constructor...
+        Constructor[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
+        if (ctors != null ||
+                mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR ||
+                mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args))  {
+            return autowireConstructor(beanName, mbd, ctors, args);
+        }
+
+        // No special handling: simply use no-arg constructor.   执行这里 -- （1）
+        return instantiateBean(beanName, mbd);
+    }
+</code></pre>
+
+<h2 id="实例化策略具体实例bean">实例化策略具体实例bean</h2>
+
+<p>我们顺着主要路径跟踪下去，就看到了重点：根据实例化策略，具体实例化我们的bean。</p>
+
+<pre><code class="language-java">protected BeanWrapper instantiateBean(final String beanName, final RootBeanDefinition mbd) {
+        try {
+            Object beanInstance;
+            final BeanFactory parent = this;
+            if (System.getSecurityManager() != null) {
+                beanInstance = AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() {
+                    public Object run() {
+                        return getInstantiationStrategy().instantiate(mbd, beanName, parent);
+                    }
+                }, getAccessControlContext());
+            }
+            else {
+                // 重点  -- （1）
+                beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
+            }
+            BeanWrapper bw = new BeanWrapperImpl(beanInstance);
+            initBeanWrapper(bw);
+            return bw;
+        }
+        catch (Throwable ex) {
+            throw new BeanCreationException(mbd.getResourceDescription(), beanName, &quot;Instantiation of bean failed&quot;, ex);
+        }
+    }
+</code></pre>
+
+<h2 id="simpleinstantiationstrategy">SimpleInstantiationStrategy</h2>
+
+<p>何为实例化策略，看看InstantiationStrategy就可以大概知道了，通过debug发现这里使用的举例实例化实现位于 SimpleInstantiationStrategy。</p>
+
+<p>此时此刻你的脑海浮现了“反射”二字，得到Constructor，然后实例化，调用Constructor#newInstance方法。</p>
+
+<pre><code class="language-java">public Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner) {
+        // Don't override the class with CGLIB if no overrides.
+        if (beanDefinition.getMethodOverrides().isEmpty()) {
+            Constructor&lt;?&gt; constructorToUse;
+            synchronized (beanDefinition.constructorArgumentLock) {
+                constructorToUse = (Constructor&lt;?&gt;) beanDefinition.resolvedConstructorOrFactoryMethod;
+                if (constructorToUse == null) {
+                    final Class clazz = beanDefinition.getBeanClass();
+                    if (clazz.isInterface()) {
+                        throw new BeanInstantiationException(clazz, &quot;Specified class is an interface&quot;);
+                    }
+                    try {
+                        if (System.getSecurityManager() != null) {
+                            constructorToUse = AccessController.doPrivileged(new PrivilegedExceptionAction&lt;Constructor&gt;() {
+                                public Constructor run() throws Exception {
+                                    return clazz.getDeclaredConstructor((Class[]) null);
+                                }
+                            });
+                        }
+                        else {
+                            constructorToUse =  clazz.getDeclaredConstructor((Class[]) null);
+                        }
+                        beanDefinition.resolvedConstructorOrFactoryMethod = constructorToUse;
+                    }
+                    catch (Exception ex) {
+                        throw new BeanInstantiationException(clazz, &quot;No default constructor found&quot;, ex);
+                    }
+                }
+            }
+            return BeanUtils.instantiateClass(constructorToUse);
+        }
+        else {
+            // Must generate CGLIB subclass.
+            return instantiateWithMethodInjection(beanDefinition, beanName, owner);
+        }
+    }
+</code></pre>
+
+<h2 id="查单例缓存">查单例缓存</h2>
+
+<p>回到最开始，任何时候局部性原理都是要考虑的，时间和空间的开销都是要权衡的，这里会缓存单例对象，后面就会看到其实就是放在一个HashMap中，bean name 映射单例，下面就是查询cache的代码，值得我们学习，使用了 double-check。在看代码的过程中，多次看到这样的处理。</p>
+
+<pre><code class="language-java">protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+        Object singletonObject = this.singletonObjects.get(beanName);
+        if (singletonObject == null) {
+            synchronized (this.singletonObjects) {
+                singletonObject = this.earlySingletonObjects.get(beanName);
+                if (singletonObject == null &amp;&amp; allowEarlyReference) {
+                    ObjectFactory singletonFactory = this.singletonFactories.get(beanName);
+                    if (singletonFactory != null) {
+                        singletonObject = singletonFactory.getObject();
+                        this.earlySingletonObjects.put(beanName, singletonObject);
+                        this.singletonFactories.remove(beanName);
+                    }
+                }
+            }
+        }
+        return (singletonObject != NULL_OBJECT ? singletonObject : null);
+    }
+</code></pre>
+
+<p>成员变量earlySingletonObjects的定义是：</p>
+
+<pre><code class="language-java">/** Cache of early singleton objects: bean name --&gt; bean instance */
+private final Map&lt;String, Object&gt; earlySingletonObjects = new HashMap&lt;String, Object&gt;();
+</code></pre>
+
+<h2 id="小结">小结</h2>
+
+<ul>
+<li>每次看代码带着目的去看，不求面面俱到，从简单的case跟踪，学到自己想要的就好。</li>
+<li>学习模仿好的方法技巧。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2016/spring-bean-instantiation/>http://vonzhou.com/2016/spring-bean-instantiation/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
+                    #单例模式</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2016/spring-bean-parse/" class="prev" rel="prev" title="Spring源码阅读 - bean解析初体验"><i class="iconfont icon-left"></i>&nbsp;Spring源码阅读 - bean解析初体验</a>
+         
+        
+        <a href="http://vonzhou.com/2016/2016-read-book/" class="next" rel="next" title="2016阅读书单">2016阅读书单&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>字节码 on 编程之路</title>
+    <link>http://vonzhou.com/tags/%E5%AD%97%E8%8A%82%E7%A0%81/</link>
+    <description>Recent content in 字节码 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 27 Nov 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/%E5%AD%97%E8%8A%82%E7%A0%81/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Java字节码工具AsmTools介绍</title>
+      <link>http://vonzhou.com/2018/asmtools-intro/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/asmtools-intro/</guid>
+      <description>AsmTools是一款字节码生成工具。 包括的组件：
+ jasm：由JASM格式得到class文件 jdis：把class文件转为JASM格式 jcoder：由JCOD格式得到class文件 jdec：把class文件转为JCOD格式  两种汇编器/反汇编器（assembler/disassemblers）对应的格式有啥区别？
+ JASM specifically focuses on representing byte-code instructions in the VM format (while providing minimal description of the structure of the rest of the class file). Generally, JASM is more convenient for semantic changes, like change to instruction flow.
+JCOD provides good support for describing the structure of a class file (as well as writing incorrect bytes outside of this structure), and provides no support for specifying byte-code instructions (simply raw bytes for instructions).</description>
+    </item>
+    
+  </channel>
+</rss>

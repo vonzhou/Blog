@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2017/java-watchservice/" />
+  <link rel="next" href="http://vonzhou.com/2018/2017-read-book/" />
+  <link rel="canonical" href="http://vonzhou.com/2017/spring-two-bean-init-order-control/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Spring 中如何控制2个bean中的初始化顺序？ | 编程之路
+       
+  </title>
+  <meta name="title" content="Spring 中如何控制2个bean中的初始化顺序？ | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Spring 中如何控制2个bean中的初始化顺序？",
+    "headline" : "Spring 中如何控制2个bean中的初始化顺序？",
+    "description" : "开发过程中有这样一个场景，2个 bean 初始化逻辑中有依赖关系，需要控制二者的初始化顺序。实现方式可以有多种，本文结合目前对 Spring 的理解，尝试列出几种思路。
+场景 假设A，B两个 bean 都需要在初始化的时候从本地磁盘读取文件，其中B加载的文件，依赖A中加载的全局配置文件中配置的路径，所以需要A先于B初始化，此外A中的配置改变后也需要触发B的重新加载逻辑，所以A，B需要注入彼此。
+对于下面的模型，问题简化为：我们需要initA()先于initB()得到执行。
+@Service public class A { @Autowired private B b; public A() { System.out.println(&quot;A construct&quot;); } @PostConstruct public void init() { initA(); } private void initA() { System.out.println(&quot;A init&quot;); } } @Service public class B { @Autowired private A a; public B() { System.out.println(&quot;B construct&quot;); } @PostConstruct public void init() { initB(); } private void initB(){ System.out.println(&quot;B init&quot;); } }  方案一：立Flag 我们可以在业务层自己控制A，B的初始化顺序，在A中设置一个“是否初始化的”标记，B初始化前检测A是否得以初始化，如果没有则调用A的初始化方法，所谓的check-and-act。对于上述模型，实现如下：",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2017",
+    "datePublished": "2017-10-17 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2017-10-17 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2017/spring-two-bean-init-order-control/",
+    "wordCount" : "529",
+    "keywords" : [ "Spring", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Spring 中如何控制2个bean中的初始化顺序？</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2017-10-17 itemprop="datePublished">October 17, 2017</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/spring/"> Spring </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>开发过程中有这样一个场景，2个 bean 初始化逻辑中有依赖关系，需要控制二者的初始化顺序。实现方式可以有多种，本文结合目前对 Spring 的理解，尝试列出几种思路。</p>
+
+<h2 id="场景">场景</h2>
+
+<p>假设A，B两个 bean 都需要在初始化的时候从本地磁盘读取文件，其中B加载的文件，依赖A中加载的全局配置文件中配置的路径，所以需要A先于B初始化，此外A中的配置改变后也需要触发B的重新加载逻辑，所以A，B需要注入彼此。</p>
+
+<p>对于下面的模型，问题简化为：我们需要initA()先于initB()得到执行。</p>
+
+<pre><code class="language-java">@Service
+public class A {
+    @Autowired
+    private B b;
+
+    public A() {
+        System.out.println(&quot;A construct&quot;);
+    }
+
+    @PostConstruct
+    public void init() {
+        initA();
+    }
+
+    private void initA() {
+        System.out.println(&quot;A init&quot;);
+    }
+}
+
+@Service
+public class B  {
+    @Autowired
+    private A a;
+
+    public B() {
+        System.out.println(&quot;B construct&quot;);
+    }
+
+    @PostConstruct
+    public void init() {
+        initB();
+    }
+
+    private void initB(){
+        System.out.println(&quot;B init&quot;);
+    }
+}
+</code></pre>
+
+<h2 id="方案一-立flag">方案一：立Flag</h2>
+
+<p>我们可以在业务层自己控制A，B的初始化顺序，在A中设置一个“是否初始化的”标记，B初始化前检测A是否得以初始化，如果没有则调用A的初始化方法，所谓的check-and-act。对于上述模型，实现如下：</p>
+
+<pre><code class="language-java">@Service
+public class A {
+
+    private static volatile boolean initialized;
+
+    @Autowired
+    private B b;
+
+    public A() {
+        System.out.println(&quot;A construct&quot;);
+    }
+
+    @PostConstruct
+    public void init() {
+        initA();
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void initA() {
+        if (!isInitialized()) {
+            System.out.println(&quot;A init&quot;);
+        }
+        initialized = true;
+    }
+}
+
+@Service
+public class B {
+
+    @Autowired
+    private A a;
+
+
+    public B() {
+        System.out.println(&quot;B construct&quot;);
+    }
+
+    @PostConstruct
+    public void init() {
+        initB();
+    }
+
+
+    private void initB() {
+        if (!a.isInitialized()) {
+            a.initA();
+        }
+        System.out.println(&quot;B init&quot;);
+    }
+</code></pre>
+
+<p>执行效果：</p>
+
+<pre><code class="language-bash">A construct
+B construct
+A init
+B init
+</code></pre>
+
+<p>这种立flag的方法好处是可以做到lazy initialization，但是如果类似逻辑很多的话代码中到处充斥着类似代码，不优雅，所以考虑是否框架本身就可以满足我们的需要。</p>
+
+<h2 id="方案二-使用dependson">方案二：使用DependsOn</h2>
+
+<p>Spring 中的 <code>DependsOn</code> 注解可以保证被依赖的bean先于当前bean被容器创建，但是如果不理解Spring中bean加载过程会对 DependsOn 有误解，自己也确实踩过坑。对于上述模型，如果在B上加上注解 <code>@DependsOn({&quot;a&quot;})</code>，得到的执行结果是：</p>
+
+<pre><code class="language-bash">A construct
+B construct
+B init
+A init
+</code></pre>
+
+<p>在这里<strong>问题的关键</strong>是：bean属性的注入是在初始化方法调用之前。</p>
+
+<pre><code class="language-java">// 代码位置：AbstractAutowireCapableBeanFactory.doCreateBean
+// 填充 bean 的各个属性，包括依赖注入
+populateBean(beanName, mbd, instanceWrapper);
+if (exposedObject != null) {
+    // 调用初始化方法，如果是 InitializingBean 则先调用 afterPropertiesSet 然后调用自定义的init-method 方法
+    exposedObject = initializeBean(beanName, exposedObject, mbd);
+}
+</code></pre>
+
+<p>结合本例，发生的实际情况是，因为出现了循环依赖，A依赖B，加载B，B依赖A，所以得到了一个提前暴露的A，然后调用B的初始化方法，接着回到A的初始化方法。具体源码分析过程如下：</p>
+
+<p>ApplicationContext 在 refresh 过程中的最后会加载所有的 no-lazy 单例。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-two-bean-init-order-control-1.jpg" alt="Spring上下文初始化过程" class="lazyload"><figcaption class="image-caption">Spring上下文初始化过程</figcaption></figure></p>
+
+<p>本例中，先加载的bean A，最终通过无参构造器构造，然后，继续属性填充（populateBean），发现需要注入 bean B。所以转而加载 bean B（递归调用 getBean()）。此时发现 bean B 需要 DependsOn(&ldquo;a&rdquo;)，在保存依赖关系（为了防止循环 depends）后，调用 getBean(&ldquo;a&rdquo;)，此时会得到提前暴露的 bean A ，所以继续 B 的加载，流程为： 初始化策略构造实例  -&gt; 属性填充（同样会注入提前暴露的 bean A ） -&gt; 调用初始化方法。</p>
+
+<pre><code class="language-java">// 代码位置：AbstractBeanFactory.doGetBean
+// Guarantee initialization of beans that the current bean depends on. 实例化依赖的 bean
+String[] dependsOn = mbd.getDependsOn();
+if (dependsOn != null) {
+    for (String dep : dependsOn) {
+        if (isDependent(beanName, dep)) {
+            throw new BeanCreationException(mbd.getResourceDescription(),
+                    beanName, &quot;Circular depends-on relationship between '&quot;
+                    + beanName + &quot;' and '&quot; + dep + &quot;'&quot;);
+        }
+        registerDependentBean(dep, beanName); // 缓存 bean 依赖的关系
+        getBean(dep);
+    }
+}
+</code></pre>
+
+<p>得到提前暴露的 bean A的过程为：</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-two-bean-init-order-control-1.jpg" alt="提前暴露bean" class="lazyload"><figcaption class="image-caption">提前暴露bean</figcaption></figure></p>
+
+<p>此时此刻，bean A 的属性注入完成了， 返回到调用初始化方法，所以表现的行为是：构造A -&gt; 构造B -&gt; B初始化 -&gt; A初始化。</p>
+
+<p>DependsOn只是保证的被依赖的bean先于当前bean被实例化，被创建，所以如果要采用这种方式实现bean初始化顺序的控制，那么可以把初始化逻辑放在构造函数中，但是复杂耗时的逻辑仿造构造器中是不合适的，会影响系统启动速度。</p>
+
+<h2 id="方案三-容器加载bean之前">方案三：容器加载bean之前</h2>
+
+<p>Spring 框架中很多地方都为我们提供了扩展点，很好的体现了开闭原则（OCP）。其中 <code>BeanFactoryPostProcessor</code> 可以允许我们在容器加载任何bean之前修改应用上下文中的<code>BeanDefinition</code>（从XML配置文件或者配置类中解析得到的bean信息，用于后续实例化bean）。</p>
+
+<p>在本例中，就可以把A的初始化逻辑放在一个 <code>BeanFactoryPostProcessor</code> 中。</p>
+
+<pre><code class="language-java">@Component
+public class ABeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
+        A.initA();
+    }
+}
+</code></pre>
+
+<p>执行效果：</p>
+
+<pre><code class="language-bash">A init
+A construct
+B construct
+B init
+</code></pre>
+
+<p>这种方式把A中的初始化逻辑放到了加载bean之前，很适合加载系统全局配置，但是这种方式中初始化逻辑不能依赖bean的状态。</p>
+
+<h2 id="方案四-事件监听器的有序性">方案四：事件监听器的有序性</h2>
+
+<p>Spring 中的 <code>Ordered</code> 也是一个很重要的组件，很多逻辑中都会判断对象是否实现了 <code>Ordered</code> 接口，如果实现了就会先进行排序操作。比如在事件发布的时候，对获取到的 <code>ApplicationListener</code> 会先进行排序。</p>
+
+<pre><code class="language-java">// 代码位置：AbstractApplicationEventMulticaster.ListenerRetriever.getApplicationListeners()
+public Collection&lt;ApplicationListener&lt;?&gt;&gt; getApplicationListeners() {
+        LinkedList&lt;ApplicationListener&lt;?&gt;&gt; allListeners = new LinkedList&lt;ApplicationListener&lt;?&gt;&gt;();
+        for (ApplicationListener&lt;?&gt; listener : this.applicationListeners) {
+            allListeners.add(listener);
+        }
+        if (!this.applicationListenerBeans.isEmpty()) {
+            BeanFactory beanFactory = getBeanFactory();
+            for (String listenerBeanName : this.applicationListenerBeans) {
+                try {
+                    ApplicationListener&lt;?&gt; listener = beanFactory.getBean(listenerBeanName, ApplicationListener.class);
+                    if (this.preFiltered || !allListeners.contains(listener)) {
+                        allListeners.add(listener);
+                    }
+                } catch (NoSuchBeanDefinitionException ex) {
+                    // Singleton listener instance (without backing bean definition) disappeared -
+                    // probably in the middle of the destruction phase
+                }
+            }
+        }
+        AnnotationAwareOrderComparator.sort(allListeners); // 排序
+        return allListeners;
+    }
+</code></pre>
+
+<p>所以可以利用事件监听器在处理事件时的有序性，在应用上下文 refresh 完成后，分别实现A，B中对应的初始化逻辑。</p>
+
+<pre><code class="language-java">@Component
+public class ApplicationListenerA implements ApplicationListener&lt;ApplicationContextEvent&gt;, Ordered {
+    @Override
+    public void onApplicationEvent(ApplicationContextEvent event) {
+        initA();
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE; // 比 ApplicationListenerB 优先级高
+    }
+
+    public static void initA() {
+        System.out.println(&quot;A init&quot;);
+    }
+}
+
+@Component
+public class ApplicationListenerB implements ApplicationListener&lt;ApplicationContextEvent&gt;, Ordered{
+    @Override
+    public void onApplicationEvent(ApplicationContextEvent event) {
+        initB();
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE -1;
+    }
+
+    private void initB() {
+        System.out.println(&quot;B init&quot;);
+    }
+}
+</code></pre>
+
+<p>执行效果：</p>
+
+<pre><code class="language-bash">A construct
+B construct
+A init
+B init
+</code></pre>
+
+<p>这种方式就是站在事件响应的角度，上下文加载完成后，先实现A逻辑，然后实现B逻辑。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>在平时的开发中使用的可能都是一个语言，一个框架的冰山一角，随着对语言，对框架的不断深入，你会发现更多的可能。本文只是基于目前对于 Spring 框架的理解做出的尝试，解决一个问题可能有多种方式，其中必然存在权衡选择，取决于对业务对技术的理解。</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2017/spring-two-bean-init-order-control/>http://vonzhou.com/2017/spring-two-bean-init-order-control/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2017/java-watchservice/" class="prev" rel="prev" title="使用WatchService监控文件变化"><i class="iconfont icon-left"></i>&nbsp;使用WatchService监控文件变化</a>
+         
+        
+        <a href="http://vonzhou.com/2018/2017-read-book/" class="next" rel="next" title="2017阅读书单">2017阅读书单&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

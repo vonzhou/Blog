@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2019/innodb-row-lock/" />
+  <link rel="next" href="http://vonzhou.com/2019/spring-beanutils-copyproperties/" />
+  <link rel="canonical" href="http://vonzhou.com/2019/jvm-gc-summary/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           JVM垃圾回收总结 | 编程之路
+       
+  </title>
+  <meta name="title" content="JVM垃圾回收总结 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "JVM垃圾回收总结",
+    "headline" : "JVM垃圾回收总结",
+    "description" : "1. 垃圾回收算法 Mark-Sweep(标记-清除)算法 复制算法 Mark-Compact(标记-整理)算法 分代收集算法 2. 垃圾收集器 新生代  Serial
+ ParNew
+  ParNew是Serial的多线程版本， 只有 Serial，ParNew能和CMS配合使用。ParNew是使用CMS后的默认新生代收集器，可以使用-XX:+UseParNewGC强制指定。
+ Parallel Scavenge  Parallel Scavenge收集器，吞吐量优先，通过参数可以控制最大垃圾收集的停顿时间（-XX:MaxGCPauseMills）及直接设置吞吐量大小（-XX:GCTimeRatio）。也可以开启GC自适应调节策略（GC Ergonomics）。
+使用XX:+UseParallelGC开启，JDK1.4.1引入。PS只能和Serial Old，ParOld搭配使用。
+Java 6，7，8 默认的收集器是Parallel GC（PS + Parallel Old），使用PrintFlagsFinal可以看到：
+$ ./bin/java -XX:+PrintFlagsFinal bool UseParallelGC := true {product} bool UseParallelOldGC = true {product}  老年代  Serial Old
+ Parallel Old
+  Parallel Old收集器是PS的老年代版本，使用多线程和“标记-整理”。
+XX:+UseParallelOldGC开启后，也会自动设置XX:+UseParallelGC，JDK5.0 update 6引入。
+ CMS  CMS收集器，以最短回收停顿时间，服务响应速度为目标，采用标记-清除算法。使用-XX:+UseConcMarkSweepGC开启。
+G1收集器 JDK7引入的
+G1收集器的Region，其他收集器新生代和老年代之间的对象引用，JVM都是使用Remembered Set来避免全堆扫描。",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2019",
+    "datePublished": "2019-02-21 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2019-02-21 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2019/jvm-gc-summary/",
+    "wordCount" : "94",
+    "keywords" : [ "JVM","GC", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">JVM垃圾回收总结</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2019-02-21 itemprop="datePublished">February 21, 2019</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="1-垃圾回收算法">1. 垃圾回收算法</h2>
+
+<h3 id="mark-sweep-标记-清除-算法">Mark-Sweep(标记-清除)算法</h3>
+
+<h3 id="复制算法">复制算法</h3>
+
+<h3 id="mark-compact-标记-整理-算法">Mark-Compact(标记-整理)算法</h3>
+
+<h3 id="分代收集算法">分代收集算法</h3>
+
+<h2 id="2-垃圾收集器">2. 垃圾收集器</h2>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/gc-collectors.jpg" alt="gc-collectors" class="lazyload"><figcaption class="image-caption">gc-collectors</figcaption></figure></p>
+
+<h3 id="新生代">新生代</h3>
+
+<ul>
+<li><p>Serial</p></li>
+
+<li><p>ParNew</p></li>
+</ul>
+
+<p>ParNew是Serial的多线程版本， 只有 Serial，ParNew能和CMS配合使用。ParNew是使用CMS后的默认新生代收集器，可以使用<code>-XX:+UseParNewGC</code>强制指定。</p>
+
+<ul>
+<li>Parallel Scavenge</li>
+</ul>
+
+<p>Parallel Scavenge收集器，吞吐量优先，通过参数可以控制最大垃圾收集的停顿时间（-XX:MaxGCPauseMills）及直接设置吞吐量大小（-XX:GCTimeRatio）。也可以开启GC自适应调节策略（GC Ergonomics）。</p>
+
+<p>使用<code>XX:+UseParallelGC</code>开启，JDK1.4.1引入。PS只能和Serial Old，ParOld搭配使用。</p>
+
+<p>Java 6，7，8 默认的收集器是Parallel GC（PS + Parallel Old），使用<code>PrintFlagsFinal</code>可以看到：</p>
+
+<pre><code class="language-java">$ ./bin/java -XX:+PrintFlagsFinal
+bool UseParallelGC                            := true                                {product}
+bool UseParallelOldGC                          = true                                {product}
+</code></pre>
+
+<h3 id="老年代">老年代</h3>
+
+<ul>
+<li><p>Serial Old</p></li>
+
+<li><p>Parallel Old</p></li>
+</ul>
+
+<p>Parallel Old收集器是PS的老年代版本，使用多线程和“标记-整理”。</p>
+
+<p><code>XX:+UseParallelOldGC</code>开启后，也会自动设置<code>XX:+UseParallelGC</code>，JDK5.0 update 6引入。</p>
+
+<ul>
+<li>CMS</li>
+</ul>
+
+<p>CMS收集器，以最短回收停顿时间，服务响应速度为目标，采用标记-清除算法。使用<code>-XX:+UseConcMarkSweepGC</code>开启。</p>
+
+<h3 id="g1收集器">G1收集器</h3>
+
+<p>JDK7引入的</p>
+
+<p>G1收集器的Region，其他收集器新生代和老年代之间的对象引用，JVM都是使用Remembered Set来避免全堆扫描。</p>
+
+<p>Java 9,10默认的GC Collector是G1.</p>
+
+<p><a href="https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/index.html" rel="nofollow noreferrer" target="_blank">Getting Started with the G1 Garbage Collector</a></p>
+
+<h4 id="zgc">ZGC</h4>
+
+<p>JDK11引入</p>
+
+<p>要完成的目标是：控制Java的垃圾回收时长在10ms以内，绝对不超过10ms，并且使用了该垃圾回收策略之后，吞吐对比当前Java缺省的垃圾回收策略G1，下降不超过15%</p>
+
+<p><a href="https://www.opsian.com/blog/javas-new-zgc-is-very-exciting/" rel="nofollow noreferrer" target="_blank">Java&rsquo;s new Z Garbage Collector (ZGC) is very exciting</a></p>
+
+<hr />
+
+<p>TODO 使用不同的GC算法看GC日志</p>
+
+<h2 id="参考">参考</h2>
+
+<p><a href="https://blogs.oracle.com/jonthecollector/our-collectors" rel="nofollow noreferrer" target="_blank">Our Collectors</a></p>
+
+<p><a href="http://www.fasterj.com/articles/oraclecollectors1.shtml" rel="nofollow noreferrer" target="_blank">Oracle JVM Garbage Collectors Available From JDK 1.7.0_04 And After</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2019/jvm-gc-summary/>http://vonzhou.com/2019/jvm-gc-summary/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/jvm/">
+                    #JVM</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/gc/">
+                    #GC</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2019/innodb-row-lock/" class="prev" rel="prev" title="InnoDB 行锁的实现"><i class="iconfont icon-left"></i>&nbsp;InnoDB 行锁的实现</a>
+         
+        
+        <a href="http://vonzhou.com/2019/spring-beanutils-copyproperties/" class="next" rel="next" title="BeanUtils.copyProperties 源码分析">BeanUtils.copyProperties 源码分析&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

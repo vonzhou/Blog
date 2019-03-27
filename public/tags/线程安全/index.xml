@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>线程安全 on 编程之路</title>
+    <link>http://vonzhou.com/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/</link>
+    <description>Recent content in 线程安全 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 11 Nov 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>深入理解条件变量 Condition</title>
+      <link>http://vonzhou.com/2018/java-condition/</link>
+      <pubDate>Sun, 11 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/java-condition/</guid>
+      <description>序 可重入锁（ReentrantLock）是 synchronized 关键字的扩展，更加灵活。还有一种ReentrantLock应用场景是和Condition搭配使用，实现多线程环境下等待状态条件的功能。Object.wait 和 Object.notify 是和 synchronized 配合使用的，条件变量Condition是和ReentrantLock相关联的。
+接下来先通过一个Demo看看Condition的用法，然后列举两个应用的地方，最后分析其源码实现。
+一个简单Demo 先通过一个Demo看看怎么使用Condition，主线程通知条件满足，通过另一个线程继续运行，可以看到的是Condition.wait/signal方法需要和一个ReentrantLock绑定。
+public class ReenterLockCondition implements Runnable { public static ReentrantLock lock = new ReentrantLock(); public static Condition condition = lock.newCondition(); @Override public void run() { try { lock.lock(); condition.await(); System.out.println(String.format(&amp;quot;条件满足，线程%s运行！&amp;quot;, Thread.currentThread().getName())); } catch (InterruptedException e) { e.printStackTrace(); } finally { lock.unlock(); } } public static void main(String args[]) throws InterruptedException { ReenterLockCondition reenterLockCondition = new ReenterLockCondition(); Thread thread1 = new Thread(reenterLockCondition); thread1.</description>
+    </item>
+    
+    <item>
+      <title>CAS 的底层实现</title>
+      <link>http://vonzhou.com/2018/cas/</link>
+      <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/cas/</guid>
+      <description>java.util.concurrent 包的很多类（如 Semaphore，ConcurrentLinkedQueue）都提供了比 sychronized 机制更高的性能和可伸缩性，源于JDK 1.5提供的原子变量（如AtomicInteger,AtomicReference），这些原子变量类可以构建高效的非阻塞算法，底层实现是CAS。
+CAS（compare and swap）是一种高效实现线程安全性的方法，支持原子更新操作，适用于实现计数器，序列发生器等场景，比如在线程池新增worker线程的时候，需要增加计数，因为i++并非一个原子操作，所以可以使用 AtomicInteger 实现安全加1的操作。
+// java.util.concurrent.ThreadPoolExecutor /** * Attempts to CAS-increment the workerCount field of ctl. */ private boolean compareAndIncrementWorkerCount(int expect) { return ctl.compareAndSet(expect, expect + 1); }  CAS和传统的加锁方式（sychronized, ReentrantLock等）相比，CAS是一种乐观方式（对比数据库的悲观、乐观锁），无锁（lock-free），争用失败的线程不会被阻塞挂起，CAS失败时由我们决定是继续尝试，还是执行其他操作。当然这里的无锁只是上层我们感知的无锁，其实底层仍然是有加锁行为的，后面会看到。
+此外，CAS存在ABA问题，可以看下 AtomicStampedReference ，内部封装的是[reference, integer]。
+接下来跟踪下源码。
+CAS底层实现 从 AtomicInteger 入手，其中的属性 valueOffset 是该对象的 value 在内存中的起始地址。
+public final boolean compareAndSet(int expect, int update) { return unsafe.compareAndSwapInt(this, valueOffset, expect, update); } // setup to use Unsafe.</description>
+    </item>
+    
+    <item>
+      <title>如何保证ArrayList在多线程环境下的线程安全性</title>
+      <link>http://vonzhou.com/2018/make-arraylist-thread-safe/</link>
+      <pubDate>Fri, 07 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/make-arraylist-thread-safe/</guid>
+      <description>如果想在多线程环境下使用ArrayList，如果保障其线程安全性？
+序 在《记一次 ArrayList 线程安全问题》一文中说明了ArrayList用在多线程环境中存在问题。关键的原因就是ArrayList底层实现新增元素时数组索引的移动操作。
+/** * Appends the specified element to the end of this list. * * @param e element to be appended to this list * @return &amp;lt;tt&amp;gt;true&amp;lt;/tt&amp;gt; (as specified by {@link Collection#add}) */ public boolean add(E e) { ensureCapacityInternal(size + 1); // Increments modCount!! elementData[size++] = e; return true; }  非线程安全场景展示：
+public static void notThreadSafe() throws Exception { final List&amp;lt;Integer&amp;gt; list = Lists.newArrayList(); for (int i = 0; i &amp;lt; 4; i++) { new Thread(new Runnable() { @Override public void run() { for (int j = 0; j &amp;lt; 10000; j++) { list.</description>
+    </item>
+    
+    <item>
+      <title>记一次 ArrayList 线程安全问题</title>
+      <link>http://vonzhou.com/2018/arraylist-thread-safe-problem/</link>
+      <pubDate>Thu, 12 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/arraylist-thread-safe-problem/</guid>
+      <description>记录一次因为考虑ArrayList线程安全欠周导致的NPE问题。
+在开发过程中遇到一个场景，要把记录数据根据时间分组到不同的区间（比如，周，月，季度），实现的思路是采用二分查找得到记录归属的分组，寻思采用并行流 效率会好点。
+场景 private List&amp;lt;List&amp;lt;Record&amp;gt;&amp;gt; arrangeByInsertTime(List&amp;lt;Record&amp;gt; list, long[] dayTs) { int size = dayTs.length; List&amp;lt;List&amp;lt;Record&amp;gt;&amp;gt; buckets = new ArrayList&amp;lt;&amp;gt;(size); for (int i = 0; i &amp;lt; size; i++) { buckets.add(Lists.newArrayList()); } if (CollectionUtils.isEmpty(list)) { return buckets; } list.parallelStream().forEach(r -&amp;gt; { int pos = Arrays.binarySearch(dayTs, r.getInsertTime()); if (pos &amp;gt;= 0) { buckets.get(pos).add(r); } else { pos = Math.abs(pos) - 2; if (pos &amp;gt;= 0 &amp;amp;&amp;amp; pos &amp;lt; dayTs.length) { buckets.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/disruptor-get-started/" />
+  <link rel="next" href="http://vonzhou.com/2018/zuul-forward-multipart-and-json/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/disruptor-consume-pattern/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Disruptor中的事件消费模式 | 编程之路
+       
+  </title>
+  <meta name="title" content="Disruptor中的事件消费模式 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Disruptor中的事件消费模式",
+    "headline" : "Disruptor中的事件消费模式",
+    "description" : "Disruptor中有两种事件消费模式，多播（Multicast）:每个消费者都处理相同的消息，WorkPool：多个消费者合作消费一批消息。
+在《Disruptor快速入门》中，我们在构造 Disruptor 的时候，明确指定了单生产者模式，那么消费者呢？有几个消费者线程来处理消息？每个事件会被处理几次？
+当我们调用 disruptor.handleEventsWith 设置消息的处理器时，我们提供的 Event Handler 会被包装为 BatchEventProcessor。
+public EventHandlerGroup&lt;T&gt; handleEventsWith(final EventHandler&lt;? super T&gt;... handlers) { return createEventProcessors(new Sequence[0], handlers); } EventHandlerGroup&lt;T&gt; createEventProcessors( final Sequence[] barrierSequences, final EventHandler&lt;? super T&gt;[] eventHandlers) { checkNotStarted(); final Sequence[] processorSequences = new Sequence[eventHandlers.length]; final SequenceBarrier barrier = ringBuffer.newBarrier(barrierSequences); for (int i = 0, eventHandlersLength = eventHandlers.length; i &lt; eventHandlersLength; i++) { final EventHandler&lt;? super T&gt; eventHandler = eventHandlers[i]; // 这里 final BatchEventProcessor&lt;T&gt; batchEventProcessor = new BatchEventProcessor&lt;T&gt;(ringBuffer, barrier, eventHandler); if (exceptionHandler !",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-09-28 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-09-28 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/disruptor-consume-pattern/",
+    "wordCount" : "662",
+    "keywords" : [ "CAS","Disruptor", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Disruptor中的事件消费模式</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-09-28 itemprop="datePublished">September 28, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>Disruptor中有两种事件消费模式，多播（Multicast）:每个消费者都处理相同的消息，WorkPool：多个消费者合作消费一批消息。</p>
+
+<p>在《Disruptor快速入门》中，我们在构造 Disruptor 的时候，明确指定了单生产者模式，那么消费者呢？有几个消费者线程来处理消息？每个事件会被处理几次？</p>
+
+<p>当我们调用 <code>disruptor.handleEventsWith</code> 设置消息的处理器时，我们提供的 Event Handler 会被包装为 <code>BatchEventProcessor</code>。</p>
+
+<pre><code class="language-java">public EventHandlerGroup&lt;T&gt; handleEventsWith(final EventHandler&lt;? super T&gt;... handlers)
+{
+    return createEventProcessors(new Sequence[0], handlers);
+}
+
+EventHandlerGroup&lt;T&gt; createEventProcessors(
+    final Sequence[] barrierSequences,
+    final EventHandler&lt;? super T&gt;[] eventHandlers)
+{
+    checkNotStarted();
+
+    final Sequence[] processorSequences = new Sequence[eventHandlers.length];
+    final SequenceBarrier barrier = ringBuffer.newBarrier(barrierSequences);
+
+    for (int i = 0, eventHandlersLength = eventHandlers.length; i &lt; eventHandlersLength; i++)
+    {
+        final EventHandler&lt;? super T&gt; eventHandler = eventHandlers[i];
+
+        // 这里
+        final BatchEventProcessor&lt;T&gt; batchEventProcessor =
+            new BatchEventProcessor&lt;T&gt;(ringBuffer, barrier, eventHandler);
+
+        if (exceptionHandler != null)
+        {
+            batchEventProcessor.setExceptionHandler(exceptionHandler);
+        }
+
+        consumerRepository.add(batchEventProcessor, eventHandler, barrier);
+        processorSequences[i] = batchEventProcessor.getSequence();
+    }
+
+    updateGatingSequencesForNextInChain(barrierSequences, processorSequences);
+
+    return new EventHandlerGroup&lt;T&gt;(this, consumerRepository, processorSequences);
+}
+</code></pre>
+
+<p>BatchEventProcessor 实现了 Runnable 接口。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-consume-pattern-1.jpg" alt="disruptor-consume-pattern-1" class="lazyload"><figcaption class="image-caption">disruptor-consume-pattern-1</figcaption></figure></p>
+
+<p>在 Disruptor 启动的时候，就会根据上述构造的消费者相关信息（ConsumerRepository）启动对应的线程去轮询消息并处理。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-consume-pattern-2.jpg" alt="disruptor-consume-pattern-2" class="lazyload"><figcaption class="image-caption">disruptor-consume-pattern-2</figcaption></figure></p>
+
+<p>新线程就会一直从 RingBuffer 中轮询消息并调用对应的事件处理器处理。</p>
+
+<p>通过上述的分析，我们可以知道消费者线程的个数取决于我们构造 Disruptor 时提供的 EventHandler 的个数。所以第一种实现多消费者模式的方法就是提供多个 EventHandler。</p>
+
+<h2 id="多个消费者各自处理事件-multicast">多个消费者各自处理事件（Multicast）</h2>
+
+<p>给 Disruptor 提供多个 EventHandler 就会开启多个消费者工作线程，每个消费者都会处理所有的事件，是一种多播模式。</p>
+
+<pre><code class="language-java">EventHandler&lt;LogEvent&gt;[] consumers = new LogEventConsumer[WORKER_SIZE];
+for (int i = 0; i &lt; consumers.length; i++) {
+    consumers[i] = new LogEventConsumer();
+}
+disruptor.handleEventsWith(consumers);
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-consume-pattern-3.jpg" alt="disruptor-consume-pattern-3" class="lazyload"><figcaption class="image-caption">disruptor-consume-pattern-3</figcaption></figure></p>
+
+<p>接下来看下源码为何如此？消费者想要获取到 RingBuffer 中的元素，就需要从 <code>Sequnce</code>中取得可用的序列号，否则就会执行等待策略。前面已经说过， EventHandler 最终封装为 BatchEventProcessor，每个  BatchEventProcessor 在执行 EventHandler 相应逻辑之前都会先获取可用的序列号，因为每个 <code>BatchEventProcessor</code> 独立维护了一个 <code>Sequence</code>对象，所以每个事件都会被所有的消费者处理一遍。</p>
+
+<pre><code class="language-java">// 从0开始
+private final Sequence sequence = new Sequence(Sequencer.INITIAL_CURSOR_VALUE);
+
+public void run()
+{
+    if (!running.compareAndSet(false, true))
+    {
+        throw new IllegalStateException(&quot;Thread is already running&quot;);
+    }
+    sequenceBarrier.clearAlert();
+
+    notifyStart();
+
+    T event = null;
+    // 获取下一个序列号
+    long nextSequence = sequence.get() + 1L;
+    try
+    {
+        while (true)
+        {
+            try
+            {
+                // 等待有可取的事件
+                final long availableSequence = sequenceBarrier.waitFor(nextSequence);
+                if (batchStartAware != null)
+                {
+                    batchStartAware.onBatchStart(availableSequence - nextSequence + 1);
+                }
+
+                while (nextSequence &lt;= availableSequence)
+                {
+                    event = dataProvider.get(nextSequence);
+                    // 处理消息
+                    eventHandler.onEvent(event, nextSequence, nextSequence == availableSequence);
+                    nextSequence++;
+                }
+
+                sequence.set(availableSequence);
+            }
+            catch (final TimeoutException e)
+            {
+                notifyTimeout(sequence.get());
+            }
+            catch (final AlertException ex)
+            {
+                if (!running.get())
+                {
+                    break;
+                }
+            }
+            catch (final Throwable ex)
+            {
+                exceptionHandler.handleEventException(ex, nextSequence, event);
+                sequence.set(nextSequence);
+                nextSequence++;
+            }
+        }
+    }
+    finally
+    {
+        notifyShutdown();
+        running.set(false);
+    }
+}
+</code></pre>
+
+<h2 id="多个消费者合作处理一批事件">多个消费者合作处理一批事件</h2>
+
+<p>上面的方式是每个 Consumer 都会处理相同的消息，<strong>可以联系 EventBus，Kafka里面的 ConsumerGroup</strong>。那么如果想多个 Consumer 协作处理一批消息呢？此时可以利用 Disruptor 的 <code>WorkPool</code> 支持，我们定制相应的线程池（Executor）来处理 EventWorker 任务。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-consume-pattern-4.jpg" alt="disruptor-consume-pattern-4" class="lazyload"><figcaption class="image-caption">disruptor-consume-pattern-4</figcaption></figure></p>
+
+<p>使用这种模式的一种场景是处理每个事件比较耗时，开启多个线程来加快处理。</p>
+
+<pre><code class="language-java">// Fixed Thread Pool
+ExecutorService executor = new ThreadPoolExecutor(WORKER_SIZE, WORKER_SIZE, 0L, TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue&lt;Runnable&gt;(10), new ThreadFactory() {
+                    private int counter = 0;
+                    private String prefix = &quot;DisruptorWorker&quot;;
+
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        return new Thread(r, prefix + &quot;-&quot; + counter++);
+                    }
+                });
+// 环形数组的容量，必须要是2的次幂
+int bufferSize = 1024;
+
+// 构造 Disruptor
+Disruptor&lt;LogEvent&gt; disruptor = new Disruptor&lt;&gt;(new LogEventFactory(), bufferSize, executor, ProducerType.SINGLE,
+                new YieldingWaitStrategy());
+
+// 设置消费者
+WorkHandler&lt;LogEvent&gt;[] consumers = new LogEventConsumer[WORKER_SIZE];
+for (int i = 0; i &lt; consumers.length; i++) {
+    consumers[i] = new LogEventConsumer();
+}
+disruptor.handleEventsWithWorkerPool(consumers);
+
+// 启动 Disruptor
+disruptor.start();
+</code></pre>
+
+<p>或者采用下面的形式，本质一样。</p>
+
+<pre><code class="language-java">RingBuffer&lt;LogEvent&gt; ringBuffer = RingBuffer.create(ProducerType.SINGLE, new LogEventFactory(), bufferSize,
+                                                    new YieldingWaitStrategy());
+SequenceBarrier barriers = ringBuffer.newBarrier();
+
+WorkerPool&lt;LogEvent&gt; workerPool = new WorkerPool&lt;LogEvent&gt;(ringBuffer, barriers, null, consumers);
+ringBuffer.addGatingSequences(workerPool.getWorkerSequences());
+workerPool.start(executor);
+</code></pre>
+
+<p>接下来分析怎么做到一个事件只处理一次的。在使用 <code>WorkPool</code> 时，我们提供的事件处理器最终会被封装为 <code>WorkProcessor</code>，里面的 run 方法便揭示了原因：所有的消费者都是从同一个 <code>Sequnce</code> 中取可用的序列号。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-consume-pattern-5.jpg" alt="disruptor-consume-pattern-5" class="lazyload"><figcaption class="image-caption">disruptor-consume-pattern-5</figcaption></figure></p>
+
+<pre><code class="language-java">public void run()
+{
+    if (!running.compareAndSet(false, true))
+    {
+        throw new IllegalStateException(&quot;Thread is already running&quot;);
+    }
+    sequenceBarrier.clearAlert();
+
+    notifyStart();
+
+    boolean processedSequence = true;
+    long cachedAvailableSequence = Long.MIN_VALUE;
+    long nextSequence = sequence.get();
+    T event = null;
+    while (true)
+    {
+        try
+        {
+            // if previous sequence was processed - fetch the next sequence and set
+            // that we have successfully processed the previous sequence
+            // typically, this will be true
+            // this prevents the sequence getting too far forward if an exception
+            // is thrown from the WorkHandler
+            if (processedSequence)
+            {
+                processedSequence = false;
+                do
+                {
+                    // 每个 WorkPool 里面的消费者都是从同一个 Sequnce 中取可用的序列号
+                    nextSequence = workSequence.get() + 1L;
+                    sequence.set(nextSequence - 1L);
+                }
+                while (!workSequence.compareAndSet(nextSequence - 1L, nextSequence));
+            }
+
+            if (cachedAvailableSequence &gt;= nextSequence)
+            {
+                // 其他都是常规操作
+                event = ringBuffer.get(nextSequence);
+                workHandler.onEvent(event);
+                processedSequence = true;
+            }
+            else
+            {
+                cachedAvailableSequence = sequenceBarrier.waitFor(nextSequence);
+            }
+        }
+        catch (final TimeoutException e)
+        {
+            notifyTimeout(sequence.get());
+        }
+        catch (final AlertException ex)
+        {
+            if (!running.get())
+            {
+                break;
+            }
+        }
+        catch (final Throwable ex)
+        {
+            // handle, mark as processed, unless the exception handler threw an exception
+            exceptionHandler.handleEventException(ex, nextSequence, event);
+            processedSequence = true;
+        }
+    }
+
+    notifyShutdown();
+
+    running.set(false);
+}
+</code></pre>
+
+<h2 id="一个要注意的问题">一个要注意的问题</h2>
+
+<p>在使用 WorkPool 的时候务必要保证一个 Consumer 要对应一个线程，否则当 RingBuffer 满的时候，Producer 和 Consumer 都会阻塞，一个例子。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-consume-pattern-6.jpg" alt="disruptor-consume-pattern-6" class="lazyload"><figcaption class="image-caption">disruptor-consume-pattern-6</figcaption></figure>
+<figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-consume-pattern-7.jpg" alt="disruptor-consume-pattern-7" class="lazyload"><figcaption class="image-caption">disruptor-consume-pattern-7</figcaption></figure></p>
+
+<p>正因为存在这个问题，所以下面形式的 Disruptor 构造器已废弃。</p>
+
+<pre><code class="language-java">@Deprecated
+public Disruptor(
+    final EventFactory&lt;T&gt; eventFactory,
+    final int ringBufferSize,
+    final Executor executor,
+    final ProducerType producerType,
+    final WaitStrategy waitStrategy)
+{
+    this(RingBuffer.create(producerType, eventFactory, ringBufferSize, waitStrategy), executor);
+}
+</code></pre>
+
+<p>推荐使用的是提供 ThreadFactory 形式的构造器，后续会根据事件处理器的个数来新增对应的线程。</p>
+
+<pre><code class="language-java">public Disruptor(
+        final EventFactory&lt;T&gt; eventFactory,
+        final int ringBufferSize,
+        final ThreadFactory threadFactory,
+        final ProducerType producerType,
+        final WaitStrategy waitStrategy)
+{
+    this(
+        RingBuffer.create(producerType, eventFactory, ringBufferSize, waitStrategy),
+        new BasicExecutor(threadFactory));
+}
+</code></pre>
+
+<p><a href="https://github.com/vonzhou/learning-java/tree/master/src/framework/disruptor" rel="nofollow noreferrer" target="_blank">本文代码</a>.</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/disruptor-consume-pattern/>http://vonzhou.com/2018/disruptor-consume-pattern/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/cas/">
+                    #CAS</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/disruptor/">
+                    #Disruptor</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/disruptor-get-started/" class="prev" rel="prev" title="Disruptor 快速入门"><i class="iconfont icon-left"></i>&nbsp;Disruptor 快速入门</a>
+         
+        
+        <a href="http://vonzhou.com/2018/zuul-forward-multipart-and-json/" class="next" rel="next" title="解决Zuul无法同时转发Multipart和JSON请求的问题">解决Zuul无法同时转发Multipart和JSON请求的问题&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

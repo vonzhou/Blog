@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/2017-read-book/" />
+  <link rel="next" href="http://vonzhou.com/2018/linux-commands/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/arraylist-thread-safe-problem/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           记一次 ArrayList 线程安全问题 | 编程之路
+       
+  </title>
+  <meta name="title" content="记一次 ArrayList 线程安全问题 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "记一次 ArrayList 线程安全问题",
+    "headline" : "记一次 ArrayList 线程安全问题",
+    "description" : "记录一次因为考虑ArrayList线程安全欠周导致的NPE问题。
+在开发过程中遇到一个场景，要把记录数据根据时间分组到不同的区间（比如，周，月，季度），实现的思路是采用二分查找得到记录归属的分组，寻思采用并行流 效率会好点。
+场景 private List&lt;List&lt;Record&gt;&gt; arrangeByInsertTime(List&lt;Record&gt; list, long[] dayTs) { int size = dayTs.length; List&lt;List&lt;Record&gt;&gt; buckets = new ArrayList&lt;&gt;(size); for (int i = 0; i &lt; size; i++) { buckets.add(Lists.newArrayList()); } if (CollectionUtils.isEmpty(list)) { return buckets; } list.parallelStream().forEach(r -&gt; { int pos = Arrays.binarySearch(dayTs, r.getInsertTime()); if (pos &gt;= 0) { buckets.get(pos).add(r); } else { pos = Math.abs(pos) - 2; if (pos &gt;= 0 &amp;&amp; pos &lt; dayTs.length) { buckets.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-07-12 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-07-12 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/arraylist-thread-safe-problem/",
+    "wordCount" : "370",
+    "keywords" : [ "多线程","线程安全", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">记一次 ArrayList 线程安全问题</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-07-12 itemprop="datePublished">July 12, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>记录一次因为考虑ArrayList线程安全欠周导致的NPE问题。</p>
+
+<p>在开发过程中遇到一个场景，要把记录数据根据时间分组到不同的区间（比如，周，月，季度），实现的思路是采用二分查找得到记录归属的分组，寻思采用并行流 效率会好点。</p>
+
+<h2 id="场景">场景</h2>
+
+<pre><code class="language-java">private List&lt;List&lt;Record&gt;&gt; arrangeByInsertTime(List&lt;Record&gt; list, long[] dayTs) {
+    int size = dayTs.length;
+    List&lt;List&lt;Record&gt;&gt; buckets = new ArrayList&lt;&gt;(size);
+
+    for (int i = 0; i &lt; size; i++) {
+        buckets.add(Lists.newArrayList());
+    }
+
+    if (CollectionUtils.isEmpty(list)) {
+        return buckets;
+    }
+
+    list.parallelStream().forEach(r -&gt; {
+        int pos = Arrays.binarySearch(dayTs, r.getInsertTime());
+        if (pos &gt;= 0) {
+            buckets.get(pos).add(r);
+        } else {
+            pos = Math.abs(pos) - 2;
+            if (pos &gt;= 0 &amp;&amp; pos &lt; dayTs.length) {
+                buckets.get(pos).add(r);
+            }
+        }
+    });
+
+    return buckets;
+}
+
+</code></pre>
+
+<p>然而不料后续出现了空指针异常（NPE），不应该啊，然后想到可能是链表的线程安全问题，打算重现一下。</p>
+
+<pre><code class="language-java">@Test
+public void listNotSafe() throws Exception {
+    List&lt;Integer&gt; list = Lists.newArrayList();
+    for (int i = 0; i &lt; 4; i++) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int j = 0; j &lt; 10000; j++) {
+                    list.add(new Random().nextInt(100));
+                }
+            }
+        }).start();
+    }
+
+    Thread.sleep(1000 * 60 * 1);
+
+    log.info(&quot;size = &quot; + list.size());
+    for (int i = 0; i &lt; list.size(); i++) {
+        if (list.get(i) == null) {
+            log.info(String.format(&quot;[%s] : HOLE&quot;, i));
+        }
+    }
+
+}
+
+</code></pre>
+
+<p>结果就很容易重现了这个问题，多线程下面往列表中增加元素导致了一些空洞现象。</p>
+
+<pre><code>2018-06-15 15:54:17.578  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : size = 37610
+2018-06-15 15:54:17.578  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [1851] : HOLE
+2018-06-15 15:54:17.578  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [4164] : HOLE
+2018-06-15 15:54:17.579  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [4165] : HOLE
+2018-06-15 15:54:17.579  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [6246] : HOLE
+2018-06-15 15:54:17.579  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [9369] : HOLE
+2018-06-15 15:54:17.580  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [14053] : HOLE
+2018-06-15 15:54:17.580  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [14054] : HOLE
+2018-06-15 15:54:17.581  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [21079] : HOLE
+2018-06-15 15:54:17.581  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [21080] : HOLE
+2018-06-15 15:54:17.581  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [21081] : HOLE
+2018-06-15 15:54:17.582  INFO 7644 --- [           main] .d.s.ConversionCountStatisticServiceTest : [31618] : HOLE
+</code></pre>
+
+<p>问题的答案就在 ArrayList 增加元素的代码中。</p>
+
+<pre><code class="language-java">/**
+ * Appends the specified element to the end of this list.
+ *
+ * @param e element to be appended to this list
+ * @return &lt;tt&gt;true&lt;/tt&gt; (as specified by {@link Collection#add})
+ */
+public boolean add(E e) {
+    ensureCapacityInternal(size + 1);  // Increments modCount!!
+    elementData[size++] = e;
+    return true;
+}
+</code></pre>
+
+<p>本质是 <code>i++</code> 操作在 Java 中是非线程安全的，这个大家都知道，通过字节码可以看到。</p>
+
+<p>下面通过示意图展示多线程环境下 add 出现问题的情形。图2中线程T1，T2同时去增加元素，当前 index=2，然后都去设置这个位置的值，然后T1，T2分别更新了索引位置，导致了 index=3的位置出现了空洞。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/arraylist-thread-safe-problem-1.jpg" alt="图1 正常情况" class="lazyload"><figcaption class="image-caption">图1 正常情况</figcaption></figure></p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/arraylist-thread-safe-problem-2.jpg" alt="图2 出现问题" class="lazyload"><figcaption class="image-caption">图2 出现问题</figcaption></figure></p>
+
+<h2 id="总结">总结</h2>
+
+<ul>
+<li>在Stream处理过程中处理引用类型的值要格外注意。</li>
+<li>ArrayList 在多线程环境下使用，大家都知道会出现 modCount 不一致异常，但是多线程 Add 虽不会出现异常，但是会出现逻辑问题，影响正确性。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/arraylist-thread-safe-problem/>http://vonzhou.com/2018/arraylist-thread-safe-problem/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">
+                    #多线程</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
+                    #线程安全</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/2017-read-book/" class="prev" rel="prev" title="2017阅读书单"><i class="iconfont icon-left"></i>&nbsp;2017阅读书单</a>
+         
+        
+        <a href="http://vonzhou.com/2018/linux-commands/" class="next" rel="next" title="Linux常用命令总结">Linux常用命令总结&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

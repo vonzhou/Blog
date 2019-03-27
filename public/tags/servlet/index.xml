@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Servlet on 编程之路</title>
+    <link>http://vonzhou.com/tags/servlet/</link>
+    <description>Recent content in Servlet on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 24 Aug 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/servlet/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>DispatcherServlet 源码阅读</title>
+      <link>http://vonzhou.com/2016/dispatcherservlet/</link>
+      <pubDate>Wed, 24 Aug 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/dispatcherservlet/</guid>
+      <description>有时间还是应该多看看源码。
+DispatcherServlet 是一个实实在在的 Servlet，所以 Spring MVC 引入后不会改变 Servlet 容器的行为， 仍然是解析 web.xml 部署文件，只需要在里面配置这个 Servlet 即可。 比如下面配置 dispatcher Servlet 处理所有的请求，也体现了 DispatcherServlet 是前端控制器（Front Controller）。 contextConfigLocation 上下文参数用于配置路径的指定，如果没有的话就使用默认的值。
+&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;web-app xmlns=&amp;quot;http://java.sun.com/xml/ns/javaee&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xsi:schemaLocation=&amp;quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&amp;quot; version=&amp;quot;3.0&amp;quot;&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.springframework.web.servlet.DispatcherServlet&amp;lt;/servlet-class&amp;gt; &amp;lt;load-on-startup&amp;gt;1&amp;lt;/load-on-startup&amp;gt; &amp;lt;/servlet&amp;gt; &amp;lt;servlet-mapping&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;url-pattern&amp;gt;/&amp;lt;/url-pattern&amp;gt; &amp;lt;/servlet-mapping&amp;gt; &amp;lt;listener&amp;gt; &amp;lt;listener-class&amp;gt;org.springframework.web.context.ContextLoaderListener&amp;lt;/listener-class&amp;gt; &amp;lt;/listener&amp;gt; &amp;lt;context-param&amp;gt; &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt; &amp;lt;param-value&amp;gt; /WEB-INF/dispatcher-servlet.xml classpath:service-context.xml &amp;lt;/param-value&amp;gt; &amp;lt;/context-param&amp;gt; &amp;lt;/web-app&amp;gt;  DispatcherServlet 初始化 DispatcherServlet 的父类 HttpServletBean 覆盖了 HttpServlet 的 init 方法，实现该 servlet 的初始化。
+/** * Map config parameters onto bean properties of this servlet, and * invoke subclass initialization.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/kafka-source-begin/" />
+  <link rel="next" href="http://vonzhou.com/2018/asmtools-intro/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/java-condition/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           深入理解条件变量 Condition | 编程之路
+       
+  </title>
+  <meta name="title" content="深入理解条件变量 Condition | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "深入理解条件变量 Condition",
+    "headline" : "深入理解条件变量 Condition",
+    "description" : "序 可重入锁（ReentrantLock）是 synchronized 关键字的扩展，更加灵活。还有一种ReentrantLock应用场景是和Condition搭配使用，实现多线程环境下等待状态条件的功能。Object.wait 和 Object.notify 是和 synchronized 配合使用的，条件变量Condition是和ReentrantLock相关联的。
+接下来先通过一个Demo看看Condition的用法，然后列举两个应用的地方，最后分析其源码实现。
+一个简单Demo 先通过一个Demo看看怎么使用Condition，主线程通知条件满足，通过另一个线程继续运行，可以看到的是Condition.wait/signal方法需要和一个ReentrantLock绑定。
+public class ReenterLockCondition implements Runnable { public static ReentrantLock lock = new ReentrantLock(); public static Condition condition = lock.newCondition(); @Override public void run() { try { lock.lock(); condition.await(); System.out.println(String.format(&quot;条件满足，线程%s运行！&quot;, Thread.currentThread().getName())); } catch (InterruptedException e) { e.printStackTrace(); } finally { lock.unlock(); } } public static void main(String args[]) throws InterruptedException { ReenterLockCondition reenterLockCondition = new ReenterLockCondition(); Thread thread1 = new Thread(reenterLockCondition); thread1.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-11-11 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-11-11 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/java-condition/",
+    "wordCount" : "1268",
+    "keywords" : [ "线程安全", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">深入理解条件变量 Condition</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-11-11 itemprop="datePublished">November 11, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="序">序</h2>
+
+<p>可重入锁（<code>ReentrantLock</code>）是 <code>synchronized</code> 关键字的扩展，更加灵活。还有一种<code>ReentrantLock</code>应用场景是和<code>Condition</code>搭配使用，实现多线程环境下等待状态条件的功能。<code>Object.wait</code> 和 <code>Object.notify</code> 是和 <code>synchronized</code> 配合使用的，条件变量<code>Condition</code>是和<code>ReentrantLock</code>相关联的。</p>
+
+<p>接下来先通过一个Demo看看<code>Condition</code>的用法，然后列举两个应用的地方，最后分析其源码实现。</p>
+
+<h2 id="一个简单demo">一个简单Demo</h2>
+
+<p>先通过一个Demo看看怎么使用<code>Condition</code>，主线程通知条件满足，通过另一个线程继续运行，可以看到的是<code>Condition.wait/signal</code>方法需要和一个<code>ReentrantLock</code>绑定。</p>
+
+<pre><code class="language-java">public class ReenterLockCondition implements Runnable {
+    public static ReentrantLock lock = new ReentrantLock();
+    public static Condition condition = lock.newCondition();
+
+    @Override
+    public void run() {
+        try {
+            lock.lock();
+            condition.await();
+            System.out.println(String.format(&quot;条件满足，线程%s运行！&quot;, Thread.currentThread().getName()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
+    public static void main(String args[]) throws InterruptedException {
+        ReenterLockCondition reenterLockCondition = new ReenterLockCondition();
+        Thread thread1 = new Thread(reenterLockCondition);
+        thread1.setName(&quot;T1&quot;);
+        thread1.start();
+        Thread.sleep(2000);
+        System.out.println(&quot;通知T1条件满足&quot;);
+        lock.lock();
+        condition.signal();
+        lock.unlock();
+    }
+}
+</code></pre>
+
+<h2 id="应用举例-jdk-arrayblockingqueue">应用举例：JDK ArrayBlockingQueue</h2>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/java-condition-1.jpg" alt="ArrayBlockingQueue类图" class="lazyload"><figcaption class="image-caption">ArrayBlockingQueue类图</figcaption></figure></p>
+
+<p>JDK并发包中的 <code>ArrayBlockingQueue</code> 就使用了<code>Condition</code>来同步队列的空/满状态。先看条件变量的定义：</p>
+
+<pre><code class="language-java">/** Main lock guarding all access */
+final ReentrantLock lock;
+
+/** Condition for waiting takes */
+private final Condition notEmpty;
+
+/** Condition for waiting puts */
+private final Condition notFull;
+
+public ArrayBlockingQueue(int capacity, boolean fair) {
+    if (capacity &lt;= 0)
+        throw new IllegalArgumentException();
+    this.items = new Object[capacity];
+    lock = new ReentrantLock(fair);
+    notEmpty = lock.newCondition();
+    notFull =  lock.newCondition();
+}
+</code></pre>
+
+<p><code>ArrayBlockingQueue</code> 构造的时候初始化了2个条件变量：非空，非满，他们都是和同一个重入锁关联的。</p>
+
+<p>元素入队的时候，如果队列一直满的话就一直阻塞等待非满条件为真，否则的话就插入对应的元素，并且通知非空条件为真。</p>
+
+<pre><code class="language-java">public void put(E e) throws InterruptedException {
+    checkNotNull(e);
+    final ReentrantLock lock = this.lock;
+    lock.lockInterruptibly();
+    try {
+        while (count == items.length)
+            notFull.await();
+        enqueue(e);
+    } finally {
+        lock.unlock();
+    }
+}
+
+private void enqueue(E x) {
+    // assert lock.getHoldCount() == 1;
+    // assert items[putIndex] == null;
+    final Object[] items = this.items;
+    items[putIndex] = x;
+    if (++putIndex == items.length)
+        putIndex = 0;
+    count++;
+    notEmpty.signal();
+}
+</code></pre>
+
+<p>同样的，出队的时候，如果队列没有元素就等待非空的条件为真，否则出队，并通知非满条件为真。</p>
+
+<pre><code class="language-java">public E take() throws InterruptedException {
+    final ReentrantLock lock = this.lock;
+    lock.lockInterruptibly();
+    try {
+        while (count == 0)
+            notEmpty.await();
+        return dequeue();
+    } finally {
+        lock.unlock();
+    }
+}
+
+private E dequeue() {
+    // assert lock.getHoldCount() == 1;
+    // assert items[takeIndex] != null;
+    final Object[] items = this.items;
+    @SuppressWarnings(&quot;unchecked&quot;)
+    E x = (E) items[takeIndex];
+    items[takeIndex] = null;
+    if (++takeIndex == items.length)
+        takeIndex = 0;
+    count--;
+    if (itrs != null)
+        itrs.elementDequeued();
+    notFull.signal();
+    return x;
+}
+    
+    
+</code></pre>
+
+<h2 id="应用举例-kafaka-bufferpool">应用举例：Kafaka BufferPool</h2>
+
+<p><code>KafkaProducer</code>里面有一个buffer pool的概念，<code>BufferPool</code>里面内存分配，回收过程也有用到条件变量。</p>
+
+<pre><code class="language-java">public ByteBuffer allocate(int size, long maxTimeToBlockMs) throws InterruptedException {
+    this.lock.lock();
+    try {
+        // check if we have a free buffer of the right size pooled
+        if (size == poolableSize &amp;&amp; !this.free.isEmpty())
+            return this.free.pollFirst();
+
+        // now check if the request is immediately satisfiable with the
+        // memory on hand or if we need to block
+        int freeListSize = this.free.size() * this.poolableSize;
+        if (this.availableMemory + freeListSize &gt;= size) {
+            // 不断释放free队列中的buffer，直到可用内存&gt;size
+            // we have enough unallocated or pooled memory to immediately
+            // satisfy the request
+            freeUp(size);
+            this.availableMemory -= size;
+            lock.unlock();
+            // 使用的不是free队列中的buffer，而是直接分配HeapByteBuffer
+            return ByteBuffer.allocate(size);
+        } else {
+            // 没有足够空间，阻塞
+            // we are out of memory and will have to block
+            int accumulated = 0;
+            ByteBuffer buffer = null;
+            Condition moreMemory = this.lock.newCondition();
+            long remainingTimeToBlockNs = TimeUnit.MILLISECONDS.toNanos(maxTimeToBlockMs);
+            this.waiters.addLast(moreMemory);
+            // loop over and over until we have a buffer or have reserved
+            // enough memory to allocate one
+            while (accumulated &lt; size) {
+                long startWaitNs = time.nanoseconds();
+                long timeNs;
+                boolean waitingTimeElapsed;
+                try {
+                    waitingTimeElapsed = !moreMemory.await(remainingTimeToBlockNs, TimeUnit.NANOSECONDS);
+                } catch (InterruptedException e) {
+                    this.waiters.remove(moreMemory);
+                    throw e;
+                } finally {
+                    long endWaitNs = time.nanoseconds();
+                    timeNs = Math.max(0L, endWaitNs - startWaitNs);
+                    this.waitTime.record(timeNs, time.milliseconds());
+                }
+
+                if (waitingTimeElapsed) {
+                    this.waiters.remove(moreMemory);
+                    throw new TimeoutException(&quot;Failed to allocate memory within the configured max blocking time &quot; + maxTimeToBlockMs + &quot; ms.&quot;);
+                }
+
+                remainingTimeToBlockNs -= timeNs;
+                // check if we can satisfy this request from the free list,
+                // otherwise allocate memory
+                if (accumulated == 0 &amp;&amp; size == this.poolableSize &amp;&amp; !this.free.isEmpty()) {
+                    // just grab a buffer from the free list
+                    buffer = this.free.pollFirst();
+                    accumulated = size;
+                } else {
+                    // 先分配一部分空间
+                    // we'll need to allocate memory, but we may only get
+                    // part of what we need on this iteration
+                    freeUp(size - accumulated);
+                    int got = (int) Math.min(size - accumulated, this.availableMemory);
+                    this.availableMemory -= got;
+                    accumulated += got;
+                }
+            }
+
+            // 成功分配空间后，移除条件变量
+            // remove the condition for this thread to let the next thread
+            // in line start getting memory
+            Condition removed = this.waiters.removeFirst();
+            if (removed != moreMemory)
+                throw new IllegalStateException(&quot;Wrong condition: this shouldn't happen.&quot;);
+
+            // 如果还有剩余空间，还有等待线程，则唤醒
+            // signal any additional waiters if there is more memory left
+            // over for them
+            if (this.availableMemory &gt; 0 || !this.free.isEmpty()) {
+                if (!this.waiters.isEmpty())
+                    this.waiters.peekFirst().signal();
+            }
+
+            // unlock and return the buffer
+            lock.unlock();
+            if (buffer == null)
+                return ByteBuffer.allocate(size);
+            else
+                return buffer;
+        }
+    } finally {
+        if (lock.isHeldByCurrentThread())
+            lock.unlock();
+    }
+}
+    
+public void deallocate(ByteBuffer buffer, int size) {
+    lock.lock();
+    try {
+        // 如果是poolableSize大小的buffer，则入free队列管理
+        if (size == this.poolableSize &amp;&amp; size == buffer.capacity()) {
+            buffer.clear();
+            this.free.add(buffer);
+        } else {
+            // 否则直接增加大小，分配的buffer由GC回收
+            this.availableMemory += size;
+        }
+
+        // 唤醒一个因内存分配得不到满足而阻塞的线程
+        Condition moreMem = this.waiters.peekFirst();
+        if (moreMem != null)
+            moreMem.signal();
+    } finally {
+        lock.unlock();
+    }
+}    
+</code></pre>
+
+<h2 id="condition-实现分析">Condition 实现分析</h2>
+
+<p>接下来看看条件变量是怎么实现的？可重入锁关联的条件变量实现类是AQS内部类<code>ConditionObject</code>，接下来通过其中的await和signal方法的源码看看<code>Condition</code>的实现。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/ConditionObject.png" alt="ConditionObject类结构" class="lazyload"><figcaption class="image-caption">ConditionObject类结构</figcaption></figure></p>
+
+<h3 id="await">await</h3>
+
+<p>调用 Condition.await 方法前需要拥有锁，await 会释放锁<code>fullyRelease</code>。</p>
+
+<pre><code class="language-java">public final void await() throws InterruptedException {
+    if (Thread.interrupted())
+        throw new InterruptedException();
+    Node node = addConditionWaiter();
+    
+    // 释放关联的锁
+    int savedState = fullyRelease(node);
+    int interruptMode = 0;
+    
+    // 如果该节点没有放入同步队列(sync queue)，则阻塞等待
+    while (!isOnSyncQueue(node)) {
+        LockSupport.park(this);
+        if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
+            break;
+    }
+    
+    // 节点进入了同步队列，则争用锁，锁获取成功后，await就退出了
+    if (acquireQueued(node, savedState) &amp;&amp; interruptMode != THROW_IE)
+        interruptMode = REINTERRUPT;
+    if (node.nextWaiter != null) // clean up if cancelled
+        unlinkCancelledWaiters();
+    if (interruptMode != 0)
+        reportInterruptAfterWait(interruptMode);
+}
+</code></pre>
+
+<h3 id="条件队列">条件队列</h3>
+
+<p>将当前线程加入到条件等待队列。</p>
+
+<pre><code class="language-java">// 新增一个条件节点
+private Node addConditionWaiter() {
+    Node t = lastWaiter;
+    // If lastWaiter is cancelled, clean out.
+    if (t != null &amp;&amp; t.waitStatus != Node.CONDITION) {
+        unlinkCancelledWaiters();
+        t = lastWaiter;
+    }
+    Node node = new Node(Thread.currentThread(), Node.CONDITION);
+    if (t == null)
+        firstWaiter = node;
+    else
+        t.nextWaiter = node;
+    lastWaiter = node;
+    return node;
+}
+</code></pre>
+
+<h3 id="锁释放">锁释放</h3>
+
+<p>AQS的方法。<code>getState()</code>方法获取的就是AQS里面的state变量，在<code>ReentrantLock</code>中，其实state保存的是重入的次数（参考《可重入锁ReentrantLock源码阅读》）。</p>
+
+<pre><code class="language-java">final int fullyRelease(Node node) {
+    boolean failed = true;
+    try {
+        int savedState = getState();
+        if (release(savedState)) {
+            failed = false;
+            return savedState;
+        } else {
+            throw new IllegalMonitorStateException();
+        }
+    } finally {
+        if (failed)
+            node.waitStatus = Node.CANCELLED;
+    }
+}
+</code></pre>
+
+<p><code>ReentrantLock.Sync.tryRelease</code>的实现如下，可以看到不管重入了多少次都会一次性释放。</p>
+
+<pre><code class="language-java">protected final boolean tryRelease(int releases) {
+    int c = getState() - releases;
+    if (Thread.currentThread() != getExclusiveOwnerThread())
+        throw new IllegalMonitorStateException();
+    boolean free = false;
+    if (c == 0) {
+        free = true;
+        setExclusiveOwnerThread(null);
+    }
+    setState(c);
+    return free;
+}
+</code></pre>
+
+<p><code>fullyRelease</code>返回之前的重入次数，后续会用到。</p>
+
+<h3 id="阻塞等待条件满足">阻塞等待条件满足</h3>
+
+<p>await 释放锁后进入阻塞等待状态，阻塞的条件是该节点没有在SyncQueue上：</p>
+
+<pre><code class="language-java">final boolean isOnSyncQueue(Node node) {
+    if (node.waitStatus == Node.CONDITION || node.prev == null)
+        return false;
+    if (node.next != null) // If has successor, it must be on queue
+        return true;
+    /*
+     * node.prev can be non-null, but not yet on queue because
+     * the CAS to place it on queue can fail. So we have to
+     * traverse from tail to make sure it actually made it.  It
+     * will always be near the tail in calls to this method, and
+     * unless the CAS failed (which is unlikely), it will be
+     * there, so we hardly ever traverse much.
+     */
+    return findNodeFromTail(node);
+}
+``
+
+signal的时候该方法会返回true。
+
+### 重获锁
+
+条件满足后，需要重新获取锁，acquireQueued会调到ReentrantLock.tryAcquire，此处可以看到保存前面`savedState`的作用。
+
+### signal
+
+唤醒就是把等待队列中的第一个节点转移到同步队列。
+
+​```java
+public final void signal() {
+    // 先判断当前线程是否获取了锁，否则异常
+    if (!isHeldExclusively())
+        throw new IllegalMonitorStateException();
+    Node first = firstWaiter;
+    if (first != null)
+        doSignal(first);
+}
+
+// 摘除头节点，把头节点移到同步队列
+private void doSignal(Node first) {
+    do {
+        if ( (firstWaiter = first.nextWaiter) == null)
+            lastWaiter = null;
+        first.nextWaiter = null;
+    } while (!transferForSignal(first) &amp;&amp;
+             (first = firstWaiter) != null);
+}
+
+final boolean transferForSignal(Node node) {
+     // CAS 将状态设置为0,0是一个无效的状态
+    if (!compareAndSetWaitStatus(node, Node.CONDITION, 0))
+        return false;
+
+    /*
+     * Splice onto queue and try to set waitStatus of predecessor to
+     * indicate that thread is (probably) waiting. If cancelled or
+     * attempt to set waitStatus fails, wake up to resync (in which
+     * case the waitStatus can be transiently and harmlessly wrong).
+     */
+    Node p = enq(node);
+    int ws = p.waitStatus;
+    
+    // 唤醒线程
+    if (ws &gt; 0 || !compareAndSetWaitStatus(p, ws, Node.SIGNAL))
+        LockSupport.unpark(node.thread);
+    return true;
+}
+
+// 这个方法是AQS中的，node进入同步队列
+private Node enq(final Node node) {
+    for (;;) {
+        Node t = tail;
+        if (t == null) { // Must initialize
+            if (compareAndSetHead(new Node()))
+                tail = head;
+        } else {
+            node.prev = t;
+            if (compareAndSetTail(t, node)) {
+                t.next = node;
+                return t;
+            }
+        }
+    }
+}
+</code></pre>
+
+<h3 id="signalall">signalAll</h3>
+
+<p>转移所有的等待节点。</p>
+
+<pre><code class="language-java">private void doSignalAll(Node first) {
+    lastWaiter = firstWaiter = null;
+    do {
+        Node next = first.nextWaiter;
+        first.nextWaiter = null;
+        transferForSignal(first);
+        first = next;
+    } while (first != null);
+}
+</code></pre>
+
+<h2 id="linux环境下的条件变量">Linux环境下的条件变量</h2>
+
+<p>了解Linux环境编程的会想到其中也有条件变量的机制来实现线程之间的同步，和Java中的基本上语义是相同的，在等待条件的时候都会原子的释放锁。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/java-condition-3.jpg" alt="pthread_wait" class="lazyload"><figcaption class="image-caption">pthread_wait</figcaption></figure></p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/java-condition-4.jpg" alt="pthread_signal" class="lazyload"><figcaption class="image-caption">pthread_signal</figcaption></figure></p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/java-condition/>http://vonzhou.com/2018/java-condition/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
+                    #线程安全</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/kafka-source-begin/" class="prev" rel="prev" title="Kafka源码阅读环境搭建"><i class="iconfont icon-left"></i>&nbsp;Kafka源码阅读环境搭建</a>
+         
+        
+        <a href="http://vonzhou.com/2018/asmtools-intro/" class="next" rel="next" title="Java字节码工具AsmTools介绍">Java字节码工具AsmTools介绍&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

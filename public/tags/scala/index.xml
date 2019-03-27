@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Scala on 编程之路</title>
+    <link>http://vonzhou.com/tags/scala/</link>
+    <description>Recent content in Scala on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 07 Nov 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/scala/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Kafka源码阅读环境搭建</title>
+      <link>http://vonzhou.com/2018/kafka-source-begin/</link>
+      <pubDate>Wed, 07 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/kafka-source-begin/</guid>
+      <description>记录Kafka源码阅读环境的搭建过程。
+序 在大数据系统中Kafka应用广泛，借助源码阅读可以加深对组件的理解，同时可以拾起Scala语言。
+安装依赖软件  JDK Scala Gradle  构建IDEA工程 在源码目录下运行 gradle idea。
+遇到的问题：
+* What went wrong: A problem occurred evaluating root project &#39;kafka-0.10.0.1-src&#39;. &amp;gt; Failed to apply plugin [class &#39;org.gradle.api.plugins.scala.ScalaBasePlugin&#39;] &amp;gt; No such property: useAnt for class: org.gradle.api.tasks.scala.ScalaCompileOptions  需要在build.gradle开头加入：
+ScalaCompileOptions.metaClass.daemonServer = true ScalaCompileOptions.metaClass.fork = true ScalaCompileOptions.metaClass.useAnt = false ScalaCompileOptions.metaClass.useCompileDaemon = false  然后构建完成。
+打开工程 然后用IDEA打开工程，kafka server的启动类是 kafka.Kafka，启动时需要指定配置文件 config/server.properties。
+这里我修改了日志路径和ZK的地址。
+log.dirs=D:\\dev\\kafka-logs zookeeper.connect=ubuntu:2181  配置启动选项，指定server.properties配置文件。
+运行后可以看到kafka成功启动的日志：
+[2018-11-07 14:17:20,673] INFO Initiating client connection, connectString=ubuntu:2181 sessionTimeout=6000 watcher=org.</description>
+    </item>
+    
+  </channel>
+</rss>

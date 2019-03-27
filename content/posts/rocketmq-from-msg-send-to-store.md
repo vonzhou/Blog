@@ -1,0 +1,64 @@
+---
+title: "RocketMQ源码阅读 -  从消息发送到存储"
+date: 2016-08-30
+draft: false
+categories: ["消息队列"]
+tags: ["消息队列", "RocketMQ", "Java"]
+---
+
+## RocketMQ 简介
+
+RocketMQ 是一款开源的消息中间件，采用Java实现，设计思想来自于Kafka（Scala实现）。接下来是自己阅读源码的一些探索。
+
+RocketMQ的整体架构如下，可以看到各个组件充当的角色，Name Server 负责维护一些全局的路由信息：当前有哪些broker，每个Topic在哪个broker上; Broker具体处理消息的存储和服务；生产者和消费者是消息的源头和归宿。
+
+![](/images/RocketMQ-arch.jpg)
+
+## Producer 发送消息
+
+Producer发送消息是如何得知发到哪个broker的 ？ 每个应用在收发消息之前，一般会调用一次`producer.start()/consumer.start()`做一些初始化工作，其中包括：创建需要的实例对象，如`MQClientInstance`；设置定时任务，如从Nameserver中定时更新本地的`Topic route info`，发送心跳信息到所有的 broker，动态调整线程池的大小，把当前producer加入到指定的组中等等。
+
+客户端会缓存路由信息`TopicPublishInfo`, 同时定期从NameServer取Topic路由信息，每个Broker与NameServer集群中的所有节点建立长连接，定时注册Topic信息到所有的NameServer。
+
+Producer在发送消息的时候会去查询本地的topicPublishInfoTable（一个ConcurrentHashMap），如果没有命中的话就会询问NameServer得到路由信息(RequestCode=GET_ROUTEINTO_BY_TOPIC) 如果nameserver中也没有查询到（表示该主题的消息第一次发送），那么将会发送一个default的topic进行路由查询。具体过程如下图所示。
+
+![](/images/RocketMQ-producer-send.jpg)
+
+Producer 在得到了具体的通信地址后，发送过程就显而易见了。通过代码可以看到在选择消息队列进行发送时采用随机方式，同时和上一次发送的broker保持不同，防止热点。
+
+## Broker处理来自Producer的消息
+
+每个producer在发送消息的时候都和对应的Broker建立了长连接，此时broker已经准备好接收Message，Broker的`SendMessageProcessor.sendMessage`处理消息的存储，具体过程如下。接收到消息后，会先写入Commit Log文件（顺序写，写满了会新建一个新的文件），然后更新Consume queue文件（存储如何由topic定位到具体的消息）。
+
+![](/images/RocketMQ-broker-msg-proc.jpg)
+
+## RocketMQ 存储特点
+
+RocketMQ的消息采用顺序写到commitlog文件，然后利用consume queue文件作为逻辑队列（索引），如图。RocketMQ采用零拷贝mmap+write的方式来回应Consumer的请求，RocketMQ宣称大部分请求都会在Page Cache层得到满足，所以消息过多不会因为磁盘读使得性能下降，这里自己的理解是，在64bit机器下，虚存地址空间（`vm_area_struct`）不是问题，所以相关的文件都会被映射到内存中（有定期删除文件的操作），即使此刻不在内存，操作系统也会因为缺页异常进行换入，虽然地址空间不是问题，但是一个进程映射文件的个数(`/proc/sys/vm/max_map_count`)是有限的，所以可能在这里发生OOM。
+
+![](/images/RocketMQ-CommitLog.jpg)
+
+通过Broker中的存储目录（默认路径是 $HOME/store）也能看到存储的逻辑视图：
+
+![](/images/RocketMQ-store-directory.jpg)
+
+## 顺序消息是如何保证的？
+
+需要业务层自己决定哪些消息应该顺序到达，然后发送的时候通过规则（hash）映射到同一个队列，因为没有谁比业务自己更加知道关于消息顺序的特点。这样的顺序是相对顺序，局部顺序，因为发送方只保证把这些消息顺序的发送到broker上的同一队列，但是不保证其他Producer也会发送消息到那个队列，所以需要Consumer在拉到消息后做一些过滤。
+
+
+## RocketMQ 刷盘实现
+
+Broker 在消息的存取时直接操作的是内存（内存映射文件），这可以提供系统的吞吐量，但是无法避免机器掉电时数据丢失，所以需要持久化到磁盘中。刷盘的最终实现都是使用NIO中的 `MappedByteBuffer.force()` 将映射区的数据写入到磁盘，如果是同步刷盘的话，在Broker把消息写到CommitLog映射区后，就会等待写入完成。异步而言，只是唤醒对应的线程，不保证执行的时机，流程如图所示。
+
+![](/images/RocketMQ-disk-flush.jpg)
+
+
+## 消息过滤
+
+类似于重复数据删除技术（Data Deduplication），可以在源端做，也可以在目的端实现，就是网络和存储的权衡，如果在Broker端做消息过滤就需要逐一比对consume queue 的 tagsCode 字段（hashcode）,如果符合则传输给消费者，因为是 hashcode，所以存在误判，需要在 Consumer 接收到消息后进行字符串级别的过滤，确保准确性。
+
+
+## 小结
+
+这次代码阅读主要着眼于消息的发送过程和Broker上的存储，其他方面的细节有待深入。

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SpringCloud on 编程之路</title>
+    <link>http://vonzhou.com/categories/springcloud/</link>
+    <description>Recent content in SpringCloud on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 10 Oct 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/categories/springcloud/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>解决Zuul无法同时转发Multipart和JSON请求的问题</title>
+      <link>http://vonzhou.com/2018/zuul-forward-multipart-and-json/</link>
+      <pubDate>Wed, 10 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/zuul-forward-multipart-and-json/</guid>
+      <description>扩展 RibbonRoutingFilter，修改默认的转发逻辑，支持转发Multipart和JSON类型请求。
+场景 系统中有一个采用 Netflix Zuul 实现的网关模块，负责统一的鉴权，然后把请求转到对应的后端模块。基本的配置后，只需要实现一个Filter就可以了。
+@Slf4j @Component public class AccessTokenFilter extends ZuulFilter { // Filter 的类型，在路由之前 @Override public String filterType() { return &amp;quot;pre&amp;quot;; } // 比系统的优先级要低些 @Override public int filterOrder() { return 7; } @Override public Object run() { RequestContext requestContext = RequestContext.getCurrentContext(); HttpServletRequest request = requestContext.getRequest(); HttpServletResponse response = requestContext.getResponse(); String token = CookieUtils.getCookieValue(&amp;quot;token&amp;quot;, request); log.info(&amp;quot;token={}&amp;quot;, token); token = URLDecoder.decode(token, &amp;quot;UTF-8&amp;quot;); // 验证 token boolean valid = validateToken(token); // 验证不通过则直接响应 if(!</description>
+    </item>
+    
+  </channel>
+</rss>

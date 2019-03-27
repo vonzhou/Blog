@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>模式匹配 on 编程之路</title>
+    <link>http://vonzhou.com/tags/%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D/</link>
+    <description>Recent content in 模式匹配 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>JDK 12新特性：Switch表达式</title>
+      <link>http://vonzhou.com/2019/java12-switch-expression/</link>
+      <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/java12-switch-expression/</guid>
+      <description>JDK 12 GA在2019.3.19发布，其中一项新特性是JEP 325：Switch表达式（Switch Expressions）。学习下。
+如果知道Scala中的模式匹配，就很容易理解Switch表达式。
+本文完整代码见SwitchDemo 。
+传统的Switch语句 传统的Switch语句（switch statement）我们并不陌生，在每个case分支中实现对应的处理逻辑。
+private static void switchStatement(WeekDay day) { int numLetters = 0; switch (day) { case MONDAY: case FRIDAY: case SUNDAY: numLetters = 6; break; case TUESDAY: numLetters = 7; break; case THURSDAY: case SATURDAY: numLetters = 8; break; case WEDNESDAY: numLetters = 9; break; } System.out.println(&amp;quot;1. Num Of Letters: &amp;quot; + numLetters); }  Switch语句的特点是每个case分支块是没有返回值的，而表达式（expression）的特点是有返回值。
+Switch表达式 模式匹配（Patrern Matching） 上述“计算字符个数”的例子使用Switch表达式，代码如下：</description>
+    </item>
+    
+  </channel>
+</rss>

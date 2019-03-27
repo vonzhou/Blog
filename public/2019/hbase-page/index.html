@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2019/kafka-producer-fullgc-story/" />
+  <link rel="next" href="http://vonzhou.com/2019/bo-lan-lai-ke/" />
+  <link rel="canonical" href="http://vonzhou.com/2019/hbase-page/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           HBase 实现分页查询 | 编程之路
+       
+  </title>
+  <meta name="title" content="HBase 实现分页查询 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "HBase 实现分页查询",
+    "headline" : "HBase 实现分页查询",
+    "description" : "序 按时间区间分页导出HBase中的数据。
+Rowkey的设计 在使用HBase时，Rowkey的设计很重要，取决于业务。
+比如要把用户关联的数据存入HBase，后续根据时间查询，可以这样设计rowkey：
+userId + (Long.MAX - timestamp) + uid  这样能满足：
+ 可以根据userId的特点预分区 时间戳逆转，可以保证最近的数据rowkey排序靠前 分布式环境下时间戳可能一样，所以追加一个UID，防止重复  示例代码：
+private String getRowKeyStr(String userId, long ts, long uid) { return String.format(&quot;%s%013d%019d&quot;, userId, Long.MAX_VALUE - ts, uid); }  构造Table实例 需要自己保证Table的线程安全性。
+public Table getTable() throws Exception { Table table = tableThreadLocal.get(); if (table == null) { table = getTableInternal(); if (table != null) { tableThreadLocal.set(table); } } return table; } public Table getTableInternal() throws Exception { Configuration config = HBaseConfiguration.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2019",
+    "datePublished": "2019-03-14 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2019-03-14 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2019/hbase-page/",
+    "wordCount" : "213",
+    "keywords" : [ "HBase","Java", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">HBase 实现分页查询</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2019-03-14 itemprop="datePublished">March 14, 2019</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"> 大数据 </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="序">序</h2>
+
+<p>按时间区间分页导出HBase中的数据。</p>
+
+<h2 id="rowkey的设计">Rowkey的设计</h2>
+
+<p>在使用HBase时，Rowkey的设计很重要，取决于业务。</p>
+
+<p>比如要把用户关联的数据存入HBase，后续根据时间查询，可以这样设计rowkey：</p>
+
+<pre><code>userId + (Long.MAX - timestamp) + uid 
+</code></pre>
+
+<p>这样能满足：</p>
+
+<ul>
+<li>可以根据userId的特点预分区</li>
+<li>时间戳逆转，可以保证最近的数据rowkey排序靠前</li>
+<li>分布式环境下时间戳可能一样，所以追加一个UID，防止重复</li>
+</ul>
+
+<p>示例代码：</p>
+
+<pre><code class="language-java">private String getRowKeyStr(String userId, long ts, long uid) {
+    return String.format(&quot;%s%013d%019d&quot;, userId, Long.MAX_VALUE - ts, uid);
+}
+</code></pre>
+
+<h2 id="构造table实例">构造Table实例</h2>
+
+<p>需要自己保证Table的线程安全性。</p>
+
+<pre><code class="language-java">public Table getTable() throws Exception {
+    Table table = tableThreadLocal.get();
+    if (table == null) {
+        table = getTableInternal();
+        if (table != null) {
+            tableThreadLocal.set(table);
+        }
+    }
+    return table;
+}
+
+public Table getTableInternal() throws Exception {
+    Configuration config = HBaseConfiguration.create();
+    config.set(HConstants.ZOOKEEPER_QUORUM, hBaseConfig.getZkQuorum());
+    config.set(HConstants.ZOOKEEPER_CLIENT_PORT, hBaseConfig.getZkClientPort());
+    config.set(HConstants.ZOOKEEPER_ZNODE_PARENT, hBaseConfig.getZkZnodeParent());
+    config.setInt(&quot;hbase.rpc.timeout&quot;, 20000);
+    config.setInt(&quot;hbase.client.operation.timeout&quot;, 30000);
+    config.setInt(&quot;hbase.client.scanner.timeout.period&quot;, 20000);
+    config.setInt(&quot;hbase.client.pause&quot;, 50);
+    config.setInt(&quot;hbase.client.retries.number&quot;, 15);
+//        HBaseAdmin.checkHBaseAvailable(config);
+
+    Connection connection = ConnectionFactory.createConnection(config);
+    Table table = connection.getTable(TableName.valueOf(hBaseConfig.getTableName()));
+
+    return table;
+}
+</code></pre>
+
+<h2 id="分页查询">分页查询</h2>
+
+<p>这里要注意是Scan中的startRow，stopRow是左闭右开区间，所以为了避免下一页中包含上一页的最后一条数据， 下一页Scan的时候startRow追加了一个0字节。</p>
+
+<pre><code class="language-java">Filter filter = new PageFilter(15);
+
+byte[] lastRow = null;
+byte[] startRow = getRowKey(userId, end, 0L);
+byte[] endRow = getRowKey(userId, start, Long.MAX_VALUE);
+
+Table table = getTable();
+if (table == null) {
+    return;
+}
+
+int sum = 0;
+
+while (true) {
+    Scan scan = new Scan();
+    scan.setFilter(filter);
+
+    byte[] sr = null;
+    if (lastRow != null) {
+        sr = Bytes.add(lastRow, new byte[1]);// 重点1
+    } else {
+        sr = startRow;
+    }
+    scan.setStartRow(sr);
+    scan.setStopRow(endRow);
+    ResultScanner scanner = table.getScanner(scan);
+    Result result = null;
+    int cnt = 0;
+    while ((result = scanner.next()) != null) {
+        // 从Result中解析数据，进行处理
+        cnt++;
+        lastRow = result.getRow();
+    }
+    scanner.close();
+    if (cnt == 0) {
+        break;
+    }
+}
+</code></pre>
+
+<h2 id="filter">Filter</h2>
+
+<p>上述只是用了PageFilter实现分页，如果需要根据列的各种条件进行查询，就需要用到FilterList，或者自己实现Filter。</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2019/hbase-page/>http://vonzhou.com/2019/hbase-page/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/hbase/">
+                    #HBase</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/java/">
+                    #Java</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2019/kafka-producer-fullgc-story/" class="prev" rel="prev" title="记一次使用KafkaProducer引发的Full GC问题"><i class="iconfont icon-left"></i>&nbsp;记一次使用KafkaProducer引发的Full GC问题</a>
+         
+        
+        <a href="http://vonzhou.com/2019/bo-lan-lai-ke/" class="next" rel="next" title="波兰来客">波兰来客&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

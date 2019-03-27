@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Spring MVC on 编程之路</title>
+    <link>http://vonzhou.com/tags/spring-mvc/</link>
+    <description>Recent content in Spring MVC on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 10 Aug 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/spring-mvc/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>ExceptionHandler 异常处理过程分析</title>
+      <link>http://vonzhou.com/2017/spring-exception-handler/</link>
+      <pubDate>Thu, 10 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/spring-exception-handler/</guid>
+      <description>ExceptionHandler 的使用场景就是在 Controller 中捕获异常，全局统一处理，而不是在每个 handler 中都进行繁琐的异常捕获操作，优点就是代码整洁。
+ExceptionHandler 异常处理过程大体为：执行 handler 方法如果抛出了异常，就根据异常类型查找到对应的异常处理方法，然后执行对应的方法，上图展示了这一过程。下面列出异常处理方法解析的过程。
+getExceptionHandlerMethod 根据特定的异常找到匹配的 @ExceptionHandler 方法，这里只关注在 Controller 查找有 ExceptionHandler 方法的路径，先忽略 ControllerAdvice 的情况。通过如下代码可以看到，对于每一个 handler 都有一个异常处理器缓存（exceptionHandlerCache），局部性原理。初次会进行 ExceptionHandlerMethodResolver 的构造，获取到 ExceptionHandlerMethodResolver 之后，根据异常获取到响应的方法，包装成一个 InvocableHandlerMethod 返回。
+protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) { Class&amp;lt;?&amp;gt; handlerType = (handlerMethod != null ? handlerMethod.getBeanType() : null); if (handlerMethod != null) { ExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache.get(handlerType); // 关键点1 if (resolver == null) { resolver = new ExceptionHandlerMethodResolver(handlerType); // 关键点2 this.exceptionHandlerCache.put(handlerType, resolver); } Method method = resolver.</description>
+    </item>
+    
+    <item>
+      <title>DispatcherServlet 源码阅读</title>
+      <link>http://vonzhou.com/2016/dispatcherservlet/</link>
+      <pubDate>Wed, 24 Aug 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/dispatcherservlet/</guid>
+      <description>有时间还是应该多看看源码。
+DispatcherServlet 是一个实实在在的 Servlet，所以 Spring MVC 引入后不会改变 Servlet 容器的行为， 仍然是解析 web.xml 部署文件，只需要在里面配置这个 Servlet 即可。 比如下面配置 dispatcher Servlet 处理所有的请求，也体现了 DispatcherServlet 是前端控制器（Front Controller）。 contextConfigLocation 上下文参数用于配置路径的指定，如果没有的话就使用默认的值。
+&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;web-app xmlns=&amp;quot;http://java.sun.com/xml/ns/javaee&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xsi:schemaLocation=&amp;quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&amp;quot; version=&amp;quot;3.0&amp;quot;&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.springframework.web.servlet.DispatcherServlet&amp;lt;/servlet-class&amp;gt; &amp;lt;load-on-startup&amp;gt;1&amp;lt;/load-on-startup&amp;gt; &amp;lt;/servlet&amp;gt; &amp;lt;servlet-mapping&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;url-pattern&amp;gt;/&amp;lt;/url-pattern&amp;gt; &amp;lt;/servlet-mapping&amp;gt; &amp;lt;listener&amp;gt; &amp;lt;listener-class&amp;gt;org.springframework.web.context.ContextLoaderListener&amp;lt;/listener-class&amp;gt; &amp;lt;/listener&amp;gt; &amp;lt;context-param&amp;gt; &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt; &amp;lt;param-value&amp;gt; /WEB-INF/dispatcher-servlet.xml classpath:service-context.xml &amp;lt;/param-value&amp;gt; &amp;lt;/context-param&amp;gt; &amp;lt;/web-app&amp;gt;  DispatcherServlet 初始化 DispatcherServlet 的父类 HttpServletBean 覆盖了 HttpServlet 的 init 方法，实现该 servlet 的初始化。
+/** * Map config parameters onto bean properties of this servlet, and * invoke subclass initialization.</description>
+    </item>
+    
+  </channel>
+</rss>

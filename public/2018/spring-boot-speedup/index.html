@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/linux-commands/" />
+  <link rel="next" href="http://vonzhou.com/2018/make-arraylist-thread-safe/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/spring-boot-speedup/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           如何加快 Spring Boot 项目的启动速度？ | 编程之路
+       
+  </title>
+  <meta name="title" content="如何加快 Spring Boot 项目的启动速度？ | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "如何加快 Spring Boot 项目的启动速度？",
+    "headline" : "如何加快 Spring Boot 项目的启动速度？",
+    "description" : "可以通过避免包扫描和自动配置来加快Spring Boot项目的启动速度。
+序 一个agent部署在其他机器上，其能够接收提交的Jar包进行部署，但是我们无法登陆机器也无法更新agent的代码。agent中有个逻辑是部署jar包的时候会等待10s，然后判断是否启动成功，如果没有启动成功，则进行回滚，这样就导致了一个问题：要部署的jar启动时间超过了10s，然后就回滚，无法部署成功。最终的解决方法只能是加快 Spring Boot 的启动速度了，经过调整后，到达了想要的结果。
+我们知道在基于 Spring Boot 的项目中，主类一般会加上注解 @SpringBootApplication，@SpringBootApplication 其实就是开启了包扫描和自动注解特性。
+@Target(ElementType.TYPE) @Retention(RetentionPolicy.RUNTIME) @Documented @Inherited @SpringBootConfiguration @EnableAutoConfiguration @ComponentScan(excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class)) public @interface SpringBootApplication { //................ }  问题的关键是 ComponentScan 和 EnableAutoConfiguration 是非常耗时的。@ComponentScan 是扫描指定包下面的注解标记，从而生成相应的 Bean，@EnableAutoConfiguration 可以根据引入的jar包，自动配置一些 Bean，但是并非都是需要的。
+避免包扫描（ComponentScan） 不使用 @SpringBootApplication 注解引入的 ComponentScan，改为自己配置项目中需要的Bean，启动类变为了：
+//@SpringBootApplication @Configuration @EnableAutoConfiguration public abstract class AppRunner { // ...... }  Bean 的实例化配置统一放到 BeanConfig.class中：
+@Configuration public class BeanConfig { @Autowired private SqlSessionFactory sqlSessionFactory; //.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-09-04 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-09-04 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/spring-boot-speedup/",
+    "wordCount" : "358",
+    "keywords" : [ "SpringBoot","Spring", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">如何加快 Spring Boot 项目的启动速度？</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-09-04 itemprop="datePublished">September 4, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/springboot/"> SpringBoot </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>可以通过避免包扫描和自动配置来加快Spring Boot项目的启动速度。</p>
+
+<h2 id="序">序</h2>
+
+<p>一个agent部署在其他机器上，其能够接收提交的Jar包进行部署，但是我们无法登陆机器也无法更新agent的代码。agent中有个逻辑是部署jar包的时候会等待10s，然后判断是否启动成功，如果没有启动成功，则进行回滚，这样就导致了一个问题：要部署的jar启动时间超过了10s，然后就回滚，无法部署成功。最终的解决方法只能是加快 Spring Boot 的启动速度了，经过调整后，到达了想要的结果。</p>
+
+<p>我们知道在基于 Spring Boot 的项目中，主类一般会加上注解 <code>@SpringBootApplication</code>，<code>@SpringBootApplication</code> 其实就是开启了包扫描和自动注解特性。</p>
+
+<pre><code class="language-java">@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
+public @interface SpringBootApplication {
+//................
+}
+</code></pre>
+
+<p>问题的关键是 <code>ComponentScan</code> 和 <code>EnableAutoConfiguration</code> 是非常耗时的。<code>@ComponentScan</code> 是扫描指定包下面的注解标记，从而生成相应的 Bean，<code>@EnableAutoConfiguration</code> 可以根据引入的jar包，自动配置一些 Bean，但是并非都是需要的。</p>
+
+<h2 id="避免包扫描-componentscan">避免包扫描（ComponentScan）</h2>
+
+<p>不使用 <code>@SpringBootApplication</code> 注解引入的 <code>ComponentScan</code>，改为自己配置项目中需要的Bean，启动类变为了：</p>
+
+<pre><code class="language-java">//@SpringBootApplication
+@Configuration
+@EnableAutoConfiguration
+public abstract class AppRunner {
+// ......
+}
+</code></pre>
+
+<p>Bean 的实例化配置统一放到 BeanConfig.class中：</p>
+
+<pre><code class="language-java">@Configuration
+public class BeanConfig {
+
+    @Autowired
+    private SqlSessionFactory sqlSessionFactory;
+
+   //.......
+
+    @Bean
+    public FooService fooService() {
+        return new FooService();
+    }
+
+    @Bean
+    public MapperFactoryBean&lt;FooMapper&gt; fooMapper() {
+        MapperFactoryBean&lt;FooMapper&gt; mfb = new MapperFactoryBean&lt;FooMapper&gt;();
+        mfb.setMapperInterface(FooMapper.class);
+        mfb.setSqlSessionFactory(sqlSessionFactory);
+        return mfb;
+    }
+
+}
+</code></pre>
+
+<h2 id="避免自动配置-enableautoconfiguration">避免自动配置（EnableAutoConfiguration）</h2>
+
+<p>可以先在项目中配置输出DEBUG日志，可以看到 Spring Boot 自动配置报告，然后自己引入那些实际需要的配置（报告中的 Positive matches）。</p>
+
+<pre><code class="language-java">=========================
+AUTO-CONFIGURATION REPORT
+=========================
+
+
+Positive matches:
+-----------------
+
+   AopAutoConfiguration matched:
+      - @ConditionalOnClass found required classes 'org.springframework.context.annotation.EnableAspectJAutoProxy', 'org.aspectj.lang.annotation.Aspect', 'org.aspectj.lang.reflect.Advice' (OnClassCondition)
+      - @ConditionalOnProperty (spring.aop.auto=true) matched (OnPropertyCondition)
+
+   AopAutoConfiguration.JdkDynamicAutoProxyConfiguration matched:
+      - @ConditionalOnProperty (spring.aop.proxy-target-class=false) matched (OnPropertyCondition)
+
+   DataSourceAutoConfiguration matched:
+      - @ConditionalOnClass found required classes 'javax.sql.DataSource', 'org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType' (OnClassCondition)
+
+   DataSourceAutoConfiguration#dataSourceInitializer matched:
+      - @ConditionalOnMissingBean (types: org.springframework.boot.autoconfigure.jdbc.DataSourceInitializer; SearchStrategy: all) did not find any beans (OnBeanCondition)
+
+   DataSourceConfiguration.Generic matched:
+      - @ConditionalOnProperty (spring.datasource.type) matched (OnPropertyCondition)
+
+   DataSourcePoolMetadataProvidersConfiguration.TomcatDataSourcePoolMetadataProviderConfiguration matched:
+      - @ConditionalOnClass found required class 'org.apache.tomcat.jdbc.pool.DataSource' (OnClassCondition)
+
+   DataSourceTransactionManagerAutoConfiguration matched:
+      - @ConditionalOnClass found required classes 'org.springframework.jdbc.core.JdbcTemplate', 'org.springframework.transaction.PlatformTransactionManager' (OnClassCondition)
+
+   DataSourceTransactionManagerAutoConfiguration.DataSourceTransactionManagerConfiguration matched:
+      - @ConditionalOnSingleCandidate (types: javax.sql.DataSource; SearchStrategy: all) found a primary bean from beans 'dataSource' (OnBeanCondition)
+
+   DispatcherServletAutoConfiguration matched:
+      - @ConditionalOnClass found required class 'org.springframework.web.servlet.DispatcherServlet' (OnClassCondition)
+      - @ConditionalOnWebApplication (required) found StandardServletEnvironment (OnWebApplicationCondition)
+
+   DispatcherServletAutoConfiguration.DispatcherServletConfiguration matched:
+      - @ConditionalOnClass found required class 'javax.servlet.ServletRegistration' (OnClassCondition)
+      - Default DispatcherServlet did not find dispatcher servlet beans (DispatcherServletAutoConfiguration.DefaultDispatcherServletCondition)
+
+   DispatcherServletAutoConfiguration.DispatcherServletRegistrationConfiguration matched:
+      - @ConditionalOnClass found required class 'javax.servlet.ServletRegistration' (OnClassCondition)
+      - DispatcherServlet Registration did not find servlet registration bean (DispatcherServletAutoConfiguration.DispatcherServletRegistrationCondition)
+      - DispatcherServlet Registration found servlet registration beans 'druidServlet' and none is named dispatcherServletRegistration (DispatcherServletAutoConfiguration.DispatcherServletRegistrationCondition)
+
+   DispatcherServletAutoConfiguration.DispatcherServletRegistrationConfiguration#dispatcherServletRegistration matched:
+      - @ConditionalOnBean (names: dispatcherServlet; types: org.springframework.web.servlet.DispatcherServlet; SearchStrategy: all) found beans 'dispatcherServlet', 'dispatcherServlet' (OnBeanCondition)
+
+  // ............... 省略
+
+
+Negative matches:
+-----------------
+
+  //...............
+
+</code></pre>
+
+<p>可以手动引入需要的配置类，启动类变成了下面这样，其中以 <code>AutoConfiguration</code> 结尾的配置类来自上述报告中那些匹配上的条目（也就是需要的），后面的如 <code>MyBatisConfig.class,  BeanConfig.class</code> 是我们自己定义的配置类。</p>
+
+<pre><code class="language-java">//@SpringBootApplication
+@Configuration
+@Import({
+    AopAutoConfiguration.class, DataSourceAutoConfiguration.class, DispatcherServletAutoConfiguration.class,
+    EmbeddedServletContainerAutoConfiguration.class, ErrorMvcAutoConfiguration.class, HttpEncodingAutoConfiguration.class,
+    HttpMessageConvertersAutoConfiguration.class, JacksonAutoConfiguration.class, JdbcTemplateAutoConfiguration.class,
+     MybatisAutoConfiguration.class, ServerPropertiesAutoConfiguration.class,
+    TransactionAutoConfiguration.class, WebMvcAutoConfiguration.class, 
+    MyBatisConfig.class, MyBatisMapperScannerConfig.class,
+    MultipartConfig.class, BeanConfig.class})
+//@EnableAutoConfiguration
+public abstract class AppRunner {
+// ......
+}
+</code></pre>
+
+<h2 id="效果对比">效果对比</h2>
+
+<p>优化前，启动耗时12秒。</p>
+
+<pre><code>2018-09-04 10:11:45 [main] INFO com.vonzhou.AppRunner.logStarted 57 - Started AppRunner in 12.608 seconds (JVM running for 13.439)
+</code></pre>
+
+<p>优化后，启动只耗了6秒。</p>
+
+<pre><code>2018-09-04 14:47:10 [main] INFO  com.vonzhou.AppRunner.logStarted 57 - Started AppRunner in 5.973 seconds (JVM running for 6.55)
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/spring-boot-speedup/>http://vonzhou.com/2018/spring-boot-speedup/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/springboot/">
+                    #SpringBoot</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/linux-commands/" class="prev" rel="prev" title="Linux常用命令总结"><i class="iconfont icon-left"></i>&nbsp;Linux常用命令总结</a>
+         
+        
+        <a href="http://vonzhou.com/2018/make-arraylist-thread-safe/" class="next" rel="next" title="如何保证ArrayList在多线程环境下的线程安全性">如何保证ArrayList在多线程环境下的线程安全性&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

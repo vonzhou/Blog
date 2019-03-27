@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SpringBoot on 编程之路</title>
+    <link>http://vonzhou.com/categories/springboot/</link>
+    <description>Recent content in SpringBoot on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 18 Sep 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/categories/springboot/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Spring Boot 执行初始化逻辑的方法</title>
+      <link>http://vonzhou.com/2018/spring-boot-init-methods/</link>
+      <pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/spring-boot-init-methods/</guid>
+      <description>在 Spring Boot 启动后执行一些初始化的逻辑有哪些方法？它们的执行顺序是怎样的？
+序 在 Spring Boot 启动后执行一些初始化的逻辑应该是一个很常见的场景，这里总结下几种方法，及执行的顺序。
+init-method 给bean配置init-method属性，或者在xml配置文件中指定，或者指定注解 Bean 的 initMethod 属性。
+InitializingBean 实现 InitializingBean 接口。
+使用 PostConstruct 注解 在初始化方法上加 PostConstruct 注解。
+Spring Boot 中的 ApplicationRunner/CommandLineRunner 实现 ApplicationRunner 或 CommandLineRunner 接口。
+运行效果 我们的基本类：
+public class Foo implements InitializingBean, CommandLineRunner, ApplicationRunner { public void init() { System.out.println(&amp;quot;init method ...&amp;quot;); } @PostConstruct public void postConstruct() { System.out.println(&amp;quot;init by PostConstruct ...&amp;quot;); } @Override public void afterPropertiesSet() throws Exception { System.</description>
+    </item>
+    
+    <item>
+      <title>如何加快 Spring Boot 项目的启动速度？</title>
+      <link>http://vonzhou.com/2018/spring-boot-speedup/</link>
+      <pubDate>Tue, 04 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/spring-boot-speedup/</guid>
+      <description>可以通过避免包扫描和自动配置来加快Spring Boot项目的启动速度。
+序 一个agent部署在其他机器上，其能够接收提交的Jar包进行部署，但是我们无法登陆机器也无法更新agent的代码。agent中有个逻辑是部署jar包的时候会等待10s，然后判断是否启动成功，如果没有启动成功，则进行回滚，这样就导致了一个问题：要部署的jar启动时间超过了10s，然后就回滚，无法部署成功。最终的解决方法只能是加快 Spring Boot 的启动速度了，经过调整后，到达了想要的结果。
+我们知道在基于 Spring Boot 的项目中，主类一般会加上注解 @SpringBootApplication，@SpringBootApplication 其实就是开启了包扫描和自动注解特性。
+@Target(ElementType.TYPE) @Retention(RetentionPolicy.RUNTIME) @Documented @Inherited @SpringBootConfiguration @EnableAutoConfiguration @ComponentScan(excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class)) public @interface SpringBootApplication { //................ }  问题的关键是 ComponentScan 和 EnableAutoConfiguration 是非常耗时的。@ComponentScan 是扫描指定包下面的注解标记，从而生成相应的 Bean，@EnableAutoConfiguration 可以根据引入的jar包，自动配置一些 Bean，但是并非都是需要的。
+避免包扫描（ComponentScan） 不使用 @SpringBootApplication 注解引入的 ComponentScan，改为自己配置项目中需要的Bean，启动类变为了：
+//@SpringBootApplication @Configuration @EnableAutoConfiguration public abstract class AppRunner { // ...... }  Bean 的实例化配置统一放到 BeanConfig.class中：
+@Configuration public class BeanConfig { @Autowired private SqlSessionFactory sqlSessionFactory; //.</description>
+    </item>
+    
+  </channel>
+</rss>

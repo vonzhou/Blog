@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/kafka-cleanup-policy/" />
+  <link rel="next" href="http://vonzhou.com/2018/cas/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/spring-boot-init-methods/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Spring Boot 执行初始化逻辑的方法 | 编程之路
+       
+  </title>
+  <meta name="title" content="Spring Boot 执行初始化逻辑的方法 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Spring Boot 执行初始化逻辑的方法",
+    "headline" : "Spring Boot 执行初始化逻辑的方法",
+    "description" : "在 Spring Boot 启动后执行一些初始化的逻辑有哪些方法？它们的执行顺序是怎样的？
+序 在 Spring Boot 启动后执行一些初始化的逻辑应该是一个很常见的场景，这里总结下几种方法，及执行的顺序。
+init-method 给bean配置init-method属性，或者在xml配置文件中指定，或者指定注解 Bean 的 initMethod 属性。
+InitializingBean 实现 InitializingBean 接口。
+使用 PostConstruct 注解 在初始化方法上加 PostConstruct 注解。
+Spring Boot 中的 ApplicationRunner/CommandLineRunner 实现 ApplicationRunner 或 CommandLineRunner 接口。
+运行效果 我们的基本类：
+public class Foo implements InitializingBean, CommandLineRunner, ApplicationRunner { public void init() { System.out.println(&quot;init method ...&quot;); } @PostConstruct public void postConstruct() { System.out.println(&quot;init by PostConstruct ...&quot;); } @Override public void afterPropertiesSet() throws Exception { System.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-09-18 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-09-18 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/spring-boot-init-methods/",
+    "wordCount" : "762",
+    "keywords" : [ "SpringBoot","Spring", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Spring Boot 执行初始化逻辑的方法</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-09-18 itemprop="datePublished">September 18, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/springboot/"> SpringBoot </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>在 Spring Boot 启动后执行一些初始化的逻辑有哪些方法？它们的执行顺序是怎样的？</p>
+
+<h2 id="序">序</h2>
+
+<p>在 Spring Boot 启动后执行一些初始化的逻辑应该是一个很常见的场景，这里总结下几种方法，及执行的顺序。</p>
+
+<h2 id="init-method">init-method</h2>
+
+<p>给bean配置init-method属性，或者在xml配置文件中指定，或者指定注解 Bean 的 <code>initMethod</code> 属性。</p>
+
+<h2 id="initializingbean">InitializingBean</h2>
+
+<p>实现 <code>InitializingBean</code> 接口。</p>
+
+<h2 id="使用-postconstruct-注解">使用 PostConstruct 注解</h2>
+
+<p>在初始化方法上加 <code>PostConstruct</code> 注解。</p>
+
+<h2 id="spring-boot-中的-applicationrunner-commandlinerunner">Spring Boot 中的 ApplicationRunner/CommandLineRunner</h2>
+
+<p>实现 <code>ApplicationRunner</code> 或 <code>CommandLineRunner</code> 接口。</p>
+
+<h2 id="运行效果">运行效果</h2>
+
+<p>我们的基本类：</p>
+
+<pre><code class="language-java">public class Foo implements InitializingBean, CommandLineRunner, ApplicationRunner {
+    public void init() {
+        System.out.println(&quot;init method ...&quot;);
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        System.out.println(&quot;init by PostConstruct ...&quot;);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println(&quot;init afterPropertiesSet ...&quot;);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println(&quot;init by CommandLineRunner ...&quot;);
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        System.out.println(&quot;init by ApplicationRunner ...&quot;);
+    }
+}
+</code></pre>
+
+<p>引入这个bean。</p>
+
+<pre><code class="language-java">@Configuration
+public class BeanConfig {
+
+    @Bean(initMethod = &quot;init&quot;)
+    public Foo foo() {
+        return new Foo();
+    }
+}
+</code></pre>
+
+<p>运行输出：</p>
+
+<pre><code class="language-java">init by PostConstruct ...
+init afterPropertiesSet ...
+init method ...
+
+init by ApplicationRunner ...
+init by CommandLineRunner ...
+</code></pre>
+
+<h2 id="执行顺序源码分析">执行顺序源码分析</h2>
+
+<p>Spring Boot 应用启动（<code>SpringApplication.run</code>）后会先加载初始化 Spring 应用上下文（refresh），然后会调用 Spring Boot 引入的运行器（runner）： <code>ApplicationRunner</code> 和 <code>CommandLineRunner</code>，本质上 <code>ApplicationRunner</code> 和 <code>CommandLineRunner</code> 并没有什么区别。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-boot-init-methods-1.jpg" alt="Runner调用流程" class="lazyload"><figcaption class="image-caption">Runner调用流程</figcaption></figure></p>
+
+<pre><code class="language-java">private void callRunners(ApplicationContext context, ApplicationArguments args) {
+    List&lt;Object&gt; runners = new ArrayList&lt;Object&gt;();
+    runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
+    runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
+    AnnotationAwareOrderComparator.sort(runners);
+    for (Object runner : new LinkedHashSet&lt;Object&gt;(runners)) {
+        if (runner instanceof ApplicationRunner) {
+            callRunner((ApplicationRunner) runner, args);
+        }
+        if (runner instanceof CommandLineRunner) {
+            callRunner((CommandLineRunner) runner, args);
+        }
+    }
+}
+</code></pre>
+
+<p>所以 Spring 中的初始化机制会先执行。接下来看看 <code>init-method，InitializingBean，PostConstruct</code> 的执行顺序。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-boot-init-methods-2.jpg" alt="initializeBean方法" class="lazyload"><figcaption class="image-caption">initializeBean方法</figcaption></figure></p>
+
+<p>bean在实例化之后会进行初始化操作，即 initializeBean ，从<code>invokeInitMethods</code>方法中我们可以看到 InitializingBean 接口方法先执行，然后是配置的 init-method 方法。</p>
+
+<pre><code class="language-java">protected Object initializeBean(final String beanName, final Object bean, RootBeanDefinition mbd) {
+    if (System.getSecurityManager() != null) {
+        AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() {
+            @Override
+            public Object run() {
+                invokeAwareMethods(beanName, bean);
+                return null;
+            }
+        }, getAccessControlContext());
+    }
+    else {
+        // 如果这个bean实现了一些Aware接口，则将对应的对象设置给他
+        invokeAwareMethods(beanName, bean);
+    }
+
+    Object wrappedBean = bean;
+    if (mbd == null || !mbd.isSynthetic()) {
+        wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+    }
+
+    try {
+        // 这里
+        invokeInitMethods(beanName, wrappedBean, mbd);
+    }
+    catch (Throwable ex) {
+        throw new BeanCreationException(
+                (mbd != null ? mbd.getResourceDescription() : null),
+                beanName, &quot;Invocation of init method failed&quot;, ex);
+    }
+
+    if (mbd == null || !mbd.isSynthetic()) {
+        wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+    }
+    return wrappedBean;
+}
+</code></pre>
+
+<pre><code class="language-java">protected void invokeInitMethods(String beanName, final Object bean, RootBeanDefinition mbd)
+        throws Throwable {
+
+    boolean isInitializingBean = (bean instanceof InitializingBean);
+    if (isInitializingBean &amp;&amp; (mbd == null || !mbd.isExternallyManagedInitMethod(&quot;afterPropertiesSet&quot;))) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(&quot;Invoking afterPropertiesSet() on bean with name '&quot; + beanName + &quot;'&quot;);
+        }
+        if (System.getSecurityManager() != null) {
+            try {
+                AccessController.doPrivileged(new PrivilegedExceptionAction&lt;Object&gt;() {
+                    @Override
+                    public Object run() throws Exception {
+                        ((InitializingBean) bean).afterPropertiesSet();
+                        return null;
+                    }
+                }, getAccessControlContext());
+            }
+            catch (PrivilegedActionException pae) {
+                throw pae.getException();
+            }
+        }
+        else {
+            // 如果实现了 InitializingBean 接口
+            ((InitializingBean) bean).afterPropertiesSet();
+        }
+    }
+
+    if (mbd != null) {
+        // 如果配置了 init-method
+        String initMethodName = mbd.getInitMethodName();
+        if (initMethodName != null &amp;&amp; !(isInitializingBean &amp;&amp; &quot;afterPropertiesSet&quot;.equals(initMethodName)) &amp;&amp;
+                !mbd.isExternallyManagedInitMethod(initMethodName)) {
+            invokeCustomInitMethod(beanName, bean, mbd);
+        }
+    }
+}
+</code></pre>
+
+<p>那么为何 <code>PostConstruct</code> 注解会先执行呢？源于 <code>PostConstruct</code> 注解是基于 <code>BeanPostProcessor</code>实现的，即 <code>InitDestroyAnnotationBeanPostProcessor</code>。</p>
+
+<pre><code class="language-java">@Override
+public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
+    try {
+        metadata.invokeInitMethods(bean, beanName);
+    }
+    catch (InvocationTargetException ex) {
+        throw new BeanCreationException(beanName, &quot;Invocation of init method failed&quot;, ex.getTargetException());
+    }
+    catch (Throwable ex) {
+        throw new BeanCreationException(beanName, &quot;Failed to invoke init method&quot;, ex);
+    }
+    return bean;
+}
+
+public void invokeInitMethods(Object target, String beanName) throws Throwable {
+    Collection&lt;LifecycleElement&gt; initMethodsToIterate =
+            (this.checkedInitMethods != null ? this.checkedInitMethods : this.initMethods);
+    if (!initMethodsToIterate.isEmpty()) {
+        boolean debug = logger.isDebugEnabled();
+        for (LifecycleElement element : initMethodsToIterate) {
+            if (debug) {
+                logger.debug(&quot;Invoking init method on bean '&quot; + beanName + &quot;': &quot; + element.getMethod());
+            }
+            element.invoke(target);
+        }
+    }
+}
+</code></pre>
+
+<p>这个 <code>BeanPostProcessor</code> 首次执行的时候利用反射去寻找这个bean中定义的生命周期元数据，即 <code>PostConstruct，PreDestroy</code> 注解标注的方法。</p>
+
+<pre><code class="language-java">private LifecycleMetadata findLifecycleMetadata(Class&lt;?&gt; clazz) {
+    if (this.lifecycleMetadataCache == null) {
+        // Happens after deserialization, during destruction...
+        return buildLifecycleMetadata(clazz);
+    }
+    // Quick check on the concurrent map first, with minimal locking.
+    LifecycleMetadata metadata = this.lifecycleMetadataCache.get(clazz);
+    if (metadata == null) {
+        synchronized (this.lifecycleMetadataCache) {
+            metadata = this.lifecycleMetadataCache.get(clazz);
+            if (metadata == null) {
+                // 双重检查
+                metadata = buildLifecycleMetadata(clazz);
+                this.lifecycleMetadataCache.put(clazz, metadata);
+            }
+            return metadata;
+        }
+    }
+    return metadata;
+}
+
+private LifecycleMetadata buildLifecycleMetadata(final Class&lt;?&gt; clazz) {
+    final boolean debug = logger.isDebugEnabled();
+    LinkedList&lt;LifecycleElement&gt; initMethods = new LinkedList&lt;LifecycleElement&gt;();
+    LinkedList&lt;LifecycleElement&gt; destroyMethods = new LinkedList&lt;LifecycleElement&gt;();
+    Class&lt;?&gt; targetClass = clazz;
+
+    do {
+        final LinkedList&lt;LifecycleElement&gt; currInitMethods = new LinkedList&lt;LifecycleElement&gt;();
+        final LinkedList&lt;LifecycleElement&gt; currDestroyMethods = new LinkedList&lt;LifecycleElement&gt;();
+
+        ReflectionUtils.doWithLocalMethods(targetClass, new ReflectionUtils.MethodCallback() {
+            @Override
+            public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+                if (initAnnotationType != null) {
+                    if (method.getAnnotation(initAnnotationType) != null) {
+                        LifecycleElement element = new LifecycleElement(method);
+                        currInitMethods.add(element);
+                        if (debug) {
+                            logger.debug(&quot;Found init method on class [&quot; + clazz.getName() + &quot;]: &quot; + method);
+                        }
+                    }
+                }
+                if (destroyAnnotationType != null) {
+                    if (method.getAnnotation(destroyAnnotationType) != null) {
+                        currDestroyMethods.add(new LifecycleElement(method));
+                        if (debug) {
+                            logger.debug(&quot;Found destroy method on class [&quot; + clazz.getName() + &quot;]: &quot; + method);
+                        }
+                    }
+                }
+            }
+        });
+
+        initMethods.addAll(0, currInitMethods);
+        destroyMethods.addAll(currDestroyMethods);
+        targetClass = targetClass.getSuperclass();
+    }
+    while (targetClass != null &amp;&amp; targetClass != Object.class);
+
+    return new LifecycleMetadata(clazz, initMethods, destroyMethods);
+}
+</code></pre>
+
+<p>上述代码中出现的初始化注解类型 initAnnotationType，销毁注解类型 destroyAnnotationType 目前来看就是 PostConstruct 和 PreDestroy，可以从
+<code>CommonAnnotationBeanPostProcessor</code>（继承了     <code>InitDestroyAnnotationBeanPostProcessor</code>）的构造器中看到，可以看到这个代码的可扩展性很好。</p>
+
+<pre><code class="language-java">public CommonAnnotationBeanPostProcessor() {
+    setOrder(Ordered.LOWEST_PRECEDENCE - 3);
+    setInitAnnotationType(PostConstruct.class);
+    setDestroyAnnotationType(PreDestroy.class);
+    ignoreResourceType(&quot;javax.xml.ws.WebServiceContext&quot;);
+}
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-boot-init-methods-3.jpg" alt="CommonAnnotationBeanPostProcessor类图" class="lazyload"><figcaption class="image-caption">CommonAnnotationBeanPostProcessor类图</figcaption></figure></p>
+
+<h2 id="总结">总结</h2>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-boot-init-methods-4.jpg" alt="几种初始化方法的总结" class="lazyload"><figcaption class="image-caption">几种初始化方法的总结</figcaption></figure></p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/spring-boot-init-methods/>http://vonzhou.com/2018/spring-boot-init-methods/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/springboot/">
+                    #SpringBoot</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/kafka-cleanup-policy/" class="prev" rel="prev" title="Kafka中的2种日志清理策略"><i class="iconfont icon-left"></i>&nbsp;Kafka中的2种日志清理策略</a>
+         
+        
+        <a href="http://vonzhou.com/2018/cas/" class="next" rel="next" title="CAS 的底层实现">CAS 的底层实现&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

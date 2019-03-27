@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>设计模式 on 编程之路</title>
+    <link>http://vonzhou.com/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</link>
+    <description>Recent content in 设计模式 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 14 Feb 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>为什么枚举是实现单例最好的方式？</title>
+      <link>http://vonzhou.com/2019/enum-singleton/</link>
+      <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/enum-singleton/</guid>
+      <description>提到单例模式（Singleton Pattern），都能说出一二，但是没那么简单。
+实现单例的方式 本文代码在这里.
+法1：静态成员 不多说。
+public class Singleton1 { public static final Singleton1 INSTANCE = new Singleton1(); private Singleton1() { } }  法2：静态工厂 和法1一样，只不过通过工厂方法来返回实例，在API设计上更可取。
+public class Singleton2 { private static final Singleton2 INSTANCE = new Singleton2(); private Singleton2() { } public static Singleton2 getInstance() { return INSTANCE; } }  法3：lazy initialization 延迟初始化 前面法1，法2是饿汉式，lazy initialization 是懒汉式，需要的时候实例化，另外 double check。
+public class Singleton3 { private static Singleton3 INSTANCE = null; private Singleton3() { } public static Singleton3 getInstance() { if (INSTANCE == null) { synchronized (Singleton3.</description>
+    </item>
+    
+  </channel>
+</rss>

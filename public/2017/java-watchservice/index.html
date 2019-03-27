@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2017/spring-exception-handler/" />
+  <link rel="next" href="http://vonzhou.com/2017/spring-two-bean-init-order-control/" />
+  <link rel="canonical" href="http://vonzhou.com/2017/java-watchservice/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           使用WatchService监控文件变化 | 编程之路
+       
+  </title>
+  <meta name="title" content="使用WatchService监控文件变化 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "使用WatchService监控文件变化",
+    "headline" : "使用WatchService监控文件变化",
+    "description" : "场景 系统实现中经常需要能够感知配置文件的变化，然后及时更新上下文。
+实现方案  自己起一个单独线程，定时加载文件，实现较简单，但是无法保证能够实时捕捉文件变化，同时耗CPU 使用commons-io中的 FileAlterationObserver，思想和上面类似，对比前后文件列表的变化，触发对应事件 JDK 1.7提供的WatchService，利用底层文件系统提供的功能  使用 WatchService WatchService用来监控一个目录是否发生改变，但是可以通过 WatchEvent 上下文定位具体文件的变化。具体使用过程中要注意以下两点：
+ 文件改变可能会触发两次事件（我的理解：文件内容的变更，元数据的变更），可以通过文件的时间戳来控制 在文件变化事件发生后，如果立即读取文件，可能所获内容并不完整，建议的做法判断文件的 length &gt; 0  // 监控文件的变化，重新加载 executor.submit(new Runnable() { @Override public void run() { try { final Path path = FileSystems.getDefault().getPath(getMonitorDir()); System.out.println(path); final WatchService watchService = FileSystems.getDefault().newWatchService(); final WatchKey watchKey = path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY); while (true) { final WatchKey wk = watchService.take(); for (WatchEvent&lt;?&gt; event : wk.pollEvents()) { final Path changed = (Path) event.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2017",
+    "datePublished": "2017-09-05 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2017-09-05 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2017/java-watchservice/",
+    "wordCount" : "148",
+    "keywords" : [ "Java", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">使用WatchService监控文件变化</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2017-09-05 itemprop="datePublished">September 5, 2017</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="场景">场景</h2>
+
+<p>系统实现中经常需要能够感知配置文件的变化，然后及时更新上下文。</p>
+
+<h2 id="实现方案">实现方案</h2>
+
+<ul>
+<li>自己起一个单独线程，定时加载文件，实现较简单，但是无法保证能够实时捕捉文件变化，同时耗CPU</li>
+<li>使用commons-io中的 FileAlterationObserver，思想和上面类似，对比前后文件列表的变化，触发对应事件</li>
+<li>JDK 1.7提供的WatchService，利用底层文件系统提供的功能</li>
+</ul>
+
+<h2 id="使用-watchservice">使用 WatchService</h2>
+
+<p>WatchService用来监控一个目录是否发生改变，但是可以通过 WatchEvent 上下文定位具体文件的变化。具体使用过程中要注意以下两点：</p>
+
+<ul>
+<li>文件改变可能会触发两次事件（我的理解：文件内容的变更，元数据的变更），可以通过文件的时间戳来控制</li>
+<li>在文件变化事件发生后，如果立即读取文件，可能所获内容并不完整，建议的做法判断文件的 length &gt; 0</li>
+</ul>
+
+<pre><code class="language-java">// 监控文件的变化，重新加载
+executor.submit(new Runnable() {
+    @Override
+    public void run() {
+        try {
+            final Path path = FileSystems.getDefault().getPath(getMonitorDir());
+            System.out.println(path);
+            final WatchService watchService = FileSystems.getDefault().newWatchService();
+            final WatchKey watchKey = path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+            while (true) {
+                final WatchKey wk = watchService.take();
+                for (WatchEvent&lt;?&gt; event : wk.pollEvents()) {
+                    final Path changed = (Path) event.context();
+                    Path absolute = path.resolve(changed);
+                    File configFile = absolute.toFile();
+                    long lastModified = configFile.lastModified();
+                    logger.info(lastModified + &quot;----------------&quot;);
+                    // 利用文件时间戳，防止触发两次
+                    if (changed.endsWith(getLicenseName()) &amp;&amp; lastModified != LAST_MOD &amp;&amp; configFile.length &gt; 0) {
+                        logger.info(&quot;----------------- reloading -----------------&quot;);
+                        LAST_MOD = lastModified; // 保存上一次时间戳
+                        UPDATED = true; // 设置标志位
+                    }
+                }
+
+                if (LICENSE_UPDATED) {
+                    reloadFile(); // 重新加载
+                }
+                // reset the key
+                boolean valid = wk.reset();
+                if (!valid) {
+                    logger.error(&quot;watch key invalid!&quot;);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(&quot;&quot;);
+        }
+    }
+});
+</code></pre>
+
+<h2 id="参考">参考</h2>
+
+<p><a href="https://docs.oracle.com/javase/tutorial/essential/io/notification.html#concerns" rel="nofollow noreferrer" target="_blank">Watching a Directory for Changes</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2017/java-watchservice/>http://vonzhou.com/2017/java-watchservice/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/java/">
+                    #Java</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2017/spring-exception-handler/" class="prev" rel="prev" title="ExceptionHandler 异常处理过程分析"><i class="iconfont icon-left"></i>&nbsp;ExceptionHandler 异常处理过程分析</a>
+         
+        
+        <a href="http://vonzhou.com/2017/spring-two-bean-init-order-control/" class="next" rel="next" title="Spring 中如何控制2个bean中的初始化顺序？">Spring 中如何控制2个bean中的初始化顺序？&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

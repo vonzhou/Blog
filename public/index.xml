@@ -1,0 +1,2206 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>编程之路 on 编程之路</title>
+    <link>http://vonzhou.com/</link>
+    <description>Recent content in 编程之路 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>JDK 12新特性：Switch表达式</title>
+      <link>http://vonzhou.com/2019/java12-switch-expression/</link>
+      <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/java12-switch-expression/</guid>
+      <description>
+
+&lt;p&gt;JDK 12 GA在2019.3.19发布，其中一项新特性是JEP 325：Switch表达式（Switch Expressions）。学习下。&lt;/p&gt;
+
+&lt;p&gt;如果知道Scala中的模式匹配，就很容易理解Switch表达式。&lt;/p&gt;
+
+&lt;p&gt;本文完整代码见&lt;a href=&#34;https://github.com/vonzhou/learning-java12/blob/master/src/main/java/com/vonzhou/learningjava12/SwitchDemo.java&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;SwitchDemo &lt;/a&gt;。&lt;/p&gt;
+
+&lt;h2 id=&#34;传统的switch语句&#34;&gt;传统的Switch语句&lt;/h2&gt;
+
+&lt;p&gt;传统的Switch语句（switch statement）我们并不陌生，在每个case分支中实现对应的处理逻辑。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private static void switchStatement(WeekDay day) {
+    int numLetters = 0;
+    switch (day) {
+        case MONDAY:
+        case FRIDAY:
+        case SUNDAY:
+            numLetters = 6;
+            break;
+        case TUESDAY:
+            numLetters = 7;
+            break;
+        case THURSDAY:
+        case SATURDAY:
+            numLetters = 8;
+            break;
+        case WEDNESDAY:
+            numLetters = 9;
+            break;
+    }
+    System.out.println(&amp;quot;1. Num Of Letters: &amp;quot; + numLetters);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Switch语句的特点是每个case分支块是没有返回值的，而表达式（expression）的特点是有返回值。&lt;/p&gt;
+
+&lt;h2 id=&#34;switch表达式&#34;&gt;Switch表达式&lt;/h2&gt;
+
+&lt;h3 id=&#34;模式匹配-patrern-matching&#34;&gt;模式匹配（Patrern Matching）&lt;/h3&gt;
+
+&lt;p&gt;上述“计算字符个数”的例子使用Switch表达式，代码如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private static void switchExpression(WeekDay day) {
+    int numLetters = switch (day) {
+        case MONDAY, FRIDAY, SUNDAY -&amp;gt; 6;
+        case TUESDAY -&amp;gt; 7;
+        case THURSDAY, SATURDAY -&amp;gt; 8;
+        case WEDNESDAY -&amp;gt; 9;
+    };
+
+    System.out.println(&amp;quot;2. Num Of Letters: &amp;quot; + numLetters);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Switch表达式目前属于预览（Preview）功能，所以在编译运行的时候需要通过&lt;code&gt;--enable-preview&lt;/code&gt;选项设置来开启，具体方法如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;D:\GitHub\learning-java12\src\main\java
+λ D:\dev\jdk-12\bin\javac.exe --enable-preview --release 12 com\vonzhou\learningjava12\SwitchDemo.java
+注: com\vonzhou\learningjava12\SwitchDemo.java 使用预览语言功能。
+注: 有关详细信息，请使用 -Xlint:preview 重新编译。
+
+D:\GitHub\learning-java12\src\main\java
+λ D:\dev\jdk-12\bin\java.exe --enable-preview com.vonzhou.learningjava12.SwitchDemo
+1. Num Of Letters: 6
+2. Num Of Letters: 9
+3. Num Of Letters: 8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;break-可以返回值&#34;&gt;break 可以返回值&lt;/h3&gt;
+
+&lt;p&gt;Switch表达式中也支持break有返回值。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private static void switchExpressionBreakReturn(WeekDay day) {
+    int numLetters = switch (day) {
+        case MONDAY:
+        case FRIDAY:
+        case SUNDAY:
+            break 6;
+        case TUESDAY:
+            break 7;
+        case THURSDAY:
+        case SATURDAY:
+            numLetters = 8;
+            break 8;
+        case WEDNESDAY:
+            break 9;
+    };
+
+    System.out.println(&amp;quot;3. Num Of Letters: &amp;quot; + numLetters);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;scala中的模式匹配&#34;&gt;Scala中的模式匹配&lt;/h2&gt;
+
+&lt;p&gt;Scala中实现模式匹配的语法是Match表达式，其实可以看做是Java中的Switch表达式。例如判断一个列表的第一个元素是否是0，可以实现为：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-Scala&#34;&gt;def startsWithZero(expr: List[Int]) =
+expr match {
+  case List(0, _*) =&amp;gt; println(&amp;quot;found it&amp;quot;)
+  case _ =&amp;gt;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;Switch表达式可以使得写出的代码更加简洁安全（more concisely and safely）。&lt;/p&gt;
+
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://openjdk.java.net/jeps/325&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;JEP 325: Switch Expressions (Preview)&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>关于我</title>
+      <link>http://vonzhou.com/about/</link>
+      <pubDate>Mon, 18 Mar 2019 10:23:42 +0800</pubDate>
+      
+      <guid>http://vonzhou.com/about/</guid>
+      <description>&lt;ul&gt;
+&lt;li&gt;2013~2016 武汉，研究生&lt;/li&gt;
+&lt;li&gt;2009~2013 武汉，大学&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>波兰来客</title>
+      <link>http://vonzhou.com/2019/bo-lan-lai-ke/</link>
+      <pubDate>Fri, 15 Mar 2019 11:03:31 +0800</pubDate>
+      
+      <guid>http://vonzhou.com/2019/bo-lan-lai-ke/</guid>
+      <description>&lt;p&gt;很喜欢这首诗。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;波兰来客 
+         —北岛
+那时我们有梦， 
+关于文学， 
+关于爱情， 
+关于穿越世界的旅行。 
+如今我们深夜饮酒， 
+杯子碰到一起， 
+都是梦破碎的声音。
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>HBase 实现分页查询</title>
+      <link>http://vonzhou.com/2019/hbase-page/</link>
+      <pubDate>Thu, 14 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/hbase-page/</guid>
+      <description>
+
+&lt;h2 id=&#34;序&#34;&gt;序&lt;/h2&gt;
+
+&lt;p&gt;按时间区间分页导出HBase中的数据。&lt;/p&gt;
+
+&lt;h2 id=&#34;rowkey的设计&#34;&gt;Rowkey的设计&lt;/h2&gt;
+
+&lt;p&gt;在使用HBase时，Rowkey的设计很重要，取决于业务。&lt;/p&gt;
+
+&lt;p&gt;比如要把用户关联的数据存入HBase，后续根据时间查询，可以这样设计rowkey：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;userId + (Long.MAX - timestamp) + uid 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样能满足：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;可以根据userId的特点预分区&lt;/li&gt;
+&lt;li&gt;时间戳逆转，可以保证最近的数据rowkey排序靠前&lt;/li&gt;
+&lt;li&gt;分布式环境下时间戳可能一样，所以追加一个UID，防止重复&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;示例代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private String getRowKeyStr(String userId, long ts, long uid) {
+    return String.format(&amp;quot;%s%013d%019d&amp;quot;, userId, Long.MAX_VALUE - ts, uid);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;构造table实例&#34;&gt;构造Table实例&lt;/h2&gt;
+
+&lt;p&gt;需要自己保证Table的线程安全性。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public Table getTable() throws Exception {
+    Table table = tableThreadLocal.get();
+    if (table == null) {
+        table = getTableInternal();
+        if (table != null) {
+            tableThreadLocal.set(table);
+        }
+    }
+    return table;
+}
+
+public Table getTableInternal() throws Exception {
+    Configuration config = HBaseConfiguration.create();
+    config.set(HConstants.ZOOKEEPER_QUORUM, hBaseConfig.getZkQuorum());
+    config.set(HConstants.ZOOKEEPER_CLIENT_PORT, hBaseConfig.getZkClientPort());
+    config.set(HConstants.ZOOKEEPER_ZNODE_PARENT, hBaseConfig.getZkZnodeParent());
+    config.setInt(&amp;quot;hbase.rpc.timeout&amp;quot;, 20000);
+    config.setInt(&amp;quot;hbase.client.operation.timeout&amp;quot;, 30000);
+    config.setInt(&amp;quot;hbase.client.scanner.timeout.period&amp;quot;, 20000);
+    config.setInt(&amp;quot;hbase.client.pause&amp;quot;, 50);
+    config.setInt(&amp;quot;hbase.client.retries.number&amp;quot;, 15);
+//        HBaseAdmin.checkHBaseAvailable(config);
+
+    Connection connection = ConnectionFactory.createConnection(config);
+    Table table = connection.getTable(TableName.valueOf(hBaseConfig.getTableName()));
+
+    return table;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;分页查询&#34;&gt;分页查询&lt;/h2&gt;
+
+&lt;p&gt;这里要注意是Scan中的startRow，stopRow是左闭右开区间，所以为了避免下一页中包含上一页的最后一条数据， 下一页Scan的时候startRow追加了一个0字节。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Filter filter = new PageFilter(15);
+
+byte[] lastRow = null;
+byte[] startRow = getRowKey(userId, end, 0L);
+byte[] endRow = getRowKey(userId, start, Long.MAX_VALUE);
+
+Table table = getTable();
+if (table == null) {
+    return;
+}
+
+int sum = 0;
+
+while (true) {
+    Scan scan = new Scan();
+    scan.setFilter(filter);
+
+    byte[] sr = null;
+    if (lastRow != null) {
+        sr = Bytes.add(lastRow, new byte[1]);// 重点1
+    } else {
+        sr = startRow;
+    }
+    scan.setStartRow(sr);
+    scan.setStopRow(endRow);
+    ResultScanner scanner = table.getScanner(scan);
+    Result result = null;
+    int cnt = 0;
+    while ((result = scanner.next()) != null) {
+        // 从Result中解析数据，进行处理
+        cnt++;
+        lastRow = result.getRow();
+    }
+    scanner.close();
+    if (cnt == 0) {
+        break;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;filter&#34;&gt;Filter&lt;/h2&gt;
+
+&lt;p&gt;上述只是用了PageFilter实现分页，如果需要根据列的各种条件进行查询，就需要用到FilterList，或者自己实现Filter。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>记一次使用KafkaProducer引发的Full GC问题</title>
+      <link>http://vonzhou.com/2019/kafka-producer-fullgc-story/</link>
+      <pubDate>Fri, 01 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/kafka-producer-fullgc-story/</guid>
+      <description>
+
+&lt;h2 id=&#34;场景&#34;&gt;场景&lt;/h2&gt;
+
+&lt;p&gt;一个模块接收数据，然后投到Kafka中，实现削峰填谷。突然有一天频繁出现Full GC问题。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/kafka-producer-fullgc-story-1.gif&#34; alt=&#34;FullGC情况&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;初步尝试&#34;&gt;初步尝试&lt;/h2&gt;
+
+&lt;p&gt;查看JVM的配置，发现最大堆配置的太小，推测：堆内存不足，导致频繁gc，内存不足，导致往kafka发送消息的时候阻塞，所以线程都会卡住。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;15302 com.xxxx.AppRunner -Dlog.dir=/path/to/logs -Xms1024m -Xmx1024m -XX:MaxPermSize=256m -verbose:gc -XX:+PrintGCDetails
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;调整堆大小配置后，Full GC 问题并没有得到缓解。&lt;/p&gt;
+
+&lt;h2 id=&#34;mat分析&#34;&gt;MAT分析&lt;/h2&gt;
+
+&lt;p&gt;heap dump出现使用MAT分析。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/kafka-producer-fullgc-story-2.png&#34; alt=&#34;MAT分析&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这里的大对象都是我们发送的批量消息对象，推测：是不是&lt;code&gt;batch.size&lt;/code&gt;设置的过大？（设置的是40MB）&lt;/p&gt;
+
+&lt;h2 id=&#34;解决方法&#34;&gt;解决方法&lt;/h2&gt;
+
+&lt;p&gt;调小&lt;code&gt;batch.size&lt;/code&gt;，设置为20MB：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;props.put(&amp;quot;buffer.memory&amp;quot;, 100 * 1024 * 1024);
+// 批量发送的字节大小， 20MB
+props.put(&amp;quot;batch.size&amp;quot;, 2 * 10 * 1024 * 1024);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最终问题得以解决，连Minor GC也很少了：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/kafka-producer-fullgc-story-3.png&#34; alt=&#34;GC趋势图&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;kafkaproducer消息发送过程&#34;&gt;KafkaProducer消息发送过程&lt;/h2&gt;
+
+&lt;p&gt;KafkaProducer发送消息的过程是：消息追加到一个内部的队列中，有一个异步线程负责从中取出，将消息发送给Broker。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/kafka-producer-fullgc-story-4.jpg&#34; alt=&#34;Producer发送消息流程&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在了解kafka消息发送过程的基础上，通过MAT大对象图还可以看到：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;buffer.memory&lt;/code&gt;配置的是客户端发送消息时&lt;code&gt;BufferPool&lt;/code&gt;的内存大小，至少要比&lt;code&gt;batch.size&lt;/code&gt;大，否则连一个&lt;code&gt;RecordBatch&lt;/code&gt;也放不进去。&lt;/li&gt;
+&lt;li&gt;实际占用的内存可能是&lt;code&gt;buffer.memory&lt;/code&gt;的好几倍（4~5倍？），流转多个环节，底层存储都是&lt;code&gt;ByteBuffer&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>BeanUtils.copyProperties 源码分析</title>
+      <link>http://vonzhou.com/2019/spring-beanutils-copyproperties/</link>
+      <pubDate>Wed, 27 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/spring-beanutils-copyproperties/</guid>
+      <description>
+
+&lt;h2 id=&#34;概述&#34;&gt;概述&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;利用反射&lt;/li&gt;
+&lt;li&gt;字段不一致也不会报错，因为会根据目标对象的属性去源对象中找对应的属性描述符，存在才拷贝&lt;/li&gt;
+&lt;li&gt;相同字段，类型不同，也不会有问题，因为拷贝之时会判断该字段源对象的读方法返回值，是否可应用用目标对象的写方法参数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;实例&#34;&gt;实例&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class CopyPropertiesDemo {
+
+    public static void main(String[] args) {
+
+        Student s = new Student();
+        s.setName(&amp;quot;vz&amp;quot;);
+        s.setFoo(1024);
+        s.setBar(-1);
+
+        Father f = new Father();
+        BeanUtils.copyProperties(s, f);
+        System.out.println(f);
+    }
+
+    static class Student{
+        private String name;
+        private int foo;
+        private int bar;
+        // setters and getters
+    }
+
+
+    static class Father{
+        private String name;
+        private int age;
+        private int salary;
+        private double foo;
+        private Integer bar;
+        // setters and getters
+
+        @Override
+        public String toString() {
+            return &amp;quot;Father{&amp;quot; +
+                    &amp;quot;name=&#39;&amp;quot; + name + &#39;\&#39;&#39; +
+                    &amp;quot;, age=&amp;quot; + age +
+                    &amp;quot;, salary=&amp;quot; + salary +
+                    &amp;quot;, foo=&amp;quot; + foo +
+                    &amp;quot;, bar=&amp;quot; + bar +
+                    &#39;}&#39;;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Father{name=&#39;vz&#39;, age=0, salary=0, foo=0.0, bar=-1}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;copyproperties-源码分析&#34;&gt;copyProperties 源码分析&lt;/h2&gt;
+
+&lt;p&gt;copyProperties 的实现总体上很清晰：利用反射，调用source对象的get方法，然后set到target对象中。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void copyProperties(Object source, Object target) throws BeansException {
+        copyProperties(source, target, null, (String[]) null);
+    }
+
+private static void copyProperties(Object source, Object target, Class&amp;lt;?&amp;gt; editable, String... ignoreProperties)
+            throws BeansException {
+        Class&amp;lt;?&amp;gt; actualEditable = target.getClass();
+
+        PropertyDescriptor[] targetPds = getPropertyDescriptors(actualEditable);
+        List&amp;lt;String&amp;gt; ignoreList = (ignoreProperties != null ? Arrays.asList(ignoreProperties) : null);
+
+        for (PropertyDescriptor targetPd : targetPds) {
+            Method writeMethod = targetPd.getWriteMethod();
+            if (writeMethod != null &amp;amp;&amp;amp; (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
+                PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
+                if (sourcePd != null) {
+                    Method readMethod = sourcePd.getReadMethod();
+                    if (readMethod != null &amp;amp;&amp;amp;
+                            ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType())) {
+                        try {
+                            if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
+                                readMethod.setAccessible(true);
+                            }
+                            Object value = readMethod.invoke(source);
+                            if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
+                                writeMethod.setAccessible(true);
+                            }
+                            writeMethod.invoke(target, value);
+                        }
+                        catch (Throwable ex) {
+                            throw new FatalBeanException(
+                                    &amp;quot;Could not copy property &#39;&amp;quot; + targetPd.getName() + &amp;quot;&#39; from source to target&amp;quot;, ex);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;获取-propertydescriptor&#34;&gt;获取 PropertyDescriptor&lt;/h2&gt;
+
+&lt;p&gt;PropertyDescriptor 描述的是Java Bean的一个属性，具有读写(getter/setter)方法，&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static PropertyDescriptor[] getPropertyDescriptors(Class&amp;lt;?&amp;gt; clazz) throws BeansException {
+        CachedIntrospectionResults cr = CachedIntrospectionResults.forClass(clazz);
+        return cr.getPropertyDescriptors();
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;CachedIntrospectionResults&lt;/code&gt;缓存了Java Bean对应Class的&lt;code&gt;PropertyDescriptor&lt;/code&gt;信息，存储数据结构是&lt;code&gt;ConcurrentHashMap&lt;/code&gt;：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;static final ConcurrentMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt; strongClassCache =
+            new ConcurrentHashMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt;(64);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;先从缓存中查询，如果没有，则进行实际的解析，构造。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;static CachedIntrospectionResults forClass(Class&amp;lt;?&amp;gt; beanClass) throws BeansException {
+        CachedIntrospectionResults results = strongClassCache.get(beanClass);
+        if (results != null) {
+            return results;
+        }
+        results = softClassCache.get(beanClass);
+        if (results != null) {
+            return results;
+        }
+
+        // TODO 具体的解析过程
+        results = new CachedIntrospectionResults(beanClass);
+        ConcurrentMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt; classCacheToUse;
+
+        // TODO cachesafe ？
+        if (ClassUtils.isCacheSafe(beanClass, CachedIntrospectionResults.class.getClassLoader()) ||
+                isClassLoaderAccepted(beanClass.getClassLoader())) {
+            classCacheToUse = strongClassCache;
+        }
+        else {
+            classCacheToUse = softClassCache;
+        }
+
+        CachedIntrospectionResults existing = classCacheToUse.putIfAbsent(beanClass, results);
+        return (existing != null ? existing : results);
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接下来看&lt;code&gt;CachedIntrospectionResults&lt;/code&gt;构造函数，先是利用&lt;code&gt;Introspector&lt;/code&gt;解析class的&lt;code&gt;BeanInfo&lt;/code&gt;（实现类是&lt;code&gt;GenericBeanInfo&lt;/code&gt;），然后更新缓存。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private CachedIntrospectionResults(Class&amp;lt;?&amp;gt; beanClass) throws BeansException {
+        try {
+            BeanInfo beanInfo = null;
+            if (beanInfo == null) {
+                // If none of the factories supported the class, fall back to the default
+                beanInfo = (shouldIntrospectorIgnoreBeaninfoClasses ?
+                        Introspector.getBeanInfo(beanClass, Introspector.IGNORE_ALL_BEANINFO) :
+                        Introspector.getBeanInfo(beanClass)); // 这里
+            }
+            this.beanInfo = beanInfo;
+
+
+            this.propertyDescriptorCache = new LinkedHashMap&amp;lt;String, PropertyDescriptor&amp;gt;();
+
+            // This call is slow so we do it once.
+            PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
+            for (PropertyDescriptor pd : pds) {
+                if (Class.class == beanClass &amp;amp;&amp;amp;
+                        (&amp;quot;classLoader&amp;quot;.equals(pd.getName()) ||  &amp;quot;protectionDomain&amp;quot;.equals(pd.getName()))) {
+                    // Ignore Class.getClassLoader() and getProtectionDomain() methods - nobody needs to bind to those
+                    continue;
+                }
+                pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
+                this.propertyDescriptorCache.put(pd.getName(), pd);
+            }
+
+            this.typeDescriptorCache = new ConcurrentReferenceHashMap&amp;lt;PropertyDescriptor, TypeDescriptor&amp;gt;();
+        }
+        catch (IntrospectionException ex) {
+            throw new FatalBeanException(&amp;quot;Failed to obtain BeanInfo for class [&amp;quot; + beanClass.getName() + &amp;quot;]&amp;quot;, ex);
+        }
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;判断是否可赋值-assignable&#34;&gt;判断是否可赋值（Assignable）&lt;/h2&gt;
+
+&lt;p&gt;看工具类&lt;code&gt;ClassUtils&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static boolean isAssignable(Class&amp;lt;?&amp;gt; lhsType, Class&amp;lt;?&amp;gt; rhsType) {
+        if (lhsType.isAssignableFrom(rhsType)) {
+            return true;
+        }
+        if (lhsType.isPrimitive()) {
+            Class&amp;lt;?&amp;gt; resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
+            if (lhsType == resolvedPrimitive) {
+                return true;
+            }
+        }
+        else {
+            Class&amp;lt;?&amp;gt; resolvedWrapper = primitiveTypeToWrapperMap.get(rhsType);
+            if (resolvedWrapper != null &amp;amp;&amp;amp; lhsType.isAssignableFrom(resolvedWrapper)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;java.lang.Class.isAssignableFrom&lt;/code&gt;方法是native的，判断当前类型是否是另一个的超类，或者父接口，或者类型一样，可以看个例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class IsAssignableFromDemo {
+    public static void main(String[] args) {
+        System.out.println(Object.class.isAssignableFrom(Object.class)); // true
+        System.out.println(Object.class.isAssignableFrom(String.class)); // true
+        System.out.println(List.class.isAssignableFrom(ArrayList.class)); // true
+        System.out.println(int.class.isAssignableFrom(long.class)); //false
+        System.out.println(int.class.isAssignableFrom(int.class));//true
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;isAssignable&lt;/code&gt;同时也会考虑原始类型及包装类型的情况，比如 int a 可以被拷贝到另一个对象的 Integer a 中。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>JVM垃圾回收总结</title>
+      <link>http://vonzhou.com/2019/jvm-gc-summary/</link>
+      <pubDate>Thu, 21 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/jvm-gc-summary/</guid>
+      <description>
+
+&lt;h2 id=&#34;1-垃圾回收算法&#34;&gt;1. 垃圾回收算法&lt;/h2&gt;
+
+&lt;h3 id=&#34;mark-sweep-标记-清除-算法&#34;&gt;Mark-Sweep(标记-清除)算法&lt;/h3&gt;
+
+&lt;h3 id=&#34;复制算法&#34;&gt;复制算法&lt;/h3&gt;
+
+&lt;h3 id=&#34;mark-compact-标记-整理-算法&#34;&gt;Mark-Compact(标记-整理)算法&lt;/h3&gt;
+
+&lt;h3 id=&#34;分代收集算法&#34;&gt;分代收集算法&lt;/h3&gt;
+
+&lt;h2 id=&#34;2-垃圾收集器&#34;&gt;2. 垃圾收集器&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/gc-collectors.jpg&#34; alt=&#34;gc-collectors&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;新生代&#34;&gt;新生代&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Serial&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ParNew&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ParNew是Serial的多线程版本， 只有 Serial，ParNew能和CMS配合使用。ParNew是使用CMS后的默认新生代收集器，可以使用&lt;code&gt;-XX:+UseParNewGC&lt;/code&gt;强制指定。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Parallel Scavenge&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Parallel Scavenge收集器，吞吐量优先，通过参数可以控制最大垃圾收集的停顿时间（-XX:MaxGCPauseMills）及直接设置吞吐量大小（-XX:GCTimeRatio）。也可以开启GC自适应调节策略（GC Ergonomics）。&lt;/p&gt;
+
+&lt;p&gt;使用&lt;code&gt;XX:+UseParallelGC&lt;/code&gt;开启，JDK1.4.1引入。PS只能和Serial Old，ParOld搭配使用。&lt;/p&gt;
+
+&lt;p&gt;Java 6，7，8 默认的收集器是Parallel GC（PS + Parallel Old），使用&lt;code&gt;PrintFlagsFinal&lt;/code&gt;可以看到：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;$ ./bin/java -XX:+PrintFlagsFinal
+bool UseParallelGC                            := true                                {product}
+bool UseParallelOldGC                          = true                                {product}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;老年代&#34;&gt;老年代&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Serial Old&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Parallel Old&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Parallel Old收集器是PS的老年代版本，使用多线程和“标记-整理”。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;XX:+UseParallelOldGC&lt;/code&gt;开启后，也会自动设置&lt;code&gt;XX:+UseParallelGC&lt;/code&gt;，JDK5.0 update 6引入。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;CMS&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;CMS收集器，以最短回收停顿时间，服务响应速度为目标，采用标记-清除算法。使用&lt;code&gt;-XX:+UseConcMarkSweepGC&lt;/code&gt;开启。&lt;/p&gt;
+
+&lt;h3 id=&#34;g1收集器&#34;&gt;G1收集器&lt;/h3&gt;
+
+&lt;p&gt;JDK7引入的&lt;/p&gt;
+
+&lt;p&gt;G1收集器的Region，其他收集器新生代和老年代之间的对象引用，JVM都是使用Remembered Set来避免全堆扫描。&lt;/p&gt;
+
+&lt;p&gt;Java 9,10默认的GC Collector是G1.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/index.html&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;Getting Started with the G1 Garbage Collector&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;zgc&#34;&gt;ZGC&lt;/h4&gt;
+
+&lt;p&gt;JDK11引入&lt;/p&gt;
+
+&lt;p&gt;要完成的目标是：控制Java的垃圾回收时长在10ms以内，绝对不超过10ms，并且使用了该垃圾回收策略之后，吞吐对比当前Java缺省的垃圾回收策略G1，下降不超过15%&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.opsian.com/blog/javas-new-zgc-is-very-exciting/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;Java&amp;rsquo;s new Z Garbage Collector (ZGC) is very exciting&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;TODO 使用不同的GC算法看GC日志&lt;/p&gt;
+
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://blogs.oracle.com/jonthecollector/our-collectors&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;Our Collectors&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.fasterj.com/articles/oraclecollectors1.shtml&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;Oracle JVM Garbage Collectors Available From JDK 1.7.0_04 And After&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>InnoDB 行锁的实现</title>
+      <link>http://vonzhou.com/2019/innodb-row-lock/</link>
+      <pubDate>Sat, 16 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/innodb-row-lock/</guid>
+      <description>
+
+&lt;p&gt;InnoDB 实现行锁（row lock）的3种算法：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Record Lock&lt;/code&gt;：单行记录上锁&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Gap Lock&lt;/code&gt;：间隙锁，锁定一个范围，不包括记录本身&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Next-key Lock&lt;/code&gt;：等价于&lt;code&gt;Gap Lock&lt;/code&gt; + &lt;code&gt;Record Lock&lt;/code&gt;，即锁定一个范围同时锁定记录本身，为了解决Phantom Problem。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;行加锁过程&#34;&gt;行加锁过程&lt;/h2&gt;
+
+&lt;p&gt;InnoDB的行锁其实是索引记录锁，InnoDB存储引擎下每个表有一个主键（聚集索引），辅助索引中包含主键，根据查询使用的索引不同加锁也不同。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;通过主键加锁，仅对聚集索引记录进行加锁，&lt;code&gt;Record Lock&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;通过辅助索引进行加锁，需要先对辅助索引加锁 &lt;code&gt;Gap Lock&lt;/code&gt;，再对聚集索引加锁 &lt;code&gt;Record Lock&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;当辅助索引是唯一索引的时候，&lt;code&gt;Next-key Lock&lt;/code&gt;会降级为 &lt;code&gt;Record Lock&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;实例&#34;&gt;实例&lt;/h2&gt;
+
+&lt;h3 id=&#34;唯一索引行锁定&#34;&gt;唯一索引行锁定&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;create table t (a int primary key);
+insert into t values(1),(2),(5);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/innodb-row-lock-1.jpg&#34; alt=&#34;唯一索引行锁定&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;会话A会对a=5的行进行X锁定，由于a是主键且唯一，所以只会对这一行进行锁定，所以在会话B中插入a=4不会阻塞。&lt;/p&gt;
+
+&lt;h3 id=&#34;辅助索引行锁定&#34;&gt;辅助索引行锁定&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;create table t2 (a int, b int, primary key(a), key(b));
+insert into t2 values(1,1),(3,1),(5,3),(7,6),(10,8);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/innodb-row-lock-2.jpg&#34; alt=&#34;辅助索引行锁定-记录锁&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;会话A对a=5的聚簇索引行加了Record Lock，所以会话B会阻塞。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/innodb-row-lock-3.jpg&#34; alt=&#34;辅助索引行锁定-间隙锁&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;会话A不仅对a=5的聚簇索引行加了Record Lock，也会对辅助索引加 Next-Key Lock，锁定的范围是 (1,3],(3,6)。&lt;/p&gt;
+
+&lt;p&gt;所以在会话B中执行&lt;code&gt;insert into t2 values(13,3);&lt;/code&gt;, &lt;code&gt;insert into t2 values(14,5);&lt;/code&gt;也是同样的情况。&lt;/p&gt;
+
+&lt;p&gt;但是插入&lt;code&gt;b=0&lt;/code&gt;, &lt;code&gt;b=1&lt;/code&gt;, &lt;code&gt;b=5&lt;/code&gt;, &lt;code&gt;b=6&lt;/code&gt;时不会阻塞。&lt;/p&gt;
+
+&lt;h2 id=&#34;相关&#34;&gt;相关&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://dev.mysql.com/doc/refman/5.5/en/innodb-locking.html&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;14.10.1 InnoDB Locking&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>为什么枚举是实现单例最好的方式？</title>
+      <link>http://vonzhou.com/2019/enum-singleton/</link>
+      <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/enum-singleton/</guid>
+      <description>
+
+&lt;p&gt;提到单例模式（Singleton Pattern），都能说出一二，但是没那么简单。&lt;/p&gt;
+
+&lt;h2 id=&#34;实现单例的方式&#34;&gt;实现单例的方式&lt;/h2&gt;
+
+&lt;p&gt;本文代码&lt;a href=&#34;https://github.com/vonzhou/learning-java/tree/master/src/lang/enumsingleton&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;在这里&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;法1-静态成员&#34;&gt;法1：静态成员&lt;/h3&gt;
+
+&lt;p&gt;不多说。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Singleton1 {
+    public static final Singleton1 INSTANCE = new Singleton1();
+
+    private Singleton1() {
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;法2-静态工厂&#34;&gt;法2：静态工厂&lt;/h3&gt;
+
+&lt;p&gt;和法1一样，只不过通过工厂方法来返回实例，在API设计上更可取。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Singleton2 {
+    private static final Singleton2 INSTANCE = new Singleton2();
+
+    private Singleton2() {
+    }
+
+    public static Singleton2 getInstance() {
+        return INSTANCE;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;法3-lazy-initialization-延迟初始化&#34;&gt;法3：lazy initialization 延迟初始化&lt;/h3&gt;
+
+&lt;p&gt;前面法1，法2是饿汉式，lazy initialization 是懒汉式，需要的时候实例化，另外 double check。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Singleton3 {
+    private static Singleton3 INSTANCE = null;
+
+    private Singleton3() {
+    }
+
+    public static Singleton3 getInstance() {
+        if (INSTANCE == null) {
+            synchronized (Singleton3.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new Singleton3();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这3种方法思路是一样的，都是把构造器搞成私有的，控制实例化的过程。但是 &lt;code&gt;private constructor&lt;/code&gt; 是可以被绕过的：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;序列化，反序列化&lt;/li&gt;
+&lt;li&gt;反射&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;序列化&#34;&gt;序列化&lt;/h3&gt;
+
+&lt;p&gt;Singleton1实例序列化，然后反序列化会得到一个不同的对象。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Singleton1 implements Serializable {
+    public static final Singleton1 INSTANCE = new Singleton1();
+
+    private Singleton1() {
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class SingletonSerializationDemo {
+
+    public static void main(String[] args) {
+        // 对于Singleton2, 对于Singleton3 表现是一样的
+        Singleton1 obj1 = Singleton1.INSTANCE;
+        Singleton1 obj2 = Singleton1.INSTANCE;
+        System.out.println(obj1 == obj2 ? &amp;quot;Two objects are same&amp;quot; : &amp;quot;Two objects are different&amp;quot;);
+
+        // 序列化 obj1
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(&amp;quot;out.ser&amp;quot;));
+            out.writeObject(obj1);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        Singleton1 obj3 = null;
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(&amp;quot;out.ser&amp;quot;));
+            obj3 = (Singleton1) in.readObject();
+            in.close();
+        } catch (Exception i) {
+            i.printStackTrace();
+        }
+
+        System.out.println(obj1 == obj3 ? &amp;quot;Two objects are same&amp;quot; : &amp;quot;Two objects are different&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Two objects are same
+Two objects are different
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以这样就违背了单例的初衷。为了使得反序列化后的对象是同一个，我们可以提供&lt;code&gt;readResolve&lt;/code&gt;方法，会在反序列过程中被调用。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Singleton1 implements Serializable {
+    public static final Singleton1 INSTANCE = new Singleton1();
+
+    private Singleton1() {
+    }
+
+    // 注释掉该方法， 进行对比
+    protected Object readResolve() {
+        return INSTANCE;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Two objects are same
+Two objects are same
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;反射&#34;&gt;反射&lt;/h3&gt;
+
+&lt;p&gt;面对反射，private constructor也是无能为力。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class SingletonReflectionDemo {
+    public static void main(String[] args) throws Exception {
+        Singleton1 obj1 = Singleton1.INSTANCE;
+        // 得到无参构造器
+        Constructor constructor = obj1.getClass().getDeclaredConstructor(new Class[0]);
+        // 这里使私有构造器可以访问
+        constructor.setAccessible(true);
+        Singleton1 obj2 = (Singleton1) constructor.newInstance();
+        System.out.println(obj1 == obj2 ? &amp;quot;Two objects are same&amp;quot; : &amp;quot;Two objects are different&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Two objects are different
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;那么面对序列化，反射，有没有更好实现Singleton的方式？enum&amp;hellip;..&lt;/p&gt;
+
+&lt;h2 id=&#34;enum是实现单例最好的方式-法4&#34;&gt;enum是实现单例最好的方式（法4）&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public enum SingletonUsingEnum {
+    INSTANCE
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;反序列化得到的也是同一个实例。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class SingletonUsingEnumSerializationDemo {
+    public static void main(String[] args) {
+        SingletonUsingEnum obj1 = SingletonUsingEnum.INSTANCE;
+
+        // 序列化 obj1
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(&amp;quot;out.ser&amp;quot;));
+            out.writeObject(obj1);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        SingletonUsingEnum obj3 = null;
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(&amp;quot;out.ser&amp;quot;));
+            obj3 = (SingletonUsingEnum) in.readObject();
+            in.close();
+        } catch (Exception i) {
+            i.printStackTrace();
+        }
+        System.out.println(obj1 == obj3 ? &amp;quot;Two objects are same&amp;quot; : &amp;quot;Two objects are different&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Two objects are same
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;使用反射创建Enum实例的时候，会抛出异常。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class SingletonUsingEnumReflectionDemo {
+    public static void main(String[] args) throws Exception {
+        SingletonUsingEnum obj1 = SingletonUsingEnum.INSTANCE;
+        Constructor constructor = obj1.getClass().getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+        SingletonUsingEnum obj2 = (SingletonUsingEnum) constructor.newInstance();
+        System.out.println(obj1 == obj2 ? &amp;quot;Two objects are same&amp;quot; : &amp;quot;Two objects are different&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Exception in thread &amp;quot;main&amp;quot; java.lang.IllegalArgumentException: Cannot reflectively create enum objects
+    at java.lang.reflect.Constructor.newInstance(Constructor.java:417)
+    at lang.enumsingleton.SingletonUsingEnumReflectionDemo.main(SingletonUsingEnumReflectionDemo.java:16)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;枚举是一个语法糖&#34;&gt;枚举是一个语法糖&lt;/h2&gt;
+
+&lt;p&gt;一个例子开始。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public enum ColorEnum {
+    RED,
+    BLUE
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;对class文件进行反编译， &lt;code&gt;javap -v ColorEnum.class&lt;/code&gt; 输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Classfile /D:/GitHub/learning-java/target/classes/lang/ColorEnum.class
+  Last modified 2019-2-14; size 898 bytes
+  MD5 checksum 79dff593c44747f1648cd48465351caf
+  Compiled from &amp;quot;ColorEnum.java&amp;quot;
+public final class lang.ColorEnum extends java.lang.Enum&amp;lt;lang.ColorEnum&amp;gt;
+  minor version: 0
+  major version: 52
+  flags: ACC_PUBLIC, ACC_FINAL, ACC_SUPER, ACC_ENUM
+Constant pool:
+   #1 = Fieldref           #4.#36         // lang/ColorEnum.$VALUES:[Llang/ColorEnum;
+   #2 = Methodref          #37.#38        // &amp;quot;[Llang/ColorEnum;&amp;quot;.clone:()Ljava/lang/Object;
+   #3 = Class              #17            // &amp;quot;[Llang/ColorEnum;&amp;quot;
+   #4 = Class              #39            // lang/ColorEnum
+   #5 = Methodref          #12.#40        // java/lang/Enum.valueOf:(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;
+   #6 = Methodref          #12.#41        // java/lang/Enum.&amp;quot;&amp;lt;init&amp;gt;&amp;quot;:(Ljava/lang/String;I)V
+   #7 = String             #13            // RED
+   #8 = Methodref          #4.#41         // lang/ColorEnum.&amp;quot;&amp;lt;init&amp;gt;&amp;quot;:(Ljava/lang/String;I)V
+   #9 = Fieldref           #4.#42         // lang/ColorEnum.RED:Llang/ColorEnum;
+  #10 = String             #15            // BLUE
+  #11 = Fieldref           #4.#43         // lang/ColorEnum.BLUE:Llang/ColorEnum;
+  #12 = Class              #44            // java/lang/Enum
+  #13 = Utf8               RED
+  #14 = Utf8               Llang/ColorEnum;
+  #15 = Utf8               BLUE
+  #16 = Utf8               $VALUES
+  #17 = Utf8               [Llang/ColorEnum;
+  #18 = Utf8               values
+  #19 = Utf8               ()[Llang/ColorEnum;
+  #20 = Utf8               Code
+  #21 = Utf8               LineNumberTable
+  #22 = Utf8               valueOf
+  #23 = Utf8               (Ljava/lang/String;)Llang/ColorEnum;
+  #24 = Utf8               LocalVariableTable
+  #25 = Utf8               name
+  #26 = Utf8               Ljava/lang/String;
+  #27 = Utf8               &amp;lt;init&amp;gt;
+  #28 = Utf8               (Ljava/lang/String;I)V
+  #29 = Utf8               this
+  #30 = Utf8               Signature
+  #31 = Utf8               ()V
+  #32 = Utf8               &amp;lt;clinit&amp;gt;
+  #33 = Utf8               Ljava/lang/Enum&amp;lt;Llang/ColorEnum;&amp;gt;;
+  #34 = Utf8               SourceFile
+  #35 = Utf8               ColorEnum.java
+  #36 = NameAndType        #16:#17        // $VALUES:[Llang/ColorEnum;
+  #37 = Class              #17            // &amp;quot;[Llang/ColorEnum;&amp;quot;
+  #38 = NameAndType        #45:#46        // clone:()Ljava/lang/Object;
+  #39 = Utf8               lang/ColorEnum
+  #40 = NameAndType        #22:#47        // valueOf:(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;
+  #41 = NameAndType        #27:#28        // &amp;quot;&amp;lt;init&amp;gt;&amp;quot;:(Ljava/lang/String;I)V
+  #42 = NameAndType        #13:#14        // RED:Llang/ColorEnum;
+  #43 = NameAndType        #15:#14        // BLUE:Llang/ColorEnum;
+  #44 = Utf8               java/lang/Enum
+  #45 = Utf8               clone
+  #46 = Utf8               ()Ljava/lang/Object;
+  #47 = Utf8               (Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;
+{
+  public static final lang.ColorEnum RED;
+    descriptor: Llang/ColorEnum;
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL, ACC_ENUM
+
+  public static final lang.ColorEnum BLUE;
+    descriptor: Llang/ColorEnum;
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL, ACC_ENUM
+
+  public static lang.ColorEnum[] values();
+    descriptor: ()[Llang/ColorEnum;
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=1, locals=0, args_size=0
+         0: getstatic     #1                  // Field $VALUES:[Llang/ColorEnum;
+         3: invokevirtual #2                  // Method &amp;quot;[Llang/ColorEnum;&amp;quot;.clone:()Ljava/lang/Object;
+         6: checkcast     #3                  // class &amp;quot;[Llang/ColorEnum;&amp;quot;
+         9: areturn
+      LineNumberTable:
+        line 7: 0
+
+  public static lang.ColorEnum valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Llang/ColorEnum;
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: ldc           #4                  // class lang/ColorEnum
+         2: aload_0
+         3: invokestatic  #5                  // Method java/lang/Enum.valueOf:(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;
+         6: checkcast     #4                  // class lang/ColorEnum
+         9: areturn
+      LineNumberTable:
+        line 7: 0
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      10     0  name   Ljava/lang/String;
+
+  static {};
+    descriptor: ()V
+    flags: ACC_STATIC
+    Code:
+      stack=4, locals=0, args_size=0
+         0: new           #4                  // class lang/ColorEnum
+         3: dup
+         4: ldc           #7                  // String RED
+         6: iconst_0
+         7: invokespecial #8                  // Method &amp;quot;&amp;lt;init&amp;gt;&amp;quot;:(Ljava/lang/String;I)V
+        10: putstatic     #9                  // Field RED:Llang/ColorEnum;
+        13: new           #4                  // class lang/ColorEnum
+        16: dup
+        17: ldc           #10                 // String BLUE
+        19: iconst_1
+        20: invokespecial #8                  // Method &amp;quot;&amp;lt;init&amp;gt;&amp;quot;:(Ljava/lang/String;I)V
+        23: putstatic     #11                 // Field BLUE:Llang/ColorEnum;
+        26: iconst_2
+        27: anewarray     #4                  // class lang/ColorEnum
+        30: dup
+        31: iconst_0
+        32: getstatic     #9                  // Field RED:Llang/ColorEnum;
+        35: aastore
+        36: dup
+        37: iconst_1
+        38: getstatic     #11                 // Field BLUE:Llang/ColorEnum;
+        41: aastore
+        42: putstatic     #1                  // Field $VALUES:[Llang/ColorEnum;
+        45: return
+      LineNumberTable:
+        line 8: 0
+        line 9: 13
+        line 7: 26
+}
+Signature: #33                          // Ljava/lang/Enum&amp;lt;Llang/ColorEnum;&amp;gt;;
+SourceFile: &amp;quot;ColorEnum.java&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;定义的枚举最终就是一个继承了&lt;code&gt;java.lang.Enum&lt;/code&gt;的类&lt;/li&gt;
+&lt;li&gt;生成了2个静态方法&lt;code&gt;valueOf()&lt;/code&gt;, &lt;code&gt;values()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;定义了2个&lt;code&gt;static final&lt;/code&gt;变量 &lt;code&gt;RED&lt;/code&gt;, &lt;code&gt;BLUE&lt;/code&gt;，并且在静态块中进行了实例化&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;enum-分析&#34;&gt;Enum 分析&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/enum.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public abstract class Enum&amp;lt;E extends Enum&amp;lt;E&amp;gt;&amp;gt; implements Comparable&amp;lt;E&amp;gt;, Serializable {
+    private final String name;
+    private final int ordinal;
+
+    public final String name() {
+        return this.name;
+    }
+
+    public final int ordinal() {
+        return this.ordinal;
+    }
+
+    protected Enum(String var1, int var2) {
+        this.name = var1;
+        this.ordinal = var2;
+    }
+
+    public String toString() {
+        return this.name;
+    }
+
+    public final boolean equals(Object var1) {
+        return this == var1;
+    }
+
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    protected final Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
+    }
+
+    public final int compareTo(E var1) {
+        if (this.getClass() != var1.getClass() &amp;amp;&amp;amp; this.getDeclaringClass() != var1.getDeclaringClass()) {
+            throw new ClassCastException();
+        } else {
+            return this.ordinal - var1.ordinal;
+        }
+    }
+
+    public final Class&amp;lt;E&amp;gt; getDeclaringClass() {
+        Class var1 = this.getClass();
+        Class var2 = var1.getSuperclass();
+        return var2 == Enum.class ? var1 : var2;
+    }
+
+    public static &amp;lt;T extends Enum&amp;lt;T&amp;gt;&amp;gt; T valueOf(Class&amp;lt;T&amp;gt; var0, String var1) {
+        Enum var2 = (Enum)var0.enumConstantDirectory().get(var1);
+        if (var2 != null) {
+            return var2;
+        } else if (var1 == null) {
+            throw new NullPointerException(&amp;quot;Name is null&amp;quot;);
+        } else {
+            throw new IllegalArgumentException(&amp;quot;No enum constant &amp;quot; + var0.getCanonicalName() + &amp;quot;.&amp;quot; + var1);
+        }
+    }
+
+    // enum class 不能实现 finalize 方法，为什么？？
+    protected final void finalize() {
+    }
+
+    private void readObject(ObjectInputStream var1) throws IOException, ClassNotFoundException {
+        throw new InvalidObjectException(&amp;quot;can&#39;t deserialize enum&amp;quot;);
+    }
+
+    private void readObjectNoData() throws ObjectStreamException {
+        throw new InvalidObjectException(&amp;quot;can&#39;t deserialize enum&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接下来看看Enum的序列化，反序列化过程。&lt;/p&gt;
+
+&lt;p&gt;Enum序列化的实现在&lt;code&gt;java.io.ObjectOutputStream.writeEnum&lt;/code&gt;中，可以看到&lt;strong&gt;只对枚举的名称进行了序列化&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private void writeEnum(Enum&amp;lt;?&amp;gt; en,
+                           ObjectStreamClass desc,
+                           boolean unshared)
+        throws IOException
+    {
+        bout.writeByte(TC_ENUM); // 特殊标记
+        ObjectStreamClass sdesc = desc.getSuperDesc();
+        writeClassDesc((sdesc.forClass() == Enum.class) ? desc : sdesc, false);
+        handles.assign(unshared ? null : en);
+        // 这里
+        writeString(en.name(), false);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;反序列化的实现在&lt;code&gt;java.io.ObjectInputStream.readEnum&lt;/code&gt;，读出Enum的name之后，从常量字典中查找出对应的枚举常量，保证了唯一性。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private Enum&amp;lt;?&amp;gt; readEnum(boolean unshared) throws IOException {
+        if (bin.readByte() != TC_ENUM) {
+            throw new InternalError();
+        }
+
+        ObjectStreamClass desc = readClassDesc(false);
+        if (!desc.isEnum()) {
+            throw new InvalidClassException(&amp;quot;non-enum class: &amp;quot; + desc);
+        }
+
+        int enumHandle = handles.assign(unshared ? unsharedMarker : null);
+        ClassNotFoundException resolveEx = desc.getResolveException();
+        if (resolveEx != null) {
+            handles.markException(enumHandle, resolveEx);
+        }
+
+        String name = readString(false);
+        Enum&amp;lt;?&amp;gt; result = null;
+        Class&amp;lt;?&amp;gt; cl = desc.forClass();
+        if (cl != null) {
+            try {
+                // 关键代码
+                @SuppressWarnings(&amp;quot;unchecked&amp;quot;)
+                Enum&amp;lt;?&amp;gt; en = Enum.valueOf((Class)cl, name);
+                result = en;
+            } catch (IllegalArgumentException ex) {
+                throw (IOException) new InvalidObjectException(
+                    &amp;quot;enum constant &amp;quot; + name + &amp;quot; does not exist in &amp;quot; +
+                    cl).initCause(ex);
+            }
+            if (!unshared) {
+                handles.setObject(enumHandle, result);
+            }
+        }
+
+        handles.finish(enumHandle);
+        passHandle = enumHandle;
+        return result;
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以，enum是实现单例最好的方式。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题</title>
+      <link>http://vonzhou.com/2019/kafka-consumer-rebalance-jitter/</link>
+      <pubDate>Wed, 30 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/kafka-consumer-rebalance-jitter/</guid>
+      <description>
+
+&lt;h2 id=&#34;场景&#34;&gt;场景&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/kafka-consumer-rebalance-jitter-1.png&#34; alt=&#34;消费流程&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;使用spring-kafka，Listener方法中把收到的消息投递到Disruptor队列中，然后Disruptor单Consumer把消息插入到DB中。&lt;/p&gt;
+
+&lt;p&gt;采用的手动ACK。&lt;/p&gt;
+
+&lt;h2 id=&#34;严重问题的出现&#34;&gt;严重问题的出现&lt;/h2&gt;
+
+&lt;p&gt;新版本发布之时，接到大量的报警异常，Consumer不停的进行Rebalance，不停的进行分区重分配，offset提交失败。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] ERROR o.a.k.c.c.i.ConsumerCoordinator.handle 550 - Error UNKNOWN_MEMBER_ID occurred while committing offsets for group xxxxx_group
+2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] ERROR o.a.k.c.c.i.ConsumerCoordinator.onJoinPrepare 254 - User provided listener org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer$1 failed on partition revocation:
+org.apache.kafka.clients.consumer.CommitFailedException: Commit cannot be completed due to group rebalance
+    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:552)
+    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:493)
+    at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:665)
+    at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:644)
+    at org.apache.kafka.clients.consumer.internals.RequestFuture$1.onSuccess(RequestFuture.java:167)
+    at org.apache.kafka.clients.consumer.internals.RequestFuture.fireSuccess(RequestFuture.java:133)
+    at org.apache.kafka.clients.consumer.internals.RequestFuture.complete(RequestFuture.java:107)
+    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient$RequestFutureCompletionHandler.onComplete(ConsumerNetworkClient.java:380)
+    at org.apache.kafka.clients.NetworkClient.poll(NetworkClient.java:274)
+    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.clientPoll(ConsumerNetworkClient.java:320)
+    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:213)
+    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:193)
+    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:163)
+    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.commitOffsetsSync(ConsumerCoordinator.java:358)
+    at org.apache.kafka.clients.consumer.KafkaConsumer.commitSync(KafkaConsumer.java:968)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.ackImmediate(KafkaMessageListenerContainer.java:578)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.manualAck(KafkaMessageListenerContainer.java:559)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.handleManualAcks(KafkaMessageListenerContainer.java:550)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.processCommits(KafkaMessageListenerContainer.java:624)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.stopInvokerAndCommitManualAcks(KafkaMessageListenerContainer.java:504)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.access$900(KafkaMessageListenerContainer.java:221)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer$1.onPartitionsRevoked(KafkaMessageListenerContainer.java:297)
+    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.onJoinPrepare(ConsumerCoordinator.java:250)
+    at org.apache.kafka.clients.consumer.internals.AbstractCoordinator.ensureActiveGroup(AbstractCoordinator.java:207)
+    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.ensurePartitionAssignment(ConsumerCoordinator.java:311)
+    at org.apache.kafka.clients.consumer.KafkaConsumer.pollOnce(KafkaConsumer.java:890)
+    at org.apache.kafka.clients.consumer.KafkaConsumer.poll(KafkaConsumer.java:853)
+    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:408)
+    at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+    at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+    at java.lang.Thread.run(Thread.java:745)
+2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] INFO  o.a.k.c.c.i.AbstractCoordinator.handle 354 - Attempt to join group xxxxx_group failed due to unknown member id, resetting and retrying.
+2019-01-29 23:59:48 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-4] INFO  o.a.k.c.c.i.AbstractCoordinator.handle 623 - Attempt to heart beat failed since the group is rebalancing, try to re-join group.
+2019-01-29 23:59:48 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-4] INFO  o.s.k.l.KafkaMessageListenerContainer.onPartitionsRevoked 224 - partitions revoked:[]
+2019-01-29 23:59:48 [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-kafka-consumer-2] INFO  o.a.k.c.c.i.AbstractCoordinator.handle 623 - Attempt to heart beat failed since the group is rebalancing, try to re-join group.
+2019-01-29 23:59:48 [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-kafka-consumer-2] INFO  o.s.k.l.KafkaMessageListenerContainer.onPartitionsRevoked 224 - partitions revoked:[]
+2019-01-29 23:59:48 [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-kafka-consumer-1] INFO  o.a.k.c.c.i.AbstractCoordinator.handle 623 - Attempt to heart beat failed since the group is rebalancing, try to re-join group.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;offset提交失败，带来的问题就是大量的消息被重复消费，相互影响，不断恶化，导致消息堆积很严重，无法推进。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate record.
+    at sun.reflect.GeneratedConstructorAccessor45.newInstance(Unknown Source)
+    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+    at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+    at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+    at com.mysql.jdbc.Util.getInstance(Util.java:386)
+    at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+    at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+    at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+    at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+    at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+    at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+    at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+    at com.mysql.jdbc.PreparedStatement.execute$sentryProxy(PreparedStatement.java:1379)
+    at com.mysql.jdbc.PreparedStatement.execute(PreparedStatement.java)
+    at com.alibaba.druid.pool.DruidPooledPreparedStatement.execute(DruidPooledPreparedStatement.java:493)
+    at org.apache.ibatis.executor.statement.PreparedStatementHandler.update(PreparedStatementHandler.java:46)
+    at org.apache.ibatis.executor.statement.RoutingStatementHandler.update(RoutingStatementHandler.java:74)
+    at org.apache.ibatis.executor.SimpleExecutor.doUpdate(SimpleExecutor.java:50)
+    at org.apache.ibatis.executor.BaseExecutor.update(BaseExecutor.java:117)
+    at org.apache.ibatis.executor.CachingExecutor.update(CachingExecutor.java:76)
+    at org.apache.ibatis.session.defaults.DefaultSqlSession.update(DefaultSqlSession.java:198)
+    at org.apache.ibatis.session.defaults.DefaultSqlSession.insert(DefaultSqlSession.java:185)
+    at sun.reflect.GeneratedMethodAccessor84.invoke(Unknown Source)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke(Method.java:498)
+    at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:434)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;解决&#34;&gt;解决&lt;/h2&gt;
+
+&lt;p&gt;出现&lt;code&gt;Error UNKNOWN_MEMBER_ID occurred while committing offsets for group&lt;/code&gt;的原因是在kafka consumer会话超时的时候，没有能把offset提交到broker，所以要么超时时间&lt;code&gt;session.timeout.ms&lt;/code&gt;设置的太短了，要么消息的处理太慢了影响了ACK的执行，要么虽然是采用了线程池的方式，但是consumer在把消息入队的时候阻塞了，从而影响ACK。&lt;/p&gt;
+
+&lt;p&gt;所以总结下来解决的思路是：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;调参 &lt;code&gt;session.timeout.ms&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;加快消息的消费速度，我推荐的方式是单Consumer拿到消息后放到一个队列中，多线程的方式进行消费处理，设置ShutdownHook保证关闭的时候队列中的消息不丢失&lt;/li&gt;
+&lt;li&gt;采用自动commit的方式，但是有数据丢失的风险&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在我们的场景中，问题应该出在spring-kafka-listener取消息的速度过快，阻塞在把消息投递到Disruptor中，所以还有一点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;降低spring-kafka的并发度&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;最终的效果：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/kafka-consumer-rebalance-jitter-2.png&#34; alt=&#34;commit失败趋势图&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Kafka的参数常用的要知道，不要盲目设置&lt;/li&gt;
+&lt;li&gt;遇到问题无从下手的时候，看看源码，找到根源&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Nginx后端响应不完整问题分析</title>
+      <link>http://vonzhou.com/2019/nginx-temp-file/</link>
+      <pubDate>Fri, 04 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/nginx-temp-file/</guid>
+      <description>
+
+&lt;p&gt;Nginx默认会开启proxy buffer，如果没有权限写临时文件，就会导致响应被截取。&lt;/p&gt;
+
+&lt;h2 id=&#34;场景&#34;&gt;场景&lt;/h2&gt;
+
+&lt;p&gt;实现了一个简单的文件存储服务器，可以上传，下载，为了使用简单，使用了Nginx配置了端口转发，这样访问时无需包含端口信息。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;wget http://10.240.208.36/api/v1/fileserv/download?objName=xxxxx.zip
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但是今天在下载文件时发现了一个问题，一个40M的文件，下载后只有100K了，关键在于只要经过Nginx访问就不完整，直接访问后端接口就是OK的，那么问题应该出在Nginx的配置方面。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;nginx-temp-file-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在Nginx的错误日志中有如下的错误信息：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;2019/01/04 10:44:36 [crit] 14545#14545: *65 open() &amp;quot;/var/lib/nginx/proxy/5/00/0000000005&amp;quot; failed (13: Permission denied) while reading upstream, client: 10.240.208.36, server: _, request: &amp;quot;GET /api/v1/fileserv/download?objName=1546565995465_06a7c789611eb727cc95c529718e675e.apk HTTP/1.1&amp;quot;, upstream: &amp;quot;http://127.0.0.1:9197/api/v1/fileserv/download?objName=1546565995465_06a7c789611eb727cc95c529718e675e.apk&amp;quot;, host: &amp;quot;10.240.208.163&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;启动Nginx的用户无权限写 /var/lib/nginx/proxy 目录，导致后续的内容无法返回，所以下载的文件不完整。&lt;/p&gt;
+
+&lt;h2 id=&#34;原理&#34;&gt;原理&lt;/h2&gt;
+
+&lt;p&gt;Nginx代理缓存（&lt;a href=&#34;http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;proxy_buffering&lt;/a&gt;）开启后（&lt;code&gt;proxy_buffering on&lt;/code&gt;，默认是开启的），当Nginx从后端服务器收到响应后，该response的前面部分会缓存起来（可以通过&lt;code&gt;proxy_buffer_size&lt;/code&gt;设置，默认是一个内存页大小，4K或者8K），如果buffer的大小无法容纳整个响应，剩下的部分会写到临时文件中，写临时文件可以通过选项 &lt;code&gt;proxy_max_temp_file_size&lt;/code&gt; 和 &lt;code&gt;proxy_temp_path&lt;/code&gt;控制，其中&lt;code&gt;proxy_max_temp_file_size&lt;/code&gt;控制临时文件的最大大小，如果设置为0则不会写临时文件，&lt;code&gt;proxy_temp_path&lt;/code&gt;设置临时文件的路径。&lt;/p&gt;
+
+&lt;h2 id=&#34;解决方案&#34;&gt;解决方案&lt;/h2&gt;
+
+&lt;p&gt;Nginx配置，设置一个Nginx用户有权访问的临时目录：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;proxy_temp_path /home/appops/nginx_proxy_temp 1 2;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;nginx-temp-file-2.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;也可以通过禁用掉代理响应缓存来处理这种情况：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;proxy_max_temp_file_size 0;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;或者&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;proxy_buffering off;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>IntegerCache源码阅读</title>
+      <link>http://vonzhou.com/2018/integercache/</link>
+      <pubDate>Wed, 19 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/integercache/</guid>
+      <description>&lt;p&gt;先从一个思考题开始，考虑下面的代码输出是什么？&lt;/p&gt;
+
+&lt;p&gt;*例1*：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void test1() {
+    Integer a = 1; // 等价于 Integer a = valueOf(1)
+    Integer b = 1;
+    System.out.println(a == b); 
+
+    Integer c = 128;
+    Integer d = 128;
+    System.out.println(c == d); 
+
+    System.out.println(c.equals(d)); 
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;true
+false
+true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;把整数常量赋值给整数包装类型，实际上调用了Integer.valueOf方法，通过指令可以看到：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/integercache-1.jpg&#34; alt=&#34;integercache-1&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static Integer valueOf(int i) {
+    if (i &amp;gt;= IntegerCache.low &amp;amp;&amp;amp; i &amp;lt;= IntegerCache.high)
+        return IntegerCache.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;初次访问IntegerCache类，会触发其初始化。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private static class IntegerCache {
+    static final int low = -128;
+    static final int high;
+    static final Integer cache[];
+
+    static {
+        // high value may be configured by property
+        int h = 127;
+        String integerCacheHighPropValue =
+            sun.misc.VM.getSavedProperty(&amp;quot;java.lang.Integer.IntegerCache.high&amp;quot;);
+        if (integerCacheHighPropValue != null) {
+            try {
+                int i = parseInt(integerCacheHighPropValue);
+                i = Math.max(i, 127);
+                // Maximum array size is Integer.MAX_VALUE
+                h = Math.min(i, Integer.MAX_VALUE - (-low) -1);
+            } catch( NumberFormatException nfe) {
+                // If the property cannot be parsed into an int, ignore it.
+            }
+        }
+        high = h;
+
+        cache = new Integer[(high - low) + 1];
+        int j = low;
+        for(int k = 0; k &amp;lt; cache.length; k++)
+            cache[k] = new Integer(j++);
+
+        // range [-128, 127] must be interned (JLS7 5.1.7)
+        assert IntegerCache.high &amp;gt;= 127;
+    }
+
+    private IntegerCache() {}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到在[low, high]范围内的数值会使用Integer缓存对象，否则新生成一个Integer对象，其中low=-128,high默认是127，但是可以通过JVM选项来配置。比如我们设置&lt;code&gt;-XX:AutoBoxCacheMax=256&lt;/code&gt;后运行例1，输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;true
+true
+true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以在进行Integer对象相等性比较的时候，不能直接使用 == (比较的是对象的hashcode，只有[low,high]之间的Integer是相同的), 而应该使用equals方法。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public boolean equals(Object obj) {
+    if (obj instanceof Integer) {
+        return value == ((Integer)obj).intValue();
+    }
+    return false;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在进行普通对象和包装类对象的相等性判断时都应注意这一点。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>2018阅读书单</title>
+      <link>http://vonzhou.com/2018/2018-read-book/</link>
+      <pubDate>Sun, 16 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/2018-read-book/</guid>
+      <description>&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;书名&lt;/th&gt;
+&lt;th&gt;评分&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;《七周七数据库》&lt;/td&gt;
+&lt;td&gt;☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《给投资新手的极简股票课》&lt;/td&gt;
+&lt;td&gt;☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《实战Java高并发程序设计》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《HBase不睡觉书》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《深入剖析Tomcat》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《MyBatis技术内幕》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《大数据技术丛书 : Storm分布式实时计算模式》&lt;/td&gt;
+&lt;td&gt;☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《大型网站技术架构演进与性能优化》&lt;/td&gt;
+&lt;td&gt;☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《Hadoop: The Definitive Guide 4th》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《人工智能》李开复&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《Go语言实战》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《Go语言圣经》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《Kafka权威指南》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《腾讯传 : 中国互联网公司进化论》&lt;/td&gt;
+&lt;td&gt;☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《大型网站系统与Java中间件开发实践》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《Spring Cloud微服务实战》&lt;/td&gt;
+&lt;td&gt;☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《第一本Docker书》&lt;/td&gt;
+&lt;td&gt;☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《HotSpot实战》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《刷新 : 重新发现商业与未来》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《百年孤独》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;《Designing Data-Intensive Applications》&lt;/td&gt;
+&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>从连接池(JedisPool)获取Redis连接源码分析</title>
+      <link>http://vonzhou.com/2018/jedis-pool-get/</link>
+      <pubDate>Fri, 14 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/jedis-pool-get/</guid>
+      <description>&lt;p&gt;本文追踪下SpringBoot中使用StringRedisTemplate，从JedisPool中获取连接的过程，了解了该过程可以更好的进行连接池的参数调优。&lt;/p&gt;
+
+&lt;p&gt;一图胜千言，从JedisPool获取一个连接的过程：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/jedis-pool-get.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;接下来走进代码。&lt;/p&gt;
+
+&lt;p&gt;在使用StringRedisTemplate或者RedisTemplate操作Redis的时候，其实都最终调用RedisTemplate.execute方法，以最简单的get开始。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.core.DefaultValueOperations
+public V get(final Object key) {
+
+    return execute(new ValueDeserializingRedisCallback(key) {
+
+        protected byte[] inRedis(byte[] rawKey, RedisConnection connection) {
+            return connection.get(rawKey);
+        }
+    }, true);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;执行之时，先根据我们提供的RedisConnectionFactory（实际的实现是JedisConnectionFactory，要么使用SpringBoot帮我们自动配置的实例，要么自己配置）来获取一个连接，然后就在这个RedisConnection上请求Redis Server。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.core.RedisTemplate
+public &amp;lt;T&amp;gt; T execute(RedisCallback&amp;lt;T&amp;gt; action, boolean exposeConnection, boolean pipeline) {
+    RedisConnectionFactory factory = getConnectionFactory();
+    RedisConnection conn = null;
+    try {
+
+        if (enableTransactionSupport) {
+            // only bind resources in case of potential transaction synchronization
+            conn = RedisConnectionUtils.bindConnection(factory, enableTransactionSupport);
+        } else {
+            // 1. 获取连接
+            conn = RedisConnectionUtils.getConnection(factory);
+        }
+
+        boolean existingConnection = TransactionSynchronizationManager.hasResource(factory);
+
+        RedisConnection connToUse = preProcessConnection(conn, existingConnection);
+
+        boolean pipelineStatus = connToUse.isPipelined();
+        if (pipeline &amp;amp;&amp;amp; !pipelineStatus) {
+            connToUse.openPipeline();
+        }
+
+        RedisConnection connToExpose = (exposeConnection ? connToUse : createRedisConnectionProxy(connToUse));
+        // 2. 执行实际的操作
+        T result = action.doInRedis(connToExpose);
+
+        // close pipeline
+        if (pipeline &amp;amp;&amp;amp; !pipelineStatus) {
+            connToUse.closePipeline();
+        }
+
+        // TODO: any other connection processing?
+        return postProcessResult(result, connToUse, existingConnection);
+    } finally {
+        RedisConnectionUtils.releaseConnection(conn, factory);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;重点看连接获取的过程。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.core.RedisConnectionUtils
+public static RedisConnection doGetConnection(RedisConnectionFactory factory, boolean allowCreate, boolean bind,
+        boolean enableTransactionSupport) {
+    // 交给我们的工厂
+    RedisConnection conn = factory.getConnection();
+
+    if (bind) {
+        RedisConnection connectionToBind = conn;
+        if (enableTransactionSupport &amp;amp;&amp;amp; isActualNonReadonlyTransactionActive()) {
+            connectionToBind = createConnectionProxy(conn, factory);
+        }
+
+        connHolder = new RedisConnectionHolder(connectionToBind);
+
+        TransactionSynchronizationManager.bindResource(factory, connHolder);
+        if (enableTransactionSupport) {
+            potentiallyRegisterTransactionSynchronisation(connHolder, factory);
+        }
+
+        return connHolder.getConnection();
+    }
+
+    return conn;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Jedis连接工厂负责创建jedis实例，如果使用连接池，则从池中获取，否则直接创建新的。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.connection.jedis.JedisConnectionFactory
+public RedisConnection getConnection() {
+
+    if (cluster != null) {
+        return getClusterConnection();
+    }
+
+    Jedis jedis = fetchJedisConnector();
+    JedisConnection connection = (usePool ? new JedisConnection(jedis, pool, dbIndex, clientName)
+            : new JedisConnection(jedis, null, dbIndex, clientName));
+    connection.setConvertPipelineAndTxResults(convertPipelineAndTxResults);
+    return postProcessConnection(connection);
+}
+
+protected Jedis fetchJedisConnector() {
+    try {
+        // 使用连接池的情形
+        if (usePool &amp;amp;&amp;amp; pool != null) {
+            return pool.getResource();
+        }
+
+        Jedis jedis = new Jedis(getShardInfo());
+        // force initialization (see Jedis issue #82)
+        jedis.connect();
+
+        potentiallySetClientName(jedis);
+        return jedis;
+    } catch (Exception ex) {
+        throw new RedisConnectionFailureException(&amp;quot;Cannot get Jedis connection&amp;quot;, ex);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接下来是Commons Pool里面的通用逻辑，先看池中的空闲对象（idle object）能否利用，不能的话就只能创建新的对象。此过程中，如果设置了等待超时时间，则超时资源得不到满足就抛出异常“Timeout waiting for idle object”，如果没有设置最大等待时间（maxWaitMillis），就会无限等待，这样如果获取连接的请求很多时就会耗尽系统的线程，要特别注意，实际生产中踩过。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.apache.commons.pool2.impl.GenericObjectPool
+public T borrowObject(long borrowMaxWaitMillis) throws Exception {
+    assertOpen();
+
+    AbandonedConfig ac = this.abandonedConfig;
+    if (ac != null &amp;amp;&amp;amp; ac.getRemoveAbandonedOnBorrow() &amp;amp;&amp;amp;
+            (getNumIdle() &amp;lt; 2) &amp;amp;&amp;amp;
+            (getNumActive() &amp;gt; getMaxTotal() - 3) ) {
+        removeAbandoned(ac);
+    }
+
+    PooledObject&amp;lt;T&amp;gt; p = null;
+
+    // Get local copy of current config so it is consistent for entire
+    // method execution
+    boolean blockWhenExhausted = getBlockWhenExhausted();
+
+    boolean create;
+    long waitTime = System.currentTimeMillis();
+
+    while (p == null) {
+        create = false;
+        if (blockWhenExhausted) {
+            // 1. 复用
+            p = idleObjects.pollFirst();
+            if (p == null) {
+                // 2. 创建新资源对象
+                p = create();
+                if (p != null) {
+                    create = true;
+                }
+            }
+            if (p == null) {
+                if (borrowMaxWaitMillis &amp;lt; 0) {
+                    // 默认的borrowMaxWaitMillis是-1，会一直阻塞直到满足
+                    p = idleObjects.takeFirst();
+                } else {
+                    p = idleObjects.pollFirst(borrowMaxWaitMillis,
+                            TimeUnit.MILLISECONDS);
+                }
+            }
+            if (p == null) {
+                throw new NoSuchElementException(
+                        &amp;quot;Timeout waiting for idle object&amp;quot;);
+            }
+            if (!p.allocate()) {
+                p = null;
+            }
+        } else {
+            p = idleObjects.pollFirst();
+            if (p == null) {
+                p = create();
+                if (p != null) {
+                    create = true;
+                }
+            }
+            if (p == null) {
+                throw new NoSuchElementException(&amp;quot;Pool exhausted&amp;quot;);
+            }
+            if (!p.allocate()) {
+                p = null;
+            }
+        }
+
+        if (p != null) {
+            try {
+                factory.activateObject(p);
+            } catch (Exception e) {
+                try {
+                    destroy(p);
+                } catch (Exception e1) {
+                    // Ignore - activation failure is more important
+                }
+                p = null;
+                if (create) {
+                    NoSuchElementException nsee = new NoSuchElementException(
+                            &amp;quot;Unable to activate object&amp;quot;);
+                    nsee.initCause(e);
+                    throw nsee;
+                }
+            }
+            if (p != null &amp;amp;&amp;amp; (getTestOnBorrow() || create &amp;amp;&amp;amp; getTestOnCreate())) {
+                boolean validate = false;
+                Throwable validationThrowable = null;
+                try {
+                    validate = factory.validateObject(p);
+                } catch (Throwable t) {
+                    PoolUtils.checkRethrow(t);
+                    validationThrowable = t;
+                }
+                if (!validate) {
+                    try {
+                        destroy(p);
+                        destroyedByBorrowValidationCount.incrementAndGet();
+                    } catch (Exception e) {
+                        // Ignore - validation failure is more important
+                    }
+                    p = null;
+                    if (create) {
+                        NoSuchElementException nsee = new NoSuchElementException(
+                                &amp;quot;Unable to validate object&amp;quot;);
+                        nsee.initCause(validationThrowable);
+                        throw nsee;
+                    }
+                }
+            }
+        }
+    }
+
+    updateStatsBorrow(p, System.currentTimeMillis() - waitTime);
+
+    return p.getObject();
+}
+
+
+private PooledObject&amp;lt;T&amp;gt; create() throws Exception {
+    int localMaxTotal = getMaxTotal();
+    long newCreateCount = createCount.incrementAndGet();
+    if (localMaxTotal &amp;gt; -1 &amp;amp;&amp;amp; newCreateCount &amp;gt; localMaxTotal ||
+            newCreateCount &amp;gt; Integer.MAX_VALUE) {
+        createCount.decrementAndGet();
+        return null;
+    }
+
+    final PooledObject&amp;lt;T&amp;gt; p;
+    try {
+        // 交由工厂
+        p = factory.makeObject();
+    } catch (Exception e) {
+        createCount.decrementAndGet();
+        throw e;
+    }
+
+    AbandonedConfig ac = this.abandonedConfig;
+    if (ac != null &amp;amp;&amp;amp; ac.getLogAbandoned()) {
+        p.setLogAbandoned(true);
+    }
+
+    createdCount.incrementAndGet();
+    allObjects.put(new IdentityWrapper&amp;lt;T&amp;gt;(p.getObject()), p);
+    return p;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最终实际的jedis实例由JedisFactory创建。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// redis.clients.jedis.JedisFactory
+public PooledObject&amp;lt;Jedis&amp;gt; makeObject() throws Exception {
+final HostAndPort hostAndPort = this.hostAndPort.get();
+final Jedis jedis = new Jedis(hostAndPort.getHost(), hostAndPort.getPort(), connectionTimeout,
+    soTimeout, ssl, sslSocketFactory, sslParameters, hostnameVerifier);
+
+try {
+    jedis.connect();
+    if (null != this.password) {
+    jedis.auth(this.password);
+    }
+    if (database != 0) {
+    jedis.select(database);
+    }
+    if (clientName != null) {
+    jedis.clientSetname(clientName);
+    }
+} catch (JedisException je) {
+    jedis.close();
+    throw je;
+}
+
+return new DefaultPooledObject&amp;lt;Jedis&amp;gt;(jedis);
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ArrayBlockingQueue与Disruptor的性能对比</title>
+      <link>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</link>
+      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</guid>
+      <description>
+
+&lt;p&gt;虽然Disruptor采用了lock-free的算法，但并非银弹，本文以最常用的场景来测试ArrayBlockingQueue和Disruptor的作为缓存队列的性能优劣。&lt;/p&gt;
+
+&lt;h2 id=&#34;测试环境&#34;&gt;测试环境&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;消息大小 20B&lt;/li&gt;
+&lt;li&gt;Windows 10, 4内核，8逻辑CPU&lt;/li&gt;
+&lt;li&gt;JDK 8&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;测试用例&#34;&gt;测试用例&lt;/h2&gt;
+
+&lt;p&gt;本文采用一个生产者来生产特定数量的消息，然后使用缓冲队列，由特定数量的消费者来共同消费处理这批消息。&lt;/p&gt;
+
+&lt;p&gt;每条消息处理耗时20ms的情况 ， 4消费线程：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;方式&lt;/th&gt;
+&lt;th&gt;1K&lt;/th&gt;
+&lt;th&gt;1W&lt;/th&gt;
+&lt;th&gt;10W&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ABQ&lt;/td&gt;
+&lt;td&gt;5s&lt;/td&gt;
+&lt;td&gt;52s&lt;/td&gt;
+&lt;td&gt;525s&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Disruptor&lt;/td&gt;
+&lt;td&gt;5s&lt;/td&gt;
+&lt;td&gt;52s&lt;/td&gt;
+&lt;td&gt;529s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;每条消息处理耗时20ms的情况 ， 8消费线程：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;方式&lt;/th&gt;
+&lt;th&gt;1K&lt;/th&gt;
+&lt;th&gt;1W&lt;/th&gt;
+&lt;th&gt;10W&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ABQ&lt;/td&gt;
+&lt;td&gt;2s&lt;/td&gt;
+&lt;td&gt;26s&lt;/td&gt;
+&lt;td&gt;263s&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Disruptor&lt;/td&gt;
+&lt;td&gt;2s&lt;/td&gt;
+&lt;td&gt;26s&lt;/td&gt;
+&lt;td&gt;263s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;从中可以看到，平均下来5ms一条消息（每条消息耗时20ms，4个线程）。如果一条消息处理的时间比较长，则使用普通ABQ，Disruptor开销差别不大，因为大头时间在消息的处理上，锁争用的开销不明显。&lt;/p&gt;
+
+&lt;p&gt;每条消息处理耗时20ms的情况 ， 4消费线程：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;方式&lt;/th&gt;
+&lt;th&gt;1K&lt;/th&gt;
+&lt;th&gt;1W&lt;/th&gt;
+&lt;th&gt;10W&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ABQ&lt;/td&gt;
+&lt;td&gt;756ms&lt;/td&gt;
+&lt;td&gt;7.332s&lt;/td&gt;
+&lt;td&gt;72.73s&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Disruptor&lt;/td&gt;
+&lt;td&gt;826ms&lt;/td&gt;
+&lt;td&gt;7.279s&lt;/td&gt;
+&lt;td&gt;71.047s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;每条消息处理耗时2ms的情况 ， 1消费线程：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;方式&lt;/th&gt;
+&lt;th&gt;1K&lt;/th&gt;
+&lt;th&gt;1W&lt;/th&gt;
+&lt;th&gt;10W&lt;/th&gt;
+&lt;th&gt;100W&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ABQ&lt;/td&gt;
+&lt;td&gt;3.156s&lt;/td&gt;
+&lt;td&gt;28.803s&lt;/td&gt;
+&lt;td&gt;284.221s&lt;/td&gt;
+&lt;td&gt;2846 s&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Disruptor&lt;/td&gt;
+&lt;td&gt;3.063s&lt;/td&gt;
+&lt;td&gt;28.436s&lt;/td&gt;
+&lt;td&gt;284.158s&lt;/td&gt;
+&lt;td&gt;2812 s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;当消息处理很快时（&amp;lt; 1ms）。&lt;/p&gt;
+
+&lt;p&gt;1消费线程：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;方式&lt;/th&gt;
+&lt;th&gt;1K&lt;/th&gt;
+&lt;th&gt;1W&lt;/th&gt;
+&lt;th&gt;10W&lt;/th&gt;
+&lt;th&gt;100W&lt;/th&gt;
+&lt;th&gt;1000W&lt;/th&gt;
+&lt;th&gt;1W * 1W&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ABQ&lt;/td&gt;
+&lt;td&gt;37ms&lt;/td&gt;
+&lt;td&gt;151ms&lt;/td&gt;
+&lt;td&gt;1059ms&lt;/td&gt;
+&lt;td&gt;8.59s&lt;/td&gt;
+&lt;td&gt;87 s&lt;/td&gt;
+&lt;td&gt;813 s&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Disruptor&lt;/td&gt;
+&lt;td&gt;94ms&lt;/td&gt;
+&lt;td&gt;215ms&lt;/td&gt;
+&lt;td&gt;7.6s&lt;/td&gt;
+&lt;td&gt;7.6s&lt;/td&gt;
+&lt;td&gt;69.87 s&lt;/td&gt;
+&lt;td&gt;684 s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;4消费线程：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;方式&lt;/th&gt;
+&lt;th&gt;1K&lt;/th&gt;
+&lt;th&gt;1W&lt;/th&gt;
+&lt;th&gt;10W&lt;/th&gt;
+&lt;th&gt;100W&lt;/th&gt;
+&lt;th&gt;1000W&lt;/th&gt;
+&lt;th&gt;1W * 1W&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ABQ&lt;/td&gt;
+&lt;td&gt;38ms&lt;/td&gt;
+&lt;td&gt;181ms&lt;/td&gt;
+&lt;td&gt;1243ms&lt;/td&gt;
+&lt;td&gt;9.74s&lt;/td&gt;
+&lt;td&gt;100s&lt;/td&gt;
+&lt;td&gt;1024 s&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Disruptor&lt;/td&gt;
+&lt;td&gt;63ms&lt;/td&gt;
+&lt;td&gt;162ms&lt;/td&gt;
+&lt;td&gt;1167ms&lt;/td&gt;
+&lt;td&gt;9.88s&lt;/td&gt;
+&lt;td&gt;97.8s&lt;/td&gt;
+&lt;td&gt;1002 s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;从上面的测试情况下，处理在消息处理很快，且使用单消费者的时候Disruptor表现较好，其他情况并没有任何优势。&lt;/p&gt;
+
+&lt;p&gt;在Disruptor官方文档中给出的性能测试结果并没有涵盖本文中的场景，官方文档中的1P-3C多播方式要用多个ArrayBlockingQueue来实现Disruptor中的Multicast方式（内部是一个RingBuffer，但是多个Sequnce）。&lt;/p&gt;
+
+&lt;p&gt;所以在选用Disruptor的时候一定要具体的测试，搞清自己的场景，像本文中的一个生产者，多个消费者共同处理消息的场景使用普通的线程池+ABQ就足够了，并不比Disruptor表现差。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/vonzhou/learning-java/tree/master/src/framework/disruptor/threadpoolvsdisruptor&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;本文代码&lt;/a&gt;。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

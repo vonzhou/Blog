@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/cas/" />
+  <link rel="next" href="http://vonzhou.com/2018/disruptor-consume-pattern/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/disruptor-get-started/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Disruptor 快速入门 | 编程之路
+       
+  </title>
+  <meta name="title" content="Disruptor 快速入门 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Disruptor 快速入门",
+    "headline" : "Disruptor 快速入门",
+    "description" : "为了提高系统的吞吐量，通常会采用队列来实现批量处理，发布订阅模式，异步等场景。在JDK的内置队列中，一般实际中会使用ArrayBlockingQueue，一方面是有界的，另一方面是通过加锁实现的线程安全，比如在使用线程池的时候最佳实践就是指定了一个 ArrayBlockingQueue 作为任务队列。
+ExecutorService service = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue&lt;Runnable&gt;(CAPACITY), new RejectedExecutionHandler() { @Override public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) { // 实现自己的拒绝策略 } });  LMAX公司开发的 Disruptor 通过无锁（CAS），避免缓存行伪共享，环形数组（RingBuffer）实现了更高的性能，Storm，Log4j2中都使用了 Disruptor。
+本文是 Disruptor 快速入门篇。
+引入依赖 依赖配置。
+&lt;dependency&gt; &lt;groupId&gt;com.lmax&lt;/groupId&gt; &lt;artifactId&gt;disruptor&lt;/artifactId&gt; &lt;version&gt;3.3.7&lt;/version&gt; &lt;/dependency&gt;  定义事件，事件工厂 定义一个简单的事件，这里假设要处理的是日志消息。
+@Data public class LogEvent { private String msg; } public class LogEventFactory implements EventFactory&lt;LogEvent&gt; { @Override public LogEvent newInstance() { return new LogEvent(); } }  事件工厂用于 Disruptor 在 RingBuffer 中预分配空间，从 RingBuffer 的源码可以看到这一点。",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-09-21 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-09-21 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/disruptor-get-started/",
+    "wordCount" : "258",
+    "keywords" : [ "CAS","Disruptor", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Disruptor 快速入门</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-09-21 itemprop="datePublished">September 21, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/disruptor-get-started-1.jpg" alt="disruptor-get-started-1" class="lazyload"><figcaption class="image-caption">disruptor-get-started-1</figcaption></figure></p>
+
+<p>为了提高系统的吞吐量，通常会采用队列来实现批量处理，发布订阅模式，异步等场景。在JDK的内置队列中，一般实际中会使用<code>ArrayBlockingQueue</code>，一方面是有界的，另一方面是通过加锁实现的线程安全，比如在使用线程池的时候最佳实践就是指定了一个 <code>ArrayBlockingQueue</code> 作为任务队列。</p>
+
+<pre><code class="language-java">ExecutorService service = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue&lt;Runnable&gt;(CAPACITY), new RejectedExecutionHandler() {
+
+                    @Override
+                    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                       // 实现自己的拒绝策略
+                    }
+                });
+</code></pre>
+
+<p>LMAX公司开发的 Disruptor 通过无锁（CAS），避免缓存行伪共享，环形数组（RingBuffer）实现了更高的性能，Storm，Log4j2中都使用了 Disruptor。</p>
+
+<p>本文是 Disruptor 快速入门篇。</p>
+
+<h2 id="引入依赖">引入依赖</h2>
+
+<p>依赖配置。</p>
+
+<pre><code class="language-java">&lt;dependency&gt;
+    &lt;groupId&gt;com.lmax&lt;/groupId&gt;
+    &lt;artifactId&gt;disruptor&lt;/artifactId&gt;
+    &lt;version&gt;3.3.7&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<h2 id="定义事件-事件工厂">定义事件，事件工厂</h2>
+
+<p>定义一个简单的事件，这里假设要处理的是日志消息。</p>
+
+<pre><code class="language-java">@Data
+public class LogEvent {
+    private String msg;
+}
+
+
+public class LogEventFactory implements EventFactory&lt;LogEvent&gt; {
+    @Override
+    public LogEvent newInstance() {
+        return new LogEvent();
+    }
+}
+</code></pre>
+
+<p><strong>事件工厂用于 Disruptor 在 RingBuffer 中预分配空间</strong>，从 RingBuffer 的源码可以看到这一点。</p>
+
+<pre><code class="language-java">private void fill(EventFactory&lt;E&gt; eventFactory)
+{
+    for (int i = 0; i &lt; bufferSize; i++)
+    {
+        entries[BUFFER_PAD + i] = eventFactory.newInstance();
+    }
+}
+</code></pre>
+
+<h2 id="消费者">消费者</h2>
+
+<p>定义消费者来处理我们的事件。</p>
+
+<pre><code class="language-java">public class LogEventConsumer implements EventHandler&lt;LogEvent&gt; {
+
+    @Override
+    public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
+        System.out.println(Thread.currentThread().getName() + &quot; | Event : &quot; + event);
+    }
+}
+</code></pre>
+
+<h2 id="生产者">生产者</h2>
+
+<p>定义事件的源头，里面的事件转换器（EventTranslatorOneArg）会把输出的参数转为我们的事件类型。</p>
+
+<pre><code class="language-java">public class LogEventProducer {
+    private final RingBuffer&lt;LogEvent&gt; ringBuffer;
+
+    public LogEventProducer(RingBuffer&lt;LogEvent&gt; ringBuffer) {
+        this.ringBuffer = ringBuffer;
+    }
+
+    private static final EventTranslatorOneArg&lt;LogEvent, String&gt; TRANSLATOR = new EventTranslatorOneArg&lt;LogEvent, String&gt;() {
+        public void translateTo(LogEvent event, long sequence, String bb) {
+            event.setMsg(bb);
+        }
+    };
+
+
+    public void onData(String msg){
+        ringBuffer.publishEvent(TRANSLATOR, msg);
+    }
+}
+</code></pre>
+
+<h2 id="组装-disruptor">组装 Disruptor</h2>
+
+<p>把上述组件组装起来就可以了，Disruptor 构造器中的两个参数-生产者类型 ProducerType（单个，或者多个？），WaitStrategy（等待RingBuffer中对应序列号可用的策略）会影响 Disruptor 的性能。</p>
+
+<pre><code class="language-java">public class LogEventMain {
+    public static void main(String[] args) {
+        LogEventFactory factory = new LogEventFactory();
+
+        // 环形数组的容量，必须要是2的次幂
+        int bufferSize = 1024;
+
+        // 构造 Disruptor
+        Disruptor&lt;LogEvent&gt; disruptor = new Disruptor&lt;&gt;(factory, bufferSize, DaemonThreadFactory.INSTANCE, ProducerType.SINGLE,
+                        new YieldingWaitStrategy());
+
+        // 设置消费者
+        disruptor.handleEventsWith(new LogEventConsumer());
+
+        // 启动 Disruptor
+        disruptor.start();
+
+        // 生产者要使用 Disruptor 的环形数组
+        RingBuffer&lt;LogEvent&gt; ringBuffer = disruptor.getRingBuffer();
+
+        LogEventProducer producer = new LogEventProducer(ringBuffer);
+
+        // 模拟消息发送
+        for (int i = 0; i &lt; 10000; i++) {
+            producer.onData(String.format(&quot;msg-%s&quot;, i));
+        }
+    }
+}
+</code></pre>
+
+<p><a href="https://github.com/vonzhou/learning-java/tree/master/src/framework/disruptor" rel="nofollow noreferrer" target="_blank">本文代码</a>.</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/disruptor-get-started/>http://vonzhou.com/2018/disruptor-get-started/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/cas/">
+                    #CAS</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/disruptor/">
+                    #Disruptor</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/cas/" class="prev" rel="prev" title="CAS 的底层实现"><i class="iconfont icon-left"></i>&nbsp;CAS 的底层实现</a>
+         
+        
+        <a href="http://vonzhou.com/2018/disruptor-consume-pattern/" class="next" rel="next" title="Disruptor中的事件消费模式">Disruptor中的事件消费模式&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

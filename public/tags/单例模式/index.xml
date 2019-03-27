@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>单例模式 on 编程之路</title>
+    <link>http://vonzhou.com/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/</link>
+    <description>Recent content in 单例模式 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 02 Sep 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Spring源码阅读 - bean实例化浅析</title>
+      <link>http://vonzhou.com/2016/spring-bean-instantiation/</link>
+      <pubDate>Fri, 02 Sep 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/spring-bean-instantiation/</guid>
+      <description>继续！
+开始 承上，我们知道XmlBeanFactory继承自AbstractBeanFactory，AbstractBeanFactory实现了BeanFactory接口，完成根据bean的name获取对象的工作。doGetBean 代码很长，我们慢慢分析，不清楚的地方就debug一下，刚开始我们就着眼于最常见的情况，最简单的情况，复杂的情况只不过加了很多额外的控制判断。
+public Object getBean(String name) throws BeansException { return doGetBean(name, null, null, false); } protected &amp;lt;T&amp;gt; T doGetBean( final String name, final Class&amp;lt;T&amp;gt; requiredType, final Object[] args, boolean typeCheckOnly) throws BeansException { final String beanName = transformedBeanName(name); Object bean; // Eagerly check singleton cache for manually registered singletons. // 先检查单例的缓存有没有我们需要的对象实例 -- （1） Object sharedInstance = getSingleton(beanName); if (sharedInstance != null &amp;amp;&amp;amp; args == null) { if (logger.</description>
+    </item>
+    
+  </channel>
+</rss>

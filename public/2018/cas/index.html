@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/spring-boot-init-methods/" />
+  <link rel="next" href="http://vonzhou.com/2018/disruptor-get-started/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/cas/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           CAS 的底层实现 | 编程之路
+       
+  </title>
+  <meta name="title" content="CAS 的底层实现 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "CAS 的底层实现",
+    "headline" : "CAS 的底层实现",
+    "description" : "java.util.concurrent 包的很多类（如 Semaphore，ConcurrentLinkedQueue）都提供了比 sychronized 机制更高的性能和可伸缩性，源于JDK 1.5提供的原子变量（如AtomicInteger,AtomicReference），这些原子变量类可以构建高效的非阻塞算法，底层实现是CAS。
+CAS（compare and swap）是一种高效实现线程安全性的方法，支持原子更新操作，适用于实现计数器，序列发生器等场景，比如在线程池新增worker线程的时候，需要增加计数，因为i++并非一个原子操作，所以可以使用 AtomicInteger 实现安全加1的操作。
+// java.util.concurrent.ThreadPoolExecutor /** * Attempts to CAS-increment the workerCount field of ctl. */ private boolean compareAndIncrementWorkerCount(int expect) { return ctl.compareAndSet(expect, expect + 1); }  CAS和传统的加锁方式（sychronized, ReentrantLock等）相比，CAS是一种乐观方式（对比数据库的悲观、乐观锁），无锁（lock-free），争用失败的线程不会被阻塞挂起，CAS失败时由我们决定是继续尝试，还是执行其他操作。当然这里的无锁只是上层我们感知的无锁，其实底层仍然是有加锁行为的，后面会看到。
+此外，CAS存在ABA问题，可以看下 AtomicStampedReference ，内部封装的是[reference, integer]。
+接下来跟踪下源码。
+CAS底层实现 从 AtomicInteger 入手，其中的属性 valueOffset 是该对象的 value 在内存中的起始地址。
+public final boolean compareAndSet(int expect, int update) { return unsafe.compareAndSwapInt(this, valueOffset, expect, update); } // setup to use Unsafe.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-09-19 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-09-19 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/cas/",
+    "wordCount" : "310",
+    "keywords" : [ "线程安全","CAS", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">CAS 的底层实现</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-09-19 itemprop="datePublished">September 19, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p><code>java.util.concurrent</code> 包的很多类（如 <code>Semaphore</code>，<code>ConcurrentLinkedQueue</code>）都提供了比 <code>sychronized</code> 机制更高的性能和可伸缩性，源于JDK 1.5提供的原子变量（如<code>AtomicInteger</code>,<code>AtomicReference</code>），这些原子变量类可以构建高效的非阻塞算法，底层实现是CAS。</p>
+
+<p>CAS（compare and swap）是一种高效实现线程安全性的方法，支持原子更新操作，适用于实现计数器，序列发生器等场景，比如在线程池新增worker线程的时候，需要增加计数，因为i++并非一个原子操作，所以可以使用 <code>AtomicInteger</code> 实现安全加1的操作。</p>
+
+<pre><code class="language-java">// java.util.concurrent.ThreadPoolExecutor
+/**
+ * Attempts to CAS-increment the workerCount field of ctl.
+ */
+private boolean compareAndIncrementWorkerCount(int expect) {
+    return ctl.compareAndSet(expect, expect + 1);
+}
+</code></pre>
+
+<p>CAS和传统的加锁方式（sychronized, ReentrantLock等）相比，CAS是一种乐观方式（对比数据库的悲观、乐观锁），无锁（lock-free），争用失败的线程不会被阻塞挂起，CAS失败时由我们决定是继续尝试，还是执行其他操作。当然这里的无锁只是上层我们感知的无锁，其实底层仍然是有加锁行为的，后面会看到。</p>
+
+<p>此外，CAS存在ABA问题，可以看下 <code>AtomicStampedReference</code> ，内部封装的是[reference, integer]。</p>
+
+<p>接下来跟踪下源码。</p>
+
+<h2 id="cas底层实现">CAS底层实现</h2>
+
+<p>从 AtomicInteger 入手，其中的属性 valueOffset 是该对象的 value 在内存中的起始地址。</p>
+
+<pre><code class="language-java">public final boolean compareAndSet(int expect, int update) {
+    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);
+}
+
+// setup to use Unsafe.compareAndSwapInt for updates
+private static final Unsafe unsafe = Unsafe.getUnsafe();
+private static final long valueOffset;
+
+static {
+    try {
+        valueOffset = unsafe.objectFieldOffset
+            (AtomicInteger.class.getDeclaredField(&quot;value&quot;));
+    } catch (Exception ex) { throw new Error(ex); }
+}
+
+ private volatile int value;
+</code></pre>
+
+<p>JDK中CAS的API都封装在 <code>sun.misc.Unsafe</code> 这个类中。接下来进入 openjdk 中对应的方法，位置 <code>hotspot\src\share\vm\prims\unsafe.cpp</code>。</p>
+
+<pre><code class="language-java">UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapInt(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jint e, jint x))
+  UnsafeWrapper(&quot;Unsafe_CompareAndSwapInt&quot;);
+    // 从偏移 obj 得到int的地址 addr
+  oop p = JNIHandles::resolve(obj);
+  jint* addr = (jint *) index_oop_from_field_offset_long(p, offset);
+  return (jint)(Atomic::cmpxchg(x, addr, e)) == e;
+UNSAFE_END
+</code></pre>
+
+<p>然后继续 <code>hotspot\src\share\vm\runtime\atomic.cpp</code>。</p>
+
+<pre><code class="language-c">jbyte Atomic::cmpxchg(jbyte exchange_value, volatile jbyte* dest, jbyte compare_value) {
+  assert(sizeof(jbyte) == 1, &quot;assumption.&quot;);
+  uintptr_t dest_addr = (uintptr_t)dest;
+  uintptr_t offset = dest_addr % sizeof(jint);
+  volatile jint* dest_int = (volatile jint*)(dest_addr - offset);
+  jint cur = *dest_int;
+  jbyte* cur_as_bytes = (jbyte*)(&amp;cur);
+  jint new_val = cur;
+  jbyte* new_val_as_bytes = (jbyte*)(&amp;new_val);
+  new_val_as_bytes[offset] = exchange_value;
+  // 直到更新成功
+  while (cur_as_bytes[offset] == compare_value) {
+    // 进入
+    jint res = cmpxchg(new_val, dest_int, cur);
+    if (res == cur) break;
+    cur = res;
+    new_val = cur;
+    new_val_as_bytes[offset] = exchange_value;
+  }
+  return cur_as_bytes[offset];
+}
+</code></pre>
+
+<p>如果是Linux x86架构的话，底层实现是 <code>hotspot\src\os_cpu\linux_x86\vm\atomic_linux_x86.inline.hpp</code>：</p>
+
+<pre><code class="language-c">// Adding a lock prefix to an instruction on MP machine
+#define LOCK_IF_MP(mp) &quot;cmp $0, &quot; #mp &quot;; je 1f; lock; 1: &quot;
+
+inline jint     Atomic::cmpxchg    (jint     exchange_value, volatile jint*     dest, jint     compare_value) {
+  int mp = os::is_MP();
+  __asm__ volatile (LOCK_IF_MP(%4) &quot;cmpxchgl %1,(%3)&quot;
+                    : &quot;=a&quot; (exchange_value)
+                    : &quot;r&quot; (exchange_value), &quot;a&quot; (compare_value), &quot;r&quot; (dest), &quot;r&quot; (mp)
+                    : &quot;cc&quot;, &quot;memory&quot;);
+  return exchange_value;
+}
+</code></pre>
+
+<p>x86中对应的机器指令是 CMPXCHG ，如果是多处理器架构的话会有 LOCK 前缀。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+<li><p>《Java并发编程实战》</p></li>
+
+<li><p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" rel="nofollow noreferrer" target="_blank">compare and swap</a></p></li>
+
+<li><p><a href="https://stackoverflow.com/questions/8891067/what-does-the-lock-instruction-mean-in-x86-assembly" rel="nofollow noreferrer" target="_blank">x86 LOCK 指令</a></p></li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/cas/>http://vonzhou.com/2018/cas/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
+                    #线程安全</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/cas/">
+                    #CAS</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/spring-boot-init-methods/" class="prev" rel="prev" title="Spring Boot 执行初始化逻辑的方法"><i class="iconfont icon-left"></i>&nbsp;Spring Boot 执行初始化逻辑的方法</a>
+         
+        
+        <a href="http://vonzhou.com/2018/disruptor-get-started/" class="next" rel="next" title="Disruptor 快速入门">Disruptor 快速入门&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

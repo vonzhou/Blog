@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Spring on 编程之路</title>
+    <link>http://vonzhou.com/tags/spring/</link>
+    <description>Recent content in Spring on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 27 Feb 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/spring/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>BeanUtils.copyProperties 源码分析</title>
+      <link>http://vonzhou.com/2019/spring-beanutils-copyproperties/</link>
+      <pubDate>Wed, 27 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/spring-beanutils-copyproperties/</guid>
+      <description>概述  利用反射 字段不一致也不会报错，因为会根据目标对象的属性去源对象中找对应的属性描述符，存在才拷贝 相同字段，类型不同，也不会有问题，因为拷贝之时会判断该字段源对象的读方法返回值，是否可应用用目标对象的写方法参数  实例 public class CopyPropertiesDemo { public static void main(String[] args) { Student s = new Student(); s.setName(&amp;quot;vz&amp;quot;); s.setFoo(1024); s.setBar(-1); Father f = new Father(); BeanUtils.copyProperties(s, f); System.out.println(f); } static class Student{ private String name; private int foo; private int bar; // setters and getters } static class Father{ private String name; private int age; private int salary; private double foo; private Integer bar; // setters and getters @Override public String toString() { return &amp;quot;Father{&amp;quot; + &amp;quot;name=&#39;&amp;quot; + name + &#39;\&#39;&#39; + &amp;quot;, age=&amp;quot; + age + &amp;quot;, salary=&amp;quot; + salary + &amp;quot;, foo=&amp;quot; + foo + &amp;quot;, bar=&amp;quot; + bar + &#39;}&#39;; } } }  输出：</description>
+    </item>
+    
+    <item>
+      <title>Spring Boot 执行初始化逻辑的方法</title>
+      <link>http://vonzhou.com/2018/spring-boot-init-methods/</link>
+      <pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/spring-boot-init-methods/</guid>
+      <description>在 Spring Boot 启动后执行一些初始化的逻辑有哪些方法？它们的执行顺序是怎样的？
+序 在 Spring Boot 启动后执行一些初始化的逻辑应该是一个很常见的场景，这里总结下几种方法，及执行的顺序。
+init-method 给bean配置init-method属性，或者在xml配置文件中指定，或者指定注解 Bean 的 initMethod 属性。
+InitializingBean 实现 InitializingBean 接口。
+使用 PostConstruct 注解 在初始化方法上加 PostConstruct 注解。
+Spring Boot 中的 ApplicationRunner/CommandLineRunner 实现 ApplicationRunner 或 CommandLineRunner 接口。
+运行效果 我们的基本类：
+public class Foo implements InitializingBean, CommandLineRunner, ApplicationRunner { public void init() { System.out.println(&amp;quot;init method ...&amp;quot;); } @PostConstruct public void postConstruct() { System.out.println(&amp;quot;init by PostConstruct ...&amp;quot;); } @Override public void afterPropertiesSet() throws Exception { System.</description>
+    </item>
+    
+    <item>
+      <title>如何加快 Spring Boot 项目的启动速度？</title>
+      <link>http://vonzhou.com/2018/spring-boot-speedup/</link>
+      <pubDate>Tue, 04 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/spring-boot-speedup/</guid>
+      <description>可以通过避免包扫描和自动配置来加快Spring Boot项目的启动速度。
+序 一个agent部署在其他机器上，其能够接收提交的Jar包进行部署，但是我们无法登陆机器也无法更新agent的代码。agent中有个逻辑是部署jar包的时候会等待10s，然后判断是否启动成功，如果没有启动成功，则进行回滚，这样就导致了一个问题：要部署的jar启动时间超过了10s，然后就回滚，无法部署成功。最终的解决方法只能是加快 Spring Boot 的启动速度了，经过调整后，到达了想要的结果。
+我们知道在基于 Spring Boot 的项目中，主类一般会加上注解 @SpringBootApplication，@SpringBootApplication 其实就是开启了包扫描和自动注解特性。
+@Target(ElementType.TYPE) @Retention(RetentionPolicy.RUNTIME) @Documented @Inherited @SpringBootConfiguration @EnableAutoConfiguration @ComponentScan(excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class)) public @interface SpringBootApplication { //................ }  问题的关键是 ComponentScan 和 EnableAutoConfiguration 是非常耗时的。@ComponentScan 是扫描指定包下面的注解标记，从而生成相应的 Bean，@EnableAutoConfiguration 可以根据引入的jar包，自动配置一些 Bean，但是并非都是需要的。
+避免包扫描（ComponentScan） 不使用 @SpringBootApplication 注解引入的 ComponentScan，改为自己配置项目中需要的Bean，启动类变为了：
+//@SpringBootApplication @Configuration @EnableAutoConfiguration public abstract class AppRunner { // ...... }  Bean 的实例化配置统一放到 BeanConfig.class中：
+@Configuration public class BeanConfig { @Autowired private SqlSessionFactory sqlSessionFactory; //.</description>
+    </item>
+    
+    <item>
+      <title>Spring 中如何控制2个bean中的初始化顺序？</title>
+      <link>http://vonzhou.com/2017/spring-two-bean-init-order-control/</link>
+      <pubDate>Tue, 17 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/spring-two-bean-init-order-control/</guid>
+      <description>开发过程中有这样一个场景，2个 bean 初始化逻辑中有依赖关系，需要控制二者的初始化顺序。实现方式可以有多种，本文结合目前对 Spring 的理解，尝试列出几种思路。
+场景 假设A，B两个 bean 都需要在初始化的时候从本地磁盘读取文件，其中B加载的文件，依赖A中加载的全局配置文件中配置的路径，所以需要A先于B初始化，此外A中的配置改变后也需要触发B的重新加载逻辑，所以A，B需要注入彼此。
+对于下面的模型，问题简化为：我们需要initA()先于initB()得到执行。
+@Service public class A { @Autowired private B b; public A() { System.out.println(&amp;quot;A construct&amp;quot;); } @PostConstruct public void init() { initA(); } private void initA() { System.out.println(&amp;quot;A init&amp;quot;); } } @Service public class B { @Autowired private A a; public B() { System.out.println(&amp;quot;B construct&amp;quot;); } @PostConstruct public void init() { initB(); } private void initB(){ System.out.println(&amp;quot;B init&amp;quot;); } }  方案一：立Flag 我们可以在业务层自己控制A，B的初始化顺序，在A中设置一个“是否初始化的”标记，B初始化前检测A是否得以初始化，如果没有则调用A的初始化方法，所谓的check-and-act。对于上述模型，实现如下：</description>
+    </item>
+    
+    <item>
+      <title>ExceptionHandler 异常处理过程分析</title>
+      <link>http://vonzhou.com/2017/spring-exception-handler/</link>
+      <pubDate>Thu, 10 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/spring-exception-handler/</guid>
+      <description>ExceptionHandler 的使用场景就是在 Controller 中捕获异常，全局统一处理，而不是在每个 handler 中都进行繁琐的异常捕获操作，优点就是代码整洁。
+ExceptionHandler 异常处理过程大体为：执行 handler 方法如果抛出了异常，就根据异常类型查找到对应的异常处理方法，然后执行对应的方法，上图展示了这一过程。下面列出异常处理方法解析的过程。
+getExceptionHandlerMethod 根据特定的异常找到匹配的 @ExceptionHandler 方法，这里只关注在 Controller 查找有 ExceptionHandler 方法的路径，先忽略 ControllerAdvice 的情况。通过如下代码可以看到，对于每一个 handler 都有一个异常处理器缓存（exceptionHandlerCache），局部性原理。初次会进行 ExceptionHandlerMethodResolver 的构造，获取到 ExceptionHandlerMethodResolver 之后，根据异常获取到响应的方法，包装成一个 InvocableHandlerMethod 返回。
+protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) { Class&amp;lt;?&amp;gt; handlerType = (handlerMethod != null ? handlerMethod.getBeanType() : null); if (handlerMethod != null) { ExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache.get(handlerType); // 关键点1 if (resolver == null) { resolver = new ExceptionHandlerMethodResolver(handlerType); // 关键点2 this.exceptionHandlerCache.put(handlerType, resolver); } Method method = resolver.</description>
+    </item>
+    
+    <item>
+      <title>Spring源码阅读 - bean实例化浅析</title>
+      <link>http://vonzhou.com/2016/spring-bean-instantiation/</link>
+      <pubDate>Fri, 02 Sep 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/spring-bean-instantiation/</guid>
+      <description>继续！
+开始 承上，我们知道XmlBeanFactory继承自AbstractBeanFactory，AbstractBeanFactory实现了BeanFactory接口，完成根据bean的name获取对象的工作。doGetBean 代码很长，我们慢慢分析，不清楚的地方就debug一下，刚开始我们就着眼于最常见的情况，最简单的情况，复杂的情况只不过加了很多额外的控制判断。
+public Object getBean(String name) throws BeansException { return doGetBean(name, null, null, false); } protected &amp;lt;T&amp;gt; T doGetBean( final String name, final Class&amp;lt;T&amp;gt; requiredType, final Object[] args, boolean typeCheckOnly) throws BeansException { final String beanName = transformedBeanName(name); Object bean; // Eagerly check singleton cache for manually registered singletons. // 先检查单例的缓存有没有我们需要的对象实例 -- （1） Object sharedInstance = getSingleton(beanName); if (sharedInstance != null &amp;amp;&amp;amp; args == null) { if (logger.</description>
+    </item>
+    
+    <item>
+      <title>Spring源码阅读 - bean解析初体验</title>
+      <link>http://vonzhou.com/2016/spring-bean-parse/</link>
+      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/spring-bean-parse/</guid>
+      <description>从一个简单例子开始 通过一个简单的bean加载例子来热热身，虽然我们平时不使用这里的XmlBeanFactory,而是用ApplicationContext,但是后面我们看到二者还是有共通之处。
+public class Foo { public void execute(){ System.out.println(&amp;quot;Foo execute...&amp;quot;); } } public class TestFoo { @Test public void testExecute(){ BeanFactory factory = new XmlBeanFactory(new ClassPathResource(&amp;quot;service-context.xml&amp;quot;)); Foo bean = (Foo) factory.getBean(&amp;quot;foo&amp;quot;); bean.execute(); } }  配置文件：
+&amp;lt;beans xmlns=&amp;quot;http://www.springframework.org/schema/beans&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xsi:schemaLocation=&amp;quot; http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&amp;quot;&amp;gt; &amp;lt;bean id=&amp;quot;foo&amp;quot; class=&amp;quot;com.vonzhou.learn.spring.beanloading.Foo&amp;quot;/&amp;gt; &amp;lt;/beans&amp;gt;  从资源文件得到DOM对象 那么就开始吧！先看看XmlBeanFactory所处的地位。
+XmlBeanFactory扩展了DefaultListableBeanFactory，使用XmlBeanDefinitionReader从XML配置文件中读取bean的定义。忽略其他的细节，我们先来看看这个配置文件（是一种Resource）是如何被加载的。跟踪进去，进入XmlBeanDefinitionReader#loadBeanDefinitions方法，然后扑面而来的是下面这个重要的方法。
+public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException { Assert.notNull(encodedResource, &amp;quot;EncodedResource must not be null&amp;quot;); if (logger.isInfoEnabled()) { logger.info(&amp;quot;Loading XML bean definitions from &amp;quot; + encodedResource.</description>
+    </item>
+    
+    <item>
+      <title>DispatcherServlet 源码阅读</title>
+      <link>http://vonzhou.com/2016/dispatcherservlet/</link>
+      <pubDate>Wed, 24 Aug 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/dispatcherservlet/</guid>
+      <description>有时间还是应该多看看源码。
+DispatcherServlet 是一个实实在在的 Servlet，所以 Spring MVC 引入后不会改变 Servlet 容器的行为， 仍然是解析 web.xml 部署文件，只需要在里面配置这个 Servlet 即可。 比如下面配置 dispatcher Servlet 处理所有的请求，也体现了 DispatcherServlet 是前端控制器（Front Controller）。 contextConfigLocation 上下文参数用于配置路径的指定，如果没有的话就使用默认的值。
+&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;web-app xmlns=&amp;quot;http://java.sun.com/xml/ns/javaee&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xsi:schemaLocation=&amp;quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&amp;quot; version=&amp;quot;3.0&amp;quot;&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.springframework.web.servlet.DispatcherServlet&amp;lt;/servlet-class&amp;gt; &amp;lt;load-on-startup&amp;gt;1&amp;lt;/load-on-startup&amp;gt; &amp;lt;/servlet&amp;gt; &amp;lt;servlet-mapping&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;url-pattern&amp;gt;/&amp;lt;/url-pattern&amp;gt; &amp;lt;/servlet-mapping&amp;gt; &amp;lt;listener&amp;gt; &amp;lt;listener-class&amp;gt;org.springframework.web.context.ContextLoaderListener&amp;lt;/listener-class&amp;gt; &amp;lt;/listener&amp;gt; &amp;lt;context-param&amp;gt; &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt; &amp;lt;param-value&amp;gt; /WEB-INF/dispatcher-servlet.xml classpath:service-context.xml &amp;lt;/param-value&amp;gt; &amp;lt;/context-param&amp;gt; &amp;lt;/web-app&amp;gt;  DispatcherServlet 初始化 DispatcherServlet 的父类 HttpServletBean 覆盖了 HttpServlet 的 init 方法，实现该 servlet 的初始化。
+/** * Map config parameters onto bean properties of this servlet, and * invoke subclass initialization.</description>
+    </item>
+    
+  </channel>
+</rss>

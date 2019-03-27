@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Java on 编程之路</title>
+    <link>http://vonzhou.com/categories/java/</link>
+    <description>Recent content in Java on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/categories/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>JDK 12新特性：Switch表达式</title>
+      <link>http://vonzhou.com/2019/java12-switch-expression/</link>
+      <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/java12-switch-expression/</guid>
+      <description>JDK 12 GA在2019.3.19发布，其中一项新特性是JEP 325：Switch表达式（Switch Expressions）。学习下。
+如果知道Scala中的模式匹配，就很容易理解Switch表达式。
+本文完整代码见SwitchDemo 。
+传统的Switch语句 传统的Switch语句（switch statement）我们并不陌生，在每个case分支中实现对应的处理逻辑。
+private static void switchStatement(WeekDay day) { int numLetters = 0; switch (day) { case MONDAY: case FRIDAY: case SUNDAY: numLetters = 6; break; case TUESDAY: numLetters = 7; break; case THURSDAY: case SATURDAY: numLetters = 8; break; case WEDNESDAY: numLetters = 9; break; } System.out.println(&amp;quot;1. Num Of Letters: &amp;quot; + numLetters); }  Switch语句的特点是每个case分支块是没有返回值的，而表达式（expression）的特点是有返回值。
+Switch表达式 模式匹配（Patrern Matching） 上述“计算字符个数”的例子使用Switch表达式，代码如下：</description>
+    </item>
+    
+    <item>
+      <title>JVM垃圾回收总结</title>
+      <link>http://vonzhou.com/2019/jvm-gc-summary/</link>
+      <pubDate>Thu, 21 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/jvm-gc-summary/</guid>
+      <description>1. 垃圾回收算法 Mark-Sweep(标记-清除)算法 复制算法 Mark-Compact(标记-整理)算法 分代收集算法 2. 垃圾收集器 新生代  Serial
+ ParNew
+  ParNew是Serial的多线程版本， 只有 Serial，ParNew能和CMS配合使用。ParNew是使用CMS后的默认新生代收集器，可以使用-XX:+UseParNewGC强制指定。
+ Parallel Scavenge  Parallel Scavenge收集器，吞吐量优先，通过参数可以控制最大垃圾收集的停顿时间（-XX:MaxGCPauseMills）及直接设置吞吐量大小（-XX:GCTimeRatio）。也可以开启GC自适应调节策略（GC Ergonomics）。
+使用XX:+UseParallelGC开启，JDK1.4.1引入。PS只能和Serial Old，ParOld搭配使用。
+Java 6，7，8 默认的收集器是Parallel GC（PS + Parallel Old），使用PrintFlagsFinal可以看到：
+$ ./bin/java -XX:+PrintFlagsFinal bool UseParallelGC := true {product} bool UseParallelOldGC = true {product}  老年代  Serial Old
+ Parallel Old
+  Parallel Old收集器是PS的老年代版本，使用多线程和“标记-整理”。
+XX:+UseParallelOldGC开启后，也会自动设置XX:+UseParallelGC，JDK5.0 update 6引入。
+ CMS  CMS收集器，以最短回收停顿时间，服务响应速度为目标，采用标记-清除算法。使用-XX:+UseConcMarkSweepGC开启。
+G1收集器 JDK7引入的
+G1收集器的Region，其他收集器新生代和老年代之间的对象引用，JVM都是使用Remembered Set来避免全堆扫描。</description>
+    </item>
+    
+    <item>
+      <title>为什么枚举是实现单例最好的方式？</title>
+      <link>http://vonzhou.com/2019/enum-singleton/</link>
+      <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/enum-singleton/</guid>
+      <description>提到单例模式（Singleton Pattern），都能说出一二，但是没那么简单。
+实现单例的方式 本文代码在这里.
+法1：静态成员 不多说。
+public class Singleton1 { public static final Singleton1 INSTANCE = new Singleton1(); private Singleton1() { } }  法2：静态工厂 和法1一样，只不过通过工厂方法来返回实例，在API设计上更可取。
+public class Singleton2 { private static final Singleton2 INSTANCE = new Singleton2(); private Singleton2() { } public static Singleton2 getInstance() { return INSTANCE; } }  法3：lazy initialization 延迟初始化 前面法1，法2是饿汉式，lazy initialization 是懒汉式，需要的时候实例化，另外 double check。
+public class Singleton3 { private static Singleton3 INSTANCE = null; private Singleton3() { } public static Singleton3 getInstance() { if (INSTANCE == null) { synchronized (Singleton3.</description>
+    </item>
+    
+    <item>
+      <title>IntegerCache源码阅读</title>
+      <link>http://vonzhou.com/2018/integercache/</link>
+      <pubDate>Wed, 19 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/integercache/</guid>
+      <description>先从一个思考题开始，考虑下面的代码输出是什么？
+*例1*：
+public static void test1() { Integer a = 1; // 等价于 Integer a = valueOf(1) Integer b = 1; System.out.println(a == b); Integer c = 128; Integer d = 128; System.out.println(c == d); System.out.println(c.equals(d)); }  输出：
+true false true  把整数常量赋值给整数包装类型，实际上调用了Integer.valueOf方法，通过指令可以看到：
+public static Integer valueOf(int i) { if (i &amp;gt;= IntegerCache.low &amp;amp;&amp;amp; i &amp;lt;= IntegerCache.high) return IntegerCache.cache[i + (-IntegerCache.low)]; return new Integer(i); }  初次访问IntegerCache类，会触发其初始化。
+private static class IntegerCache { static final int low = -128; static final int high; static final Integer cache[]; static { // high value may be configured by property int h = 127; String integerCacheHighPropValue = sun.</description>
+    </item>
+    
+    <item>
+      <title>从连接池(JedisPool)获取Redis连接源码分析</title>
+      <link>http://vonzhou.com/2018/jedis-pool-get/</link>
+      <pubDate>Fri, 14 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/jedis-pool-get/</guid>
+      <description>本文追踪下SpringBoot中使用StringRedisTemplate，从JedisPool中获取连接的过程，了解了该过程可以更好的进行连接池的参数调优。
+一图胜千言，从JedisPool获取一个连接的过程：
+接下来走进代码。
+在使用StringRedisTemplate或者RedisTemplate操作Redis的时候，其实都最终调用RedisTemplate.execute方法，以最简单的get开始。
+// org.springframework.data.redis.core.DefaultValueOperations public V get(final Object key) { return execute(new ValueDeserializingRedisCallback(key) { protected byte[] inRedis(byte[] rawKey, RedisConnection connection) { return connection.get(rawKey); } }, true); }  执行之时，先根据我们提供的RedisConnectionFactory（实际的实现是JedisConnectionFactory，要么使用SpringBoot帮我们自动配置的实例，要么自己配置）来获取一个连接，然后就在这个RedisConnection上请求Redis Server。
+// org.springframework.data.redis.core.RedisTemplate public &amp;lt;T&amp;gt; T execute(RedisCallback&amp;lt;T&amp;gt; action, boolean exposeConnection, boolean pipeline) { RedisConnectionFactory factory = getConnectionFactory(); RedisConnection conn = null; try { if (enableTransactionSupport) { // only bind resources in case of potential transaction synchronization conn = RedisConnectionUtils.bindConnection(factory, enableTransactionSupport); } else { // 1.</description>
+    </item>
+    
+    <item>
+      <title>ArrayBlockingQueue与Disruptor的性能对比</title>
+      <link>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</link>
+      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</guid>
+      <description>虽然Disruptor采用了lock-free的算法，但并非银弹，本文以最常用的场景来测试ArrayBlockingQueue和Disruptor的作为缓存队列的性能优劣。
+测试环境  消息大小 20B Windows 10, 4内核，8逻辑CPU JDK 8  测试用例 本文采用一个生产者来生产特定数量的消息，然后使用缓冲队列，由特定数量的消费者来共同消费处理这批消息。
+每条消息处理耗时20ms的情况 ， 4消费线程：
+   方式 1K 1W 10W     ABQ 5s 52s 525s   Disruptor 5s 52s 529s    每条消息处理耗时20ms的情况 ， 8消费线程：
+   方式 1K 1W 10W     ABQ 2s 26s 263s   Disruptor 2s 26s 263s    从中可以看到，平均下来5ms一条消息（每条消息耗时20ms，4个线程）。如果一条消息处理的时间比较长，则使用普通ABQ，Disruptor开销差别不大，因为大头时间在消息的处理上，锁争用的开销不明显。
+每条消息处理耗时20ms的情况 ， 4消费线程：</description>
+    </item>
+    
+    <item>
+      <title>Java字节码工具AsmTools介绍</title>
+      <link>http://vonzhou.com/2018/asmtools-intro/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/asmtools-intro/</guid>
+      <description>AsmTools是一款字节码生成工具。 包括的组件：
+ jasm：由JASM格式得到class文件 jdis：把class文件转为JASM格式 jcoder：由JCOD格式得到class文件 jdec：把class文件转为JCOD格式  两种汇编器/反汇编器（assembler/disassemblers）对应的格式有啥区别？
+ JASM specifically focuses on representing byte-code instructions in the VM format (while providing minimal description of the structure of the rest of the class file). Generally, JASM is more convenient for semantic changes, like change to instruction flow.
+JCOD provides good support for describing the structure of a class file (as well as writing incorrect bytes outside of this structure), and provides no support for specifying byte-code instructions (simply raw bytes for instructions).</description>
+    </item>
+    
+    <item>
+      <title>深入理解条件变量 Condition</title>
+      <link>http://vonzhou.com/2018/java-condition/</link>
+      <pubDate>Sun, 11 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/java-condition/</guid>
+      <description>序 可重入锁（ReentrantLock）是 synchronized 关键字的扩展，更加灵活。还有一种ReentrantLock应用场景是和Condition搭配使用，实现多线程环境下等待状态条件的功能。Object.wait 和 Object.notify 是和 synchronized 配合使用的，条件变量Condition是和ReentrantLock相关联的。
+接下来先通过一个Demo看看Condition的用法，然后列举两个应用的地方，最后分析其源码实现。
+一个简单Demo 先通过一个Demo看看怎么使用Condition，主线程通知条件满足，通过另一个线程继续运行，可以看到的是Condition.wait/signal方法需要和一个ReentrantLock绑定。
+public class ReenterLockCondition implements Runnable { public static ReentrantLock lock = new ReentrantLock(); public static Condition condition = lock.newCondition(); @Override public void run() { try { lock.lock(); condition.await(); System.out.println(String.format(&amp;quot;条件满足，线程%s运行！&amp;quot;, Thread.currentThread().getName())); } catch (InterruptedException e) { e.printStackTrace(); } finally { lock.unlock(); } } public static void main(String args[]) throws InterruptedException { ReenterLockCondition reenterLockCondition = new ReenterLockCondition(); Thread thread1 = new Thread(reenterLockCondition); thread1.</description>
+    </item>
+    
+    <item>
+      <title>Disruptor中的事件消费模式</title>
+      <link>http://vonzhou.com/2018/disruptor-consume-pattern/</link>
+      <pubDate>Fri, 28 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/disruptor-consume-pattern/</guid>
+      <description>Disruptor中有两种事件消费模式，多播（Multicast）:每个消费者都处理相同的消息，WorkPool：多个消费者合作消费一批消息。
+在《Disruptor快速入门》中，我们在构造 Disruptor 的时候，明确指定了单生产者模式，那么消费者呢？有几个消费者线程来处理消息？每个事件会被处理几次？
+当我们调用 disruptor.handleEventsWith 设置消息的处理器时，我们提供的 Event Handler 会被包装为 BatchEventProcessor。
+public EventHandlerGroup&amp;lt;T&amp;gt; handleEventsWith(final EventHandler&amp;lt;? super T&amp;gt;... handlers) { return createEventProcessors(new Sequence[0], handlers); } EventHandlerGroup&amp;lt;T&amp;gt; createEventProcessors( final Sequence[] barrierSequences, final EventHandler&amp;lt;? super T&amp;gt;[] eventHandlers) { checkNotStarted(); final Sequence[] processorSequences = new Sequence[eventHandlers.length]; final SequenceBarrier barrier = ringBuffer.newBarrier(barrierSequences); for (int i = 0, eventHandlersLength = eventHandlers.length; i &amp;lt; eventHandlersLength; i++) { final EventHandler&amp;lt;? super T&amp;gt; eventHandler = eventHandlers[i]; // 这里 final BatchEventProcessor&amp;lt;T&amp;gt; batchEventProcessor = new BatchEventProcessor&amp;lt;T&amp;gt;(ringBuffer, barrier, eventHandler); if (exceptionHandler !</description>
+    </item>
+    
+    <item>
+      <title>Disruptor 快速入门</title>
+      <link>http://vonzhou.com/2018/disruptor-get-started/</link>
+      <pubDate>Fri, 21 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/disruptor-get-started/</guid>
+      <description>为了提高系统的吞吐量，通常会采用队列来实现批量处理，发布订阅模式，异步等场景。在JDK的内置队列中，一般实际中会使用ArrayBlockingQueue，一方面是有界的，另一方面是通过加锁实现的线程安全，比如在使用线程池的时候最佳实践就是指定了一个 ArrayBlockingQueue 作为任务队列。
+ExecutorService service = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue&amp;lt;Runnable&amp;gt;(CAPACITY), new RejectedExecutionHandler() { @Override public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) { // 实现自己的拒绝策略 } });  LMAX公司开发的 Disruptor 通过无锁（CAS），避免缓存行伪共享，环形数组（RingBuffer）实现了更高的性能，Storm，Log4j2中都使用了 Disruptor。
+本文是 Disruptor 快速入门篇。
+引入依赖 依赖配置。
+&amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;com.lmax&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;disruptor&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;3.3.7&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt;  定义事件，事件工厂 定义一个简单的事件，这里假设要处理的是日志消息。
+@Data public class LogEvent { private String msg; } public class LogEventFactory implements EventFactory&amp;lt;LogEvent&amp;gt; { @Override public LogEvent newInstance() { return new LogEvent(); } }  事件工厂用于 Disruptor 在 RingBuffer 中预分配空间，从 RingBuffer 的源码可以看到这一点。</description>
+    </item>
+    
+    <item>
+      <title>CAS 的底层实现</title>
+      <link>http://vonzhou.com/2018/cas/</link>
+      <pubDate>Wed, 19 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/cas/</guid>
+      <description>java.util.concurrent 包的很多类（如 Semaphore，ConcurrentLinkedQueue）都提供了比 sychronized 机制更高的性能和可伸缩性，源于JDK 1.5提供的原子变量（如AtomicInteger,AtomicReference），这些原子变量类可以构建高效的非阻塞算法，底层实现是CAS。
+CAS（compare and swap）是一种高效实现线程安全性的方法，支持原子更新操作，适用于实现计数器，序列发生器等场景，比如在线程池新增worker线程的时候，需要增加计数，因为i++并非一个原子操作，所以可以使用 AtomicInteger 实现安全加1的操作。
+// java.util.concurrent.ThreadPoolExecutor /** * Attempts to CAS-increment the workerCount field of ctl. */ private boolean compareAndIncrementWorkerCount(int expect) { return ctl.compareAndSet(expect, expect + 1); }  CAS和传统的加锁方式（sychronized, ReentrantLock等）相比，CAS是一种乐观方式（对比数据库的悲观、乐观锁），无锁（lock-free），争用失败的线程不会被阻塞挂起，CAS失败时由我们决定是继续尝试，还是执行其他操作。当然这里的无锁只是上层我们感知的无锁，其实底层仍然是有加锁行为的，后面会看到。
+此外，CAS存在ABA问题，可以看下 AtomicStampedReference ，内部封装的是[reference, integer]。
+接下来跟踪下源码。
+CAS底层实现 从 AtomicInteger 入手，其中的属性 valueOffset 是该对象的 value 在内存中的起始地址。
+public final boolean compareAndSet(int expect, int update) { return unsafe.compareAndSwapInt(this, valueOffset, expect, update); } // setup to use Unsafe.</description>
+    </item>
+    
+    <item>
+      <title>如何保证ArrayList在多线程环境下的线程安全性</title>
+      <link>http://vonzhou.com/2018/make-arraylist-thread-safe/</link>
+      <pubDate>Fri, 07 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/make-arraylist-thread-safe/</guid>
+      <description>如果想在多线程环境下使用ArrayList，如果保障其线程安全性？
+序 在《记一次 ArrayList 线程安全问题》一文中说明了ArrayList用在多线程环境中存在问题。关键的原因就是ArrayList底层实现新增元素时数组索引的移动操作。
+/** * Appends the specified element to the end of this list. * * @param e element to be appended to this list * @return &amp;lt;tt&amp;gt;true&amp;lt;/tt&amp;gt; (as specified by {@link Collection#add}) */ public boolean add(E e) { ensureCapacityInternal(size + 1); // Increments modCount!! elementData[size++] = e; return true; }  非线程安全场景展示：
+public static void notThreadSafe() throws Exception { final List&amp;lt;Integer&amp;gt; list = Lists.newArrayList(); for (int i = 0; i &amp;lt; 4; i++) { new Thread(new Runnable() { @Override public void run() { for (int j = 0; j &amp;lt; 10000; j++) { list.</description>
+    </item>
+    
+    <item>
+      <title>记一次 ArrayList 线程安全问题</title>
+      <link>http://vonzhou.com/2018/arraylist-thread-safe-problem/</link>
+      <pubDate>Thu, 12 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/arraylist-thread-safe-problem/</guid>
+      <description>记录一次因为考虑ArrayList线程安全欠周导致的NPE问题。
+在开发过程中遇到一个场景，要把记录数据根据时间分组到不同的区间（比如，周，月，季度），实现的思路是采用二分查找得到记录归属的分组，寻思采用并行流 效率会好点。
+场景 private List&amp;lt;List&amp;lt;Record&amp;gt;&amp;gt; arrangeByInsertTime(List&amp;lt;Record&amp;gt; list, long[] dayTs) { int size = dayTs.length; List&amp;lt;List&amp;lt;Record&amp;gt;&amp;gt; buckets = new ArrayList&amp;lt;&amp;gt;(size); for (int i = 0; i &amp;lt; size; i++) { buckets.add(Lists.newArrayList()); } if (CollectionUtils.isEmpty(list)) { return buckets; } list.parallelStream().forEach(r -&amp;gt; { int pos = Arrays.binarySearch(dayTs, r.getInsertTime()); if (pos &amp;gt;= 0) { buckets.get(pos).add(r); } else { pos = Math.abs(pos) - 2; if (pos &amp;gt;= 0 &amp;amp;&amp;amp; pos &amp;lt; dayTs.length) { buckets.</description>
+    </item>
+    
+    <item>
+      <title>使用WatchService监控文件变化</title>
+      <link>http://vonzhou.com/2017/java-watchservice/</link>
+      <pubDate>Tue, 05 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/java-watchservice/</guid>
+      <description>场景 系统实现中经常需要能够感知配置文件的变化，然后及时更新上下文。
+实现方案  自己起一个单独线程，定时加载文件，实现较简单，但是无法保证能够实时捕捉文件变化，同时耗CPU 使用commons-io中的 FileAlterationObserver，思想和上面类似，对比前后文件列表的变化，触发对应事件 JDK 1.7提供的WatchService，利用底层文件系统提供的功能  使用 WatchService WatchService用来监控一个目录是否发生改变，但是可以通过 WatchEvent 上下文定位具体文件的变化。具体使用过程中要注意以下两点：
+ 文件改变可能会触发两次事件（我的理解：文件内容的变更，元数据的变更），可以通过文件的时间戳来控制 在文件变化事件发生后，如果立即读取文件，可能所获内容并不完整，建议的做法判断文件的 length &amp;gt; 0  // 监控文件的变化，重新加载 executor.submit(new Runnable() { @Override public void run() { try { final Path path = FileSystems.getDefault().getPath(getMonitorDir()); System.out.println(path); final WatchService watchService = FileSystems.getDefault().newWatchService(); final WatchKey watchKey = path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY); while (true) { final WatchKey wk = watchService.take(); for (WatchEvent&amp;lt;?&amp;gt; event : wk.pollEvents()) { final Path changed = (Path) event.</description>
+    </item>
+    
+  </channel>
+</rss>

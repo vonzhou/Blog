@@ -1,21 +1,9 @@
+
 # 编程之路 - Build Your Programming Culture
 
+
+
 ##  [博客地址](https://github.com/vonzhou/hugo-blog)
-
-
-## 源文件
-
-[content/posts](content/posts)
-
-
-## 约定
-
-
-
-* 博客短链(title.md)要意义明确，文中图片资源命名也以tile-xx命名，序号递增
-
-
-
 ##  [历史文章列表](https://github.com/vonzhou/Blog/blob/master/Contents/Other/history-blogs.md)  2018.12.14
 
 
@@ -32,3 +20,14 @@
 * [SQL优化方法总结](https://github.com/vonzhou/Blog/blob/master/Contents/Database/sql-optimization) 2019.2.23
 * [何为整洁架构？](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/cleanarch/clean-arch.md) 2019.1.8
 * [《非暴力沟通》读书笔记](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/nonviolent-communication.md)
+
+
+
+
+
+
+
+
+
+
+

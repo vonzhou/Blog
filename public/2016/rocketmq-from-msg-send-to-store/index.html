@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2016/dispatcherservlet/" />
+  <link rel="next" href="http://vonzhou.com/2016/spring-bean-parse/" />
+  <link rel="canonical" href="http://vonzhou.com/2016/rocketmq-from-msg-send-to-store/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           RocketMQ源码阅读 -  从消息发送到存储 | 编程之路
+       
+  </title>
+  <meta name="title" content="RocketMQ源码阅读 -  从消息发送到存储 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "RocketMQ源码阅读 -  从消息发送到存储",
+    "headline" : "RocketMQ源码阅读 -  从消息发送到存储",
+    "description" : "RocketMQ 简介 RocketMQ 是一款开源的消息中间件，采用Java实现，设计思想来自于Kafka（Scala实现）。接下来是自己阅读源码的一些探索。
+RocketMQ的整体架构如下，可以看到各个组件充当的角色，Name Server 负责维护一些全局的路由信息：当前有哪些broker，每个Topic在哪个broker上; Broker具体处理消息的存储和服务；生产者和消费者是消息的源头和归宿。
+Producer 发送消息 Producer发送消息是如何得知发到哪个broker的 ？ 每个应用在收发消息之前，一般会调用一次producer.start()/consumer.start()做一些初始化工作，其中包括：创建需要的实例对象，如MQClientInstance；设置定时任务，如从Nameserver中定时更新本地的Topic route info，发送心跳信息到所有的 broker，动态调整线程池的大小，把当前producer加入到指定的组中等等。
+客户端会缓存路由信息TopicPublishInfo, 同时定期从NameServer取Topic路由信息，每个Broker与NameServer集群中的所有节点建立长连接，定时注册Topic信息到所有的NameServer。
+Producer在发送消息的时候会去查询本地的topicPublishInfoTable（一个ConcurrentHashMap），如果没有命中的话就会询问NameServer得到路由信息(RequestCode=GET_ROUTEINTO_BY_TOPIC) 如果nameserver中也没有查询到（表示该主题的消息第一次发送），那么将会发送一个default的topic进行路由查询。具体过程如下图所示。
+Producer 在得到了具体的通信地址后，发送过程就显而易见了。通过代码可以看到在选择消息队列进行发送时采用随机方式，同时和上一次发送的broker保持不同，防止热点。
+Broker处理来自Producer的消息 每个producer在发送消息的时候都和对应的Broker建立了长连接，此时broker已经准备好接收Message，Broker的SendMessageProcessor.sendMessage处理消息的存储，具体过程如下。接收到消息后，会先写入Commit Log文件（顺序写，写满了会新建一个新的文件），然后更新Consume queue文件（存储如何由topic定位到具体的消息）。
+RocketMQ 存储特点 RocketMQ的消息采用顺序写到commitlog文件，然后利用consume queue文件作为逻辑队列（索引），如图。RocketMQ采用零拷贝mmap+write的方式来回应Consumer的请求，RocketMQ宣称大部分请求都会在Page Cache层得到满足，所以消息过多不会因为磁盘读使得性能下降，这里自己的理解是，在64bit机器下，虚存地址空间（vm_area_struct）不是问题，所以相关的文件都会被映射到内存中（有定期删除文件的操作），即使此刻不在内存，操作系统也会因为缺页异常进行换入，虽然地址空间不是问题，但是一个进程映射文件的个数(/proc/sys/vm/max_map_count)是有限的，所以可能在这里发生OOM。
+通过Broker中的存储目录（默认路径是 $HOME/store）也能看到存储的逻辑视图：
+顺序消息是如何保证的？ 需要业务层自己决定哪些消息应该顺序到达，然后发送的时候通过规则（hash）映射到同一个队列，因为没有谁比业务自己更加知道关于消息顺序的特点。这样的顺序是相对顺序，局部顺序，因为发送方只保证把这些消息顺序的发送到broker上的同一队列，但是不保证其他Producer也会发送消息到那个队列，所以需要Consumer在拉到消息后做一些过滤。
+RocketMQ 刷盘实现 Broker 在消息的存取时直接操作的是内存（内存映射文件），这可以提供系统的吞吐量，但是无法避免机器掉电时数据丢失，所以需要持久化到磁盘中。刷盘的最终实现都是使用NIO中的 MappedByteBuffer.force() 将映射区的数据写入到磁盘，如果是同步刷盘的话，在Broker把消息写到CommitLog映射区后，就会等待写入完成。异步而言，只是唤醒对应的线程，不保证执行的时机，流程如图所示。
+消息过滤 类似于重复数据删除技术（Data Deduplication），可以在源端做，也可以在目的端实现，就是网络和存储的权衡，如果在Broker端做消息过滤就需要逐一比对consume queue 的 tagsCode 字段（hashcode）,如果符合则传输给消费者，因为是 hashcode，所以存在误判，需要在 Consumer 接收到消息后进行字符串级别的过滤，确保准确性。
+小结 这次代码阅读主要着眼于消息的发送过程和Broker上的存储，其他方面的细节有待深入。",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2016",
+    "datePublished": "2016-08-30 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2016-08-30 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2016/rocketmq-from-msg-send-to-store/",
+    "wordCount" : "53",
+    "keywords" : [ "消息队列","RocketMQ","Java", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">RocketMQ源码阅读 -  从消息发送到存储</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2016-08-30 itemprop="datePublished">August 30, 2016</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"> 消息队列 </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="rocketmq-简介">RocketMQ 简介</h2>
+
+<p>RocketMQ 是一款开源的消息中间件，采用Java实现，设计思想来自于Kafka（Scala实现）。接下来是自己阅读源码的一些探索。</p>
+
+<p>RocketMQ的整体架构如下，可以看到各个组件充当的角色，Name Server 负责维护一些全局的路由信息：当前有哪些broker，每个Topic在哪个broker上; Broker具体处理消息的存储和服务；生产者和消费者是消息的源头和归宿。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/RocketMQ-arch.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<h2 id="producer-发送消息">Producer 发送消息</h2>
+
+<p>Producer发送消息是如何得知发到哪个broker的 ？ 每个应用在收发消息之前，一般会调用一次<code>producer.start()/consumer.start()</code>做一些初始化工作，其中包括：创建需要的实例对象，如<code>MQClientInstance</code>；设置定时任务，如从Nameserver中定时更新本地的<code>Topic route info</code>，发送心跳信息到所有的 broker，动态调整线程池的大小，把当前producer加入到指定的组中等等。</p>
+
+<p>客户端会缓存路由信息<code>TopicPublishInfo</code>, 同时定期从NameServer取Topic路由信息，每个Broker与NameServer集群中的所有节点建立长连接，定时注册Topic信息到所有的NameServer。</p>
+
+<p>Producer在发送消息的时候会去查询本地的topicPublishInfoTable（一个ConcurrentHashMap），如果没有命中的话就会询问NameServer得到路由信息(RequestCode=GET_ROUTEINTO_BY_TOPIC) 如果nameserver中也没有查询到（表示该主题的消息第一次发送），那么将会发送一个default的topic进行路由查询。具体过程如下图所示。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/RocketMQ-producer-send.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>Producer 在得到了具体的通信地址后，发送过程就显而易见了。通过代码可以看到在选择消息队列进行发送时采用随机方式，同时和上一次发送的broker保持不同，防止热点。</p>
+
+<h2 id="broker处理来自producer的消息">Broker处理来自Producer的消息</h2>
+
+<p>每个producer在发送消息的时候都和对应的Broker建立了长连接，此时broker已经准备好接收Message，Broker的<code>SendMessageProcessor.sendMessage</code>处理消息的存储，具体过程如下。接收到消息后，会先写入Commit Log文件（顺序写，写满了会新建一个新的文件），然后更新Consume queue文件（存储如何由topic定位到具体的消息）。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/RocketMQ-broker-msg-proc.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<h2 id="rocketmq-存储特点">RocketMQ 存储特点</h2>
+
+<p>RocketMQ的消息采用顺序写到commitlog文件，然后利用consume queue文件作为逻辑队列（索引），如图。RocketMQ采用零拷贝mmap+write的方式来回应Consumer的请求，RocketMQ宣称大部分请求都会在Page Cache层得到满足，所以消息过多不会因为磁盘读使得性能下降，这里自己的理解是，在64bit机器下，虚存地址空间（<code>vm_area_struct</code>）不是问题，所以相关的文件都会被映射到内存中（有定期删除文件的操作），即使此刻不在内存，操作系统也会因为缺页异常进行换入，虽然地址空间不是问题，但是一个进程映射文件的个数(<code>/proc/sys/vm/max_map_count</code>)是有限的，所以可能在这里发生OOM。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/RocketMQ-CommitLog.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>通过Broker中的存储目录（默认路径是 $HOME/store）也能看到存储的逻辑视图：</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/RocketMQ-store-directory.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<h2 id="顺序消息是如何保证的">顺序消息是如何保证的？</h2>
+
+<p>需要业务层自己决定哪些消息应该顺序到达，然后发送的时候通过规则（hash）映射到同一个队列，因为没有谁比业务自己更加知道关于消息顺序的特点。这样的顺序是相对顺序，局部顺序，因为发送方只保证把这些消息顺序的发送到broker上的同一队列，但是不保证其他Producer也会发送消息到那个队列，所以需要Consumer在拉到消息后做一些过滤。</p>
+
+<h2 id="rocketmq-刷盘实现">RocketMQ 刷盘实现</h2>
+
+<p>Broker 在消息的存取时直接操作的是内存（内存映射文件），这可以提供系统的吞吐量，但是无法避免机器掉电时数据丢失，所以需要持久化到磁盘中。刷盘的最终实现都是使用NIO中的 <code>MappedByteBuffer.force()</code> 将映射区的数据写入到磁盘，如果是同步刷盘的话，在Broker把消息写到CommitLog映射区后，就会等待写入完成。异步而言，只是唤醒对应的线程，不保证执行的时机，流程如图所示。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/RocketMQ-disk-flush.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<h2 id="消息过滤">消息过滤</h2>
+
+<p>类似于重复数据删除技术（Data Deduplication），可以在源端做，也可以在目的端实现，就是网络和存储的权衡，如果在Broker端做消息过滤就需要逐一比对consume queue 的 tagsCode 字段（hashcode）,如果符合则传输给消费者，因为是 hashcode，所以存在误判，需要在 Consumer 接收到消息后进行字符串级别的过滤，确保准确性。</p>
+
+<h2 id="小结">小结</h2>
+
+<p>这次代码阅读主要着眼于消息的发送过程和Broker上的存储，其他方面的细节有待深入。</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2016/rocketmq-from-msg-send-to-store/>http://vonzhou.com/2016/rocketmq-from-msg-send-to-store/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">
+                    #消息队列</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/rocketmq/">
+                    #RocketMQ</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/java/">
+                    #Java</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2016/dispatcherservlet/" class="prev" rel="prev" title="DispatcherServlet 源码阅读"><i class="iconfont icon-left"></i>&nbsp;DispatcherServlet 源码阅读</a>
+         
+        
+        <a href="http://vonzhou.com/2016/spring-bean-parse/" class="next" rel="next" title="Spring源码阅读 - bean解析初体验">Spring源码阅读 - bean解析初体验&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

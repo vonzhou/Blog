@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>集合 on 编程之路</title>
+    <link>http://vonzhou.com/tags/%E9%9B%86%E5%90%88/</link>
+    <description>Recent content in 集合 on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 01 Dec 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/%E9%9B%86%E5%90%88/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>ArrayBlockingQueue与Disruptor的性能对比</title>
+      <link>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</link>
+      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</guid>
+      <description>虽然Disruptor采用了lock-free的算法，但并非银弹，本文以最常用的场景来测试ArrayBlockingQueue和Disruptor的作为缓存队列的性能优劣。
+测试环境  消息大小 20B Windows 10, 4内核，8逻辑CPU JDK 8  测试用例 本文采用一个生产者来生产特定数量的消息，然后使用缓冲队列，由特定数量的消费者来共同消费处理这批消息。
+每条消息处理耗时20ms的情况 ， 4消费线程：
+   方式 1K 1W 10W     ABQ 5s 52s 525s   Disruptor 5s 52s 529s    每条消息处理耗时20ms的情况 ， 8消费线程：
+   方式 1K 1W 10W     ABQ 2s 26s 263s   Disruptor 2s 26s 263s    从中可以看到，平均下来5ms一条消息（每条消息耗时20ms，4个线程）。如果一条消息处理的时间比较长，则使用普通ABQ，Disruptor开销差别不大，因为大头时间在消息的处理上，锁争用的开销不明显。
+每条消息处理耗时20ms的情况 ， 4消费线程：</description>
+    </item>
+    
+    <item>
+      <title>如何保证ArrayList在多线程环境下的线程安全性</title>
+      <link>http://vonzhou.com/2018/make-arraylist-thread-safe/</link>
+      <pubDate>Fri, 07 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/make-arraylist-thread-safe/</guid>
+      <description>如果想在多线程环境下使用ArrayList，如果保障其线程安全性？
+序 在《记一次 ArrayList 线程安全问题》一文中说明了ArrayList用在多线程环境中存在问题。关键的原因就是ArrayList底层实现新增元素时数组索引的移动操作。
+/** * Appends the specified element to the end of this list. * * @param e element to be appended to this list * @return &amp;lt;tt&amp;gt;true&amp;lt;/tt&amp;gt; (as specified by {@link Collection#add}) */ public boolean add(E e) { ensureCapacityInternal(size + 1); // Increments modCount!! elementData[size++] = e; return true; }  非线程安全场景展示：
+public static void notThreadSafe() throws Exception { final List&amp;lt;Integer&amp;gt; list = Lists.newArrayList(); for (int i = 0; i &amp;lt; 4; i++) { new Thread(new Runnable() { @Override public void run() { for (int j = 0; j &amp;lt; 10000; j++) { list.</description>
+    </item>
+    
+  </channel>
+</rss>

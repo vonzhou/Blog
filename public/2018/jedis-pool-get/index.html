@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/" />
+  <link rel="next" href="http://vonzhou.com/2018/2018-read-book/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/jedis-pool-get/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           从连接池(JedisPool)获取Redis连接源码分析 | 编程之路
+       
+  </title>
+  <meta name="title" content="从连接池(JedisPool)获取Redis连接源码分析 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "从连接池(JedisPool)获取Redis连接源码分析",
+    "headline" : "从连接池(JedisPool)获取Redis连接源码分析",
+    "description" : "本文追踪下SpringBoot中使用StringRedisTemplate，从JedisPool中获取连接的过程，了解了该过程可以更好的进行连接池的参数调优。
+一图胜千言，从JedisPool获取一个连接的过程：
+接下来走进代码。
+在使用StringRedisTemplate或者RedisTemplate操作Redis的时候，其实都最终调用RedisTemplate.execute方法，以最简单的get开始。
+// org.springframework.data.redis.core.DefaultValueOperations public V get(final Object key) { return execute(new ValueDeserializingRedisCallback(key) { protected byte[] inRedis(byte[] rawKey, RedisConnection connection) { return connection.get(rawKey); } }, true); }  执行之时，先根据我们提供的RedisConnectionFactory（实际的实现是JedisConnectionFactory，要么使用SpringBoot帮我们自动配置的实例，要么自己配置）来获取一个连接，然后就在这个RedisConnection上请求Redis Server。
+// org.springframework.data.redis.core.RedisTemplate public &lt;T&gt; T execute(RedisCallback&lt;T&gt; action, boolean exposeConnection, boolean pipeline) { RedisConnectionFactory factory = getConnectionFactory(); RedisConnection conn = null; try { if (enableTransactionSupport) { // only bind resources in case of potential transaction synchronization conn = RedisConnectionUtils.bindConnection(factory, enableTransactionSupport); } else { // 1.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-12-14 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-12-14 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/jedis-pool-get/",
+    "wordCount" : "750",
+    "keywords" : [ "Java","Redis", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">从连接池(JedisPool)获取Redis连接源码分析</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-12-14 itemprop="datePublished">December 14, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          <p>本文追踪下SpringBoot中使用StringRedisTemplate，从JedisPool中获取连接的过程，了解了该过程可以更好的进行连接池的参数调优。</p>
+
+<p>一图胜千言，从JedisPool获取一个连接的过程：</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/jedis-pool-get.jpg" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>接下来走进代码。</p>
+
+<p>在使用StringRedisTemplate或者RedisTemplate操作Redis的时候，其实都最终调用RedisTemplate.execute方法，以最简单的get开始。</p>
+
+<pre><code class="language-java">// org.springframework.data.redis.core.DefaultValueOperations
+public V get(final Object key) {
+
+    return execute(new ValueDeserializingRedisCallback(key) {
+
+        protected byte[] inRedis(byte[] rawKey, RedisConnection connection) {
+            return connection.get(rawKey);
+        }
+    }, true);
+}
+</code></pre>
+
+<p>执行之时，先根据我们提供的RedisConnectionFactory（实际的实现是JedisConnectionFactory，要么使用SpringBoot帮我们自动配置的实例，要么自己配置）来获取一个连接，然后就在这个RedisConnection上请求Redis Server。</p>
+
+<pre><code class="language-java">// org.springframework.data.redis.core.RedisTemplate
+public &lt;T&gt; T execute(RedisCallback&lt;T&gt; action, boolean exposeConnection, boolean pipeline) {
+    RedisConnectionFactory factory = getConnectionFactory();
+    RedisConnection conn = null;
+    try {
+
+        if (enableTransactionSupport) {
+            // only bind resources in case of potential transaction synchronization
+            conn = RedisConnectionUtils.bindConnection(factory, enableTransactionSupport);
+        } else {
+            // 1. 获取连接
+            conn = RedisConnectionUtils.getConnection(factory);
+        }
+
+        boolean existingConnection = TransactionSynchronizationManager.hasResource(factory);
+
+        RedisConnection connToUse = preProcessConnection(conn, existingConnection);
+
+        boolean pipelineStatus = connToUse.isPipelined();
+        if (pipeline &amp;&amp; !pipelineStatus) {
+            connToUse.openPipeline();
+        }
+
+        RedisConnection connToExpose = (exposeConnection ? connToUse : createRedisConnectionProxy(connToUse));
+        // 2. 执行实际的操作
+        T result = action.doInRedis(connToExpose);
+
+        // close pipeline
+        if (pipeline &amp;&amp; !pipelineStatus) {
+            connToUse.closePipeline();
+        }
+
+        // TODO: any other connection processing?
+        return postProcessResult(result, connToUse, existingConnection);
+    } finally {
+        RedisConnectionUtils.releaseConnection(conn, factory);
+    }
+}
+</code></pre>
+
+<p>重点看连接获取的过程。</p>
+
+<pre><code class="language-java">// org.springframework.data.redis.core.RedisConnectionUtils
+public static RedisConnection doGetConnection(RedisConnectionFactory factory, boolean allowCreate, boolean bind,
+        boolean enableTransactionSupport) {
+    // 交给我们的工厂
+    RedisConnection conn = factory.getConnection();
+
+    if (bind) {
+        RedisConnection connectionToBind = conn;
+        if (enableTransactionSupport &amp;&amp; isActualNonReadonlyTransactionActive()) {
+            connectionToBind = createConnectionProxy(conn, factory);
+        }
+
+        connHolder = new RedisConnectionHolder(connectionToBind);
+
+        TransactionSynchronizationManager.bindResource(factory, connHolder);
+        if (enableTransactionSupport) {
+            potentiallyRegisterTransactionSynchronisation(connHolder, factory);
+        }
+
+        return connHolder.getConnection();
+    }
+
+    return conn;
+}
+</code></pre>
+
+<p>Jedis连接工厂负责创建jedis实例，如果使用连接池，则从池中获取，否则直接创建新的。</p>
+
+<pre><code class="language-java">// org.springframework.data.redis.connection.jedis.JedisConnectionFactory
+public RedisConnection getConnection() {
+
+    if (cluster != null) {
+        return getClusterConnection();
+    }
+
+    Jedis jedis = fetchJedisConnector();
+    JedisConnection connection = (usePool ? new JedisConnection(jedis, pool, dbIndex, clientName)
+            : new JedisConnection(jedis, null, dbIndex, clientName));
+    connection.setConvertPipelineAndTxResults(convertPipelineAndTxResults);
+    return postProcessConnection(connection);
+}
+
+protected Jedis fetchJedisConnector() {
+    try {
+        // 使用连接池的情形
+        if (usePool &amp;&amp; pool != null) {
+            return pool.getResource();
+        }
+
+        Jedis jedis = new Jedis(getShardInfo());
+        // force initialization (see Jedis issue #82)
+        jedis.connect();
+
+        potentiallySetClientName(jedis);
+        return jedis;
+    } catch (Exception ex) {
+        throw new RedisConnectionFailureException(&quot;Cannot get Jedis connection&quot;, ex);
+    }
+}
+</code></pre>
+
+<p>接下来是Commons Pool里面的通用逻辑，先看池中的空闲对象（idle object）能否利用，不能的话就只能创建新的对象。此过程中，如果设置了等待超时时间，则超时资源得不到满足就抛出异常“Timeout waiting for idle object”，如果没有设置最大等待时间（maxWaitMillis），就会无限等待，这样如果获取连接的请求很多时就会耗尽系统的线程，要特别注意，实际生产中踩过。</p>
+
+<pre><code class="language-java">// org.apache.commons.pool2.impl.GenericObjectPool
+public T borrowObject(long borrowMaxWaitMillis) throws Exception {
+    assertOpen();
+
+    AbandonedConfig ac = this.abandonedConfig;
+    if (ac != null &amp;&amp; ac.getRemoveAbandonedOnBorrow() &amp;&amp;
+            (getNumIdle() &lt; 2) &amp;&amp;
+            (getNumActive() &gt; getMaxTotal() - 3) ) {
+        removeAbandoned(ac);
+    }
+
+    PooledObject&lt;T&gt; p = null;
+
+    // Get local copy of current config so it is consistent for entire
+    // method execution
+    boolean blockWhenExhausted = getBlockWhenExhausted();
+
+    boolean create;
+    long waitTime = System.currentTimeMillis();
+
+    while (p == null) {
+        create = false;
+        if (blockWhenExhausted) {
+            // 1. 复用
+            p = idleObjects.pollFirst();
+            if (p == null) {
+                // 2. 创建新资源对象
+                p = create();
+                if (p != null) {
+                    create = true;
+                }
+            }
+            if (p == null) {
+                if (borrowMaxWaitMillis &lt; 0) {
+                    // 默认的borrowMaxWaitMillis是-1，会一直阻塞直到满足
+                    p = idleObjects.takeFirst();
+                } else {
+                    p = idleObjects.pollFirst(borrowMaxWaitMillis,
+                            TimeUnit.MILLISECONDS);
+                }
+            }
+            if (p == null) {
+                throw new NoSuchElementException(
+                        &quot;Timeout waiting for idle object&quot;);
+            }
+            if (!p.allocate()) {
+                p = null;
+            }
+        } else {
+            p = idleObjects.pollFirst();
+            if (p == null) {
+                p = create();
+                if (p != null) {
+                    create = true;
+                }
+            }
+            if (p == null) {
+                throw new NoSuchElementException(&quot;Pool exhausted&quot;);
+            }
+            if (!p.allocate()) {
+                p = null;
+            }
+        }
+
+        if (p != null) {
+            try {
+                factory.activateObject(p);
+            } catch (Exception e) {
+                try {
+                    destroy(p);
+                } catch (Exception e1) {
+                    // Ignore - activation failure is more important
+                }
+                p = null;
+                if (create) {
+                    NoSuchElementException nsee = new NoSuchElementException(
+                            &quot;Unable to activate object&quot;);
+                    nsee.initCause(e);
+                    throw nsee;
+                }
+            }
+            if (p != null &amp;&amp; (getTestOnBorrow() || create &amp;&amp; getTestOnCreate())) {
+                boolean validate = false;
+                Throwable validationThrowable = null;
+                try {
+                    validate = factory.validateObject(p);
+                } catch (Throwable t) {
+                    PoolUtils.checkRethrow(t);
+                    validationThrowable = t;
+                }
+                if (!validate) {
+                    try {
+                        destroy(p);
+                        destroyedByBorrowValidationCount.incrementAndGet();
+                    } catch (Exception e) {
+                        // Ignore - validation failure is more important
+                    }
+                    p = null;
+                    if (create) {
+                        NoSuchElementException nsee = new NoSuchElementException(
+                                &quot;Unable to validate object&quot;);
+                        nsee.initCause(validationThrowable);
+                        throw nsee;
+                    }
+                }
+            }
+        }
+    }
+
+    updateStatsBorrow(p, System.currentTimeMillis() - waitTime);
+
+    return p.getObject();
+}
+
+
+private PooledObject&lt;T&gt; create() throws Exception {
+    int localMaxTotal = getMaxTotal();
+    long newCreateCount = createCount.incrementAndGet();
+    if (localMaxTotal &gt; -1 &amp;&amp; newCreateCount &gt; localMaxTotal ||
+            newCreateCount &gt; Integer.MAX_VALUE) {
+        createCount.decrementAndGet();
+        return null;
+    }
+
+    final PooledObject&lt;T&gt; p;
+    try {
+        // 交由工厂
+        p = factory.makeObject();
+    } catch (Exception e) {
+        createCount.decrementAndGet();
+        throw e;
+    }
+
+    AbandonedConfig ac = this.abandonedConfig;
+    if (ac != null &amp;&amp; ac.getLogAbandoned()) {
+        p.setLogAbandoned(true);
+    }
+
+    createdCount.incrementAndGet();
+    allObjects.put(new IdentityWrapper&lt;T&gt;(p.getObject()), p);
+    return p;
+}
+</code></pre>
+
+<p>最终实际的jedis实例由JedisFactory创建。</p>
+
+<pre><code class="language-java">// redis.clients.jedis.JedisFactory
+public PooledObject&lt;Jedis&gt; makeObject() throws Exception {
+final HostAndPort hostAndPort = this.hostAndPort.get();
+final Jedis jedis = new Jedis(hostAndPort.getHost(), hostAndPort.getPort(), connectionTimeout,
+    soTimeout, ssl, sslSocketFactory, sslParameters, hostnameVerifier);
+
+try {
+    jedis.connect();
+    if (null != this.password) {
+    jedis.auth(this.password);
+    }
+    if (database != 0) {
+    jedis.select(database);
+    }
+    if (clientName != null) {
+    jedis.clientSetname(clientName);
+    }
+} catch (JedisException je) {
+    jedis.close();
+    throw je;
+}
+
+return new DefaultPooledObject&lt;Jedis&gt;(jedis);
+
+}
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/jedis-pool-get/>http://vonzhou.com/2018/jedis-pool-get/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/java/">
+                    #Java</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/redis/">
+                    #Redis</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/" class="prev" rel="prev" title="ArrayBlockingQueue与Disruptor的性能对比"><i class="iconfont icon-left"></i>&nbsp;ArrayBlockingQueue与Disruptor的性能对比</a>
+         
+        
+        <a href="http://vonzhou.com/2018/2018-read-book/" class="next" rel="next" title="2018阅读书单">2018阅读书单&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

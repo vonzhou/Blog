@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/asmtools-intro/" />
+  <link rel="next" href="http://vonzhou.com/2018/jedis-pool-get/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           ArrayBlockingQueue与Disruptor的性能对比 | 编程之路
+       
+  </title>
+  <meta name="title" content="ArrayBlockingQueue与Disruptor的性能对比 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "ArrayBlockingQueue与Disruptor的性能对比",
+    "headline" : "ArrayBlockingQueue与Disruptor的性能对比",
+    "description" : "虽然Disruptor采用了lock-free的算法，但并非银弹，本文以最常用的场景来测试ArrayBlockingQueue和Disruptor的作为缓存队列的性能优劣。
+测试环境  消息大小 20B Windows 10, 4内核，8逻辑CPU JDK 8  测试用例 本文采用一个生产者来生产特定数量的消息，然后使用缓冲队列，由特定数量的消费者来共同消费处理这批消息。
+每条消息处理耗时20ms的情况 ， 4消费线程：
+   方式 1K 1W 10W     ABQ 5s 52s 525s   Disruptor 5s 52s 529s    每条消息处理耗时20ms的情况 ， 8消费线程：
+   方式 1K 1W 10W     ABQ 2s 26s 263s   Disruptor 2s 26s 263s    从中可以看到，平均下来5ms一条消息（每条消息耗时20ms，4个线程）。如果一条消息处理的时间比较长，则使用普通ABQ，Disruptor开销差别不大，因为大头时间在消息的处理上，锁争用的开销不明显。
+每条消息处理耗时20ms的情况 ， 4消费线程：",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-12-01 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-12-01 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/",
+    "wordCount" : "138",
+    "keywords" : [ "CAS","Disruptor","集合", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">ArrayBlockingQueue与Disruptor的性能对比</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-12-01 itemprop="datePublished">December 1, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>虽然Disruptor采用了lock-free的算法，但并非银弹，本文以最常用的场景来测试ArrayBlockingQueue和Disruptor的作为缓存队列的性能优劣。</p>
+
+<h2 id="测试环境">测试环境</h2>
+
+<ul>
+<li>消息大小 20B</li>
+<li>Windows 10, 4内核，8逻辑CPU</li>
+<li>JDK 8</li>
+</ul>
+
+<h2 id="测试用例">测试用例</h2>
+
+<p>本文采用一个生产者来生产特定数量的消息，然后使用缓冲队列，由特定数量的消费者来共同消费处理这批消息。</p>
+
+<p>每条消息处理耗时20ms的情况 ， 4消费线程：</p>
+
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>1K</th>
+<th>1W</th>
+<th>10W</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ABQ</td>
+<td>5s</td>
+<td>52s</td>
+<td>525s</td>
+</tr>
+
+<tr>
+<td>Disruptor</td>
+<td>5s</td>
+<td>52s</td>
+<td>529s</td>
+</tr>
+</tbody>
+</table>
+
+<p>每条消息处理耗时20ms的情况 ， 8消费线程：</p>
+
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>1K</th>
+<th>1W</th>
+<th>10W</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ABQ</td>
+<td>2s</td>
+<td>26s</td>
+<td>263s</td>
+</tr>
+
+<tr>
+<td>Disruptor</td>
+<td>2s</td>
+<td>26s</td>
+<td>263s</td>
+</tr>
+</tbody>
+</table>
+
+<p>从中可以看到，平均下来5ms一条消息（每条消息耗时20ms，4个线程）。如果一条消息处理的时间比较长，则使用普通ABQ，Disruptor开销差别不大，因为大头时间在消息的处理上，锁争用的开销不明显。</p>
+
+<p>每条消息处理耗时20ms的情况 ， 4消费线程：</p>
+
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>1K</th>
+<th>1W</th>
+<th>10W</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ABQ</td>
+<td>756ms</td>
+<td>7.332s</td>
+<td>72.73s</td>
+</tr>
+
+<tr>
+<td>Disruptor</td>
+<td>826ms</td>
+<td>7.279s</td>
+<td>71.047s</td>
+</tr>
+</tbody>
+</table>
+
+<p>每条消息处理耗时2ms的情况 ， 1消费线程：</p>
+
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>1K</th>
+<th>1W</th>
+<th>10W</th>
+<th>100W</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ABQ</td>
+<td>3.156s</td>
+<td>28.803s</td>
+<td>284.221s</td>
+<td>2846 s</td>
+</tr>
+
+<tr>
+<td>Disruptor</td>
+<td>3.063s</td>
+<td>28.436s</td>
+<td>284.158s</td>
+<td>2812 s</td>
+</tr>
+</tbody>
+</table>
+
+<p>当消息处理很快时（&lt; 1ms）。</p>
+
+<p>1消费线程：</p>
+
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>1K</th>
+<th>1W</th>
+<th>10W</th>
+<th>100W</th>
+<th>1000W</th>
+<th>1W * 1W</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ABQ</td>
+<td>37ms</td>
+<td>151ms</td>
+<td>1059ms</td>
+<td>8.59s</td>
+<td>87 s</td>
+<td>813 s</td>
+</tr>
+
+<tr>
+<td>Disruptor</td>
+<td>94ms</td>
+<td>215ms</td>
+<td>7.6s</td>
+<td>7.6s</td>
+<td>69.87 s</td>
+<td>684 s</td>
+</tr>
+</tbody>
+</table>
+
+<p>4消费线程：</p>
+
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>1K</th>
+<th>1W</th>
+<th>10W</th>
+<th>100W</th>
+<th>1000W</th>
+<th>1W * 1W</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ABQ</td>
+<td>38ms</td>
+<td>181ms</td>
+<td>1243ms</td>
+<td>9.74s</td>
+<td>100s</td>
+<td>1024 s</td>
+</tr>
+
+<tr>
+<td>Disruptor</td>
+<td>63ms</td>
+<td>162ms</td>
+<td>1167ms</td>
+<td>9.88s</td>
+<td>97.8s</td>
+<td>1002 s</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="总结">总结</h2>
+
+<p>从上面的测试情况下，处理在消息处理很快，且使用单消费者的时候Disruptor表现较好，其他情况并没有任何优势。</p>
+
+<p>在Disruptor官方文档中给出的性能测试结果并没有涵盖本文中的场景，官方文档中的1P-3C多播方式要用多个ArrayBlockingQueue来实现Disruptor中的Multicast方式（内部是一个RingBuffer，但是多个Sequnce）。</p>
+
+<p>所以在选用Disruptor的时候一定要具体的测试，搞清自己的场景，像本文中的一个生产者，多个消费者共同处理消息的场景使用普通的线程池+ABQ就足够了，并不比Disruptor表现差。</p>
+
+<p><a href="https://github.com/vonzhou/learning-java/tree/master/src/framework/disruptor/threadpoolvsdisruptor" rel="nofollow noreferrer" target="_blank">本文代码</a>。</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/cas/">
+                    #CAS</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/disruptor/">
+                    #Disruptor</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E9%9B%86%E5%90%88/">
+                    #集合</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/asmtools-intro/" class="prev" rel="prev" title="Java字节码工具AsmTools介绍"><i class="iconfont icon-left"></i>&nbsp;Java字节码工具AsmTools介绍</a>
+         
+        
+        <a href="http://vonzhou.com/2018/jedis-pool-get/" class="next" rel="next" title="从连接池(JedisPool)获取Redis连接源码分析">从连接池(JedisPool)获取Redis连接源码分析&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

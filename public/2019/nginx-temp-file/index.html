@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/integercache/" />
+  <link rel="next" href="http://vonzhou.com/2019/kafka-consumer-rebalance-jitter/" />
+  <link rel="canonical" href="http://vonzhou.com/2019/nginx-temp-file/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Nginx后端响应不完整问题分析 | 编程之路
+       
+  </title>
+  <meta name="title" content="Nginx后端响应不完整问题分析 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Nginx后端响应不完整问题分析",
+    "headline" : "Nginx后端响应不完整问题分析",
+    "description" : " Nginx默认会开启proxy buffer，如果没有权限写临时文件，就会导致响应被截取。
+场景 实现了一个简单的文件存储服务器，可以上传，下载，为了使用简单，使用了Nginx配置了端口转发，这样访问时无需包含端口信息。
+wget http://10.240.208.36/api/v1/fileserv/download?objName=xxxxx.zip  但是今天在下载文件时发现了一个问题，一个40M的文件，下载后只有100K了，关键在于只要经过Nginx访问就不完整，直接访问后端接口就是OK的，那么问题应该出在Nginx的配置方面。
+在Nginx的错误日志中有如下的错误信息：
+2019/01/04 10:44:36 [crit] 14545#14545: *65 open() &quot;/var/lib/nginx/proxy/5/00/0000000005&quot; failed (13: Permission denied) while reading upstream, client: 10.240.208.36, server: _, request: &quot;GET /api/v1/fileserv/download?objName=1546565995465_06a7c789611eb727cc95c529718e675e.apk HTTP/1.1&quot;, upstream: &quot;http://127.0.0.1:9197/api/v1/fileserv/download?objName=1546565995465_06a7c789611eb727cc95c529718e675e.apk&quot;, host: &quot;10.240.208.163&quot;  启动Nginx的用户无权限写 /var/lib/nginx/proxy 目录，导致后续的内容无法返回，所以下载的文件不完整。
+原理 Nginx代理缓存（proxy_buffering）开启后（proxy_buffering on，默认是开启的），当Nginx从后端服务器收到响应后，该response的前面部分会缓存起来（可以通过proxy_buffer_size设置，默认是一个内存页大小，4K或者8K），如果buffer的大小无法容纳整个响应，剩下的部分会写到临时文件中，写临时文件可以通过选项 proxy_max_temp_file_size 和 proxy_temp_path控制，其中proxy_max_temp_file_size控制临时文件的最大大小，如果设置为0则不会写临时文件，proxy_temp_path设置临时文件的路径。
+解决方案 Nginx配置，设置一个Nginx用户有权访问的临时目录：
+proxy_temp_path /home/appops/nginx_proxy_temp 1 2;  也可以通过禁用掉代理响应缓存来处理这种情况：
+proxy_max_temp_file_size 0;  或者
+proxy_buffering off;  ",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2019",
+    "datePublished": "2019-01-04 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2019-01-04 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2019/nginx-temp-file/",
+    "wordCount" : "55",
+    "keywords" : [ "Nginx", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Nginx后端响应不完整问题分析</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2019-01-04 itemprop="datePublished">January 4, 2019</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/nginx/"> Nginx </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>Nginx默认会开启proxy buffer，如果没有权限写临时文件，就会导致响应被截取。</p>
+
+<h2 id="场景">场景</h2>
+
+<p>实现了一个简单的文件存储服务器，可以上传，下载，为了使用简单，使用了Nginx配置了端口转发，这样访问时无需包含端口信息。</p>
+
+<pre><code class="language-bash">wget http://10.240.208.36/api/v1/fileserv/download?objName=xxxxx.zip
+</code></pre>
+
+<p>但是今天在下载文件时发现了一个问题，一个40M的文件，下载后只有100K了，关键在于只要经过Nginx访问就不完整，直接访问后端接口就是OK的，那么问题应该出在Nginx的配置方面。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="nginx-temp-file-1.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>在Nginx的错误日志中有如下的错误信息：</p>
+
+<pre><code class="language-bash">2019/01/04 10:44:36 [crit] 14545#14545: *65 open() &quot;/var/lib/nginx/proxy/5/00/0000000005&quot; failed (13: Permission denied) while reading upstream, client: 10.240.208.36, server: _, request: &quot;GET /api/v1/fileserv/download?objName=1546565995465_06a7c789611eb727cc95c529718e675e.apk HTTP/1.1&quot;, upstream: &quot;http://127.0.0.1:9197/api/v1/fileserv/download?objName=1546565995465_06a7c789611eb727cc95c529718e675e.apk&quot;, host: &quot;10.240.208.163&quot;
+</code></pre>
+
+<p>启动Nginx的用户无权限写 /var/lib/nginx/proxy 目录，导致后续的内容无法返回，所以下载的文件不完整。</p>
+
+<h2 id="原理">原理</h2>
+
+<p>Nginx代理缓存（<a href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering" rel="nofollow noreferrer" target="_blank">proxy_buffering</a>）开启后（<code>proxy_buffering on</code>，默认是开启的），当Nginx从后端服务器收到响应后，该response的前面部分会缓存起来（可以通过<code>proxy_buffer_size</code>设置，默认是一个内存页大小，4K或者8K），如果buffer的大小无法容纳整个响应，剩下的部分会写到临时文件中，写临时文件可以通过选项 <code>proxy_max_temp_file_size</code> 和 <code>proxy_temp_path</code>控制，其中<code>proxy_max_temp_file_size</code>控制临时文件的最大大小，如果设置为0则不会写临时文件，<code>proxy_temp_path</code>设置临时文件的路径。</p>
+
+<h2 id="解决方案">解决方案</h2>
+
+<p>Nginx配置，设置一个Nginx用户有权访问的临时目录：</p>
+
+<pre><code class="language-bash">proxy_temp_path /home/appops/nginx_proxy_temp 1 2;
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="nginx-temp-file-2.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>也可以通过禁用掉代理响应缓存来处理这种情况：</p>
+
+<pre><code class="language-bash">proxy_max_temp_file_size 0;
+</code></pre>
+
+<p>或者</p>
+
+<pre><code class="language-bash">proxy_buffering off;
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2019/nginx-temp-file/>http://vonzhou.com/2019/nginx-temp-file/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/nginx/">
+                    #Nginx</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/integercache/" class="prev" rel="prev" title="IntegerCache源码阅读"><i class="iconfont icon-left"></i>&nbsp;IntegerCache源码阅读</a>
+         
+        
+        <a href="http://vonzhou.com/2019/kafka-consumer-rebalance-jitter/" class="next" rel="next" title="大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题">大面积offset commit失败，导致不停Rebalance，大量消息重复消费的问题&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Java on 编程之路</title>
+    <link>http://vonzhou.com/tags/java/</link>
+    <description>Recent content in Java on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>JDK 12新特性：Switch表达式</title>
+      <link>http://vonzhou.com/2019/java12-switch-expression/</link>
+      <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/java12-switch-expression/</guid>
+      <description>JDK 12 GA在2019.3.19发布，其中一项新特性是JEP 325：Switch表达式（Switch Expressions）。学习下。
+如果知道Scala中的模式匹配，就很容易理解Switch表达式。
+本文完整代码见SwitchDemo 。
+传统的Switch语句 传统的Switch语句（switch statement）我们并不陌生，在每个case分支中实现对应的处理逻辑。
+private static void switchStatement(WeekDay day) { int numLetters = 0; switch (day) { case MONDAY: case FRIDAY: case SUNDAY: numLetters = 6; break; case TUESDAY: numLetters = 7; break; case THURSDAY: case SATURDAY: numLetters = 8; break; case WEDNESDAY: numLetters = 9; break; } System.out.println(&amp;quot;1. Num Of Letters: &amp;quot; + numLetters); }  Switch语句的特点是每个case分支块是没有返回值的，而表达式（expression）的特点是有返回值。
+Switch表达式 模式匹配（Patrern Matching） 上述“计算字符个数”的例子使用Switch表达式，代码如下：</description>
+    </item>
+    
+    <item>
+      <title>HBase 实现分页查询</title>
+      <link>http://vonzhou.com/2019/hbase-page/</link>
+      <pubDate>Thu, 14 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/hbase-page/</guid>
+      <description>序 按时间区间分页导出HBase中的数据。
+Rowkey的设计 在使用HBase时，Rowkey的设计很重要，取决于业务。
+比如要把用户关联的数据存入HBase，后续根据时间查询，可以这样设计rowkey：
+userId + (Long.MAX - timestamp) + uid  这样能满足：
+ 可以根据userId的特点预分区 时间戳逆转，可以保证最近的数据rowkey排序靠前 分布式环境下时间戳可能一样，所以追加一个UID，防止重复  示例代码：
+private String getRowKeyStr(String userId, long ts, long uid) { return String.format(&amp;quot;%s%013d%019d&amp;quot;, userId, Long.MAX_VALUE - ts, uid); }  构造Table实例 需要自己保证Table的线程安全性。
+public Table getTable() throws Exception { Table table = tableThreadLocal.get(); if (table == null) { table = getTableInternal(); if (table != null) { tableThreadLocal.set(table); } } return table; } public Table getTableInternal() throws Exception { Configuration config = HBaseConfiguration.</description>
+    </item>
+    
+    <item>
+      <title>BeanUtils.copyProperties 源码分析</title>
+      <link>http://vonzhou.com/2019/spring-beanutils-copyproperties/</link>
+      <pubDate>Wed, 27 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/spring-beanutils-copyproperties/</guid>
+      <description>概述  利用反射 字段不一致也不会报错，因为会根据目标对象的属性去源对象中找对应的属性描述符，存在才拷贝 相同字段，类型不同，也不会有问题，因为拷贝之时会判断该字段源对象的读方法返回值，是否可应用用目标对象的写方法参数  实例 public class CopyPropertiesDemo { public static void main(String[] args) { Student s = new Student(); s.setName(&amp;quot;vz&amp;quot;); s.setFoo(1024); s.setBar(-1); Father f = new Father(); BeanUtils.copyProperties(s, f); System.out.println(f); } static class Student{ private String name; private int foo; private int bar; // setters and getters } static class Father{ private String name; private int age; private int salary; private double foo; private Integer bar; // setters and getters @Override public String toString() { return &amp;quot;Father{&amp;quot; + &amp;quot;name=&#39;&amp;quot; + name + &#39;\&#39;&#39; + &amp;quot;, age=&amp;quot; + age + &amp;quot;, salary=&amp;quot; + salary + &amp;quot;, foo=&amp;quot; + foo + &amp;quot;, bar=&amp;quot; + bar + &#39;}&#39;; } } }  输出：</description>
+    </item>
+    
+    <item>
+      <title>为什么枚举是实现单例最好的方式？</title>
+      <link>http://vonzhou.com/2019/enum-singleton/</link>
+      <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/enum-singleton/</guid>
+      <description>提到单例模式（Singleton Pattern），都能说出一二，但是没那么简单。
+实现单例的方式 本文代码在这里.
+法1：静态成员 不多说。
+public class Singleton1 { public static final Singleton1 INSTANCE = new Singleton1(); private Singleton1() { } }  法2：静态工厂 和法1一样，只不过通过工厂方法来返回实例，在API设计上更可取。
+public class Singleton2 { private static final Singleton2 INSTANCE = new Singleton2(); private Singleton2() { } public static Singleton2 getInstance() { return INSTANCE; } }  法3：lazy initialization 延迟初始化 前面法1，法2是饿汉式，lazy initialization 是懒汉式，需要的时候实例化，另外 double check。
+public class Singleton3 { private static Singleton3 INSTANCE = null; private Singleton3() { } public static Singleton3 getInstance() { if (INSTANCE == null) { synchronized (Singleton3.</description>
+    </item>
+    
+    <item>
+      <title>从连接池(JedisPool)获取Redis连接源码分析</title>
+      <link>http://vonzhou.com/2018/jedis-pool-get/</link>
+      <pubDate>Fri, 14 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/jedis-pool-get/</guid>
+      <description>本文追踪下SpringBoot中使用StringRedisTemplate，从JedisPool中获取连接的过程，了解了该过程可以更好的进行连接池的参数调优。
+一图胜千言，从JedisPool获取一个连接的过程：
+接下来走进代码。
+在使用StringRedisTemplate或者RedisTemplate操作Redis的时候，其实都最终调用RedisTemplate.execute方法，以最简单的get开始。
+// org.springframework.data.redis.core.DefaultValueOperations public V get(final Object key) { return execute(new ValueDeserializingRedisCallback(key) { protected byte[] inRedis(byte[] rawKey, RedisConnection connection) { return connection.get(rawKey); } }, true); }  执行之时，先根据我们提供的RedisConnectionFactory（实际的实现是JedisConnectionFactory，要么使用SpringBoot帮我们自动配置的实例，要么自己配置）来获取一个连接，然后就在这个RedisConnection上请求Redis Server。
+// org.springframework.data.redis.core.RedisTemplate public &amp;lt;T&amp;gt; T execute(RedisCallback&amp;lt;T&amp;gt; action, boolean exposeConnection, boolean pipeline) { RedisConnectionFactory factory = getConnectionFactory(); RedisConnection conn = null; try { if (enableTransactionSupport) { // only bind resources in case of potential transaction synchronization conn = RedisConnectionUtils.bindConnection(factory, enableTransactionSupport); } else { // 1.</description>
+    </item>
+    
+    <item>
+      <title>Java字节码工具AsmTools介绍</title>
+      <link>http://vonzhou.com/2018/asmtools-intro/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/asmtools-intro/</guid>
+      <description>AsmTools是一款字节码生成工具。 包括的组件：
+ jasm：由JASM格式得到class文件 jdis：把class文件转为JASM格式 jcoder：由JCOD格式得到class文件 jdec：把class文件转为JCOD格式  两种汇编器/反汇编器（assembler/disassemblers）对应的格式有啥区别？
+ JASM specifically focuses on representing byte-code instructions in the VM format (while providing minimal description of the structure of the rest of the class file). Generally, JASM is more convenient for semantic changes, like change to instruction flow.
+JCOD provides good support for describing the structure of a class file (as well as writing incorrect bytes outside of this structure), and provides no support for specifying byte-code instructions (simply raw bytes for instructions).</description>
+    </item>
+    
+    <item>
+      <title>使用WatchService监控文件变化</title>
+      <link>http://vonzhou.com/2017/java-watchservice/</link>
+      <pubDate>Tue, 05 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/java-watchservice/</guid>
+      <description>场景 系统实现中经常需要能够感知配置文件的变化，然后及时更新上下文。
+实现方案  自己起一个单独线程，定时加载文件，实现较简单，但是无法保证能够实时捕捉文件变化，同时耗CPU 使用commons-io中的 FileAlterationObserver，思想和上面类似，对比前后文件列表的变化，触发对应事件 JDK 1.7提供的WatchService，利用底层文件系统提供的功能  使用 WatchService WatchService用来监控一个目录是否发生改变，但是可以通过 WatchEvent 上下文定位具体文件的变化。具体使用过程中要注意以下两点：
+ 文件改变可能会触发两次事件（我的理解：文件内容的变更，元数据的变更），可以通过文件的时间戳来控制 在文件变化事件发生后，如果立即读取文件，可能所获内容并不完整，建议的做法判断文件的 length &amp;gt; 0  // 监控文件的变化，重新加载 executor.submit(new Runnable() { @Override public void run() { try { final Path path = FileSystems.getDefault().getPath(getMonitorDir()); System.out.println(path); final WatchService watchService = FileSystems.getDefault().newWatchService(); final WatchKey watchKey = path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY); while (true) { final WatchKey wk = watchService.take(); for (WatchEvent&amp;lt;?&amp;gt; event : wk.pollEvents()) { final Path changed = (Path) event.</description>
+    </item>
+    
+    <item>
+      <title>RocketMQ源码阅读 -  从消息发送到存储</title>
+      <link>http://vonzhou.com/2016/rocketmq-from-msg-send-to-store/</link>
+      <pubDate>Tue, 30 Aug 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/rocketmq-from-msg-send-to-store/</guid>
+      <description>RocketMQ 简介 RocketMQ 是一款开源的消息中间件，采用Java实现，设计思想来自于Kafka（Scala实现）。接下来是自己阅读源码的一些探索。
+RocketMQ的整体架构如下，可以看到各个组件充当的角色，Name Server 负责维护一些全局的路由信息：当前有哪些broker，每个Topic在哪个broker上; Broker具体处理消息的存储和服务；生产者和消费者是消息的源头和归宿。
+Producer 发送消息 Producer发送消息是如何得知发到哪个broker的 ？ 每个应用在收发消息之前，一般会调用一次producer.start()/consumer.start()做一些初始化工作，其中包括：创建需要的实例对象，如MQClientInstance；设置定时任务，如从Nameserver中定时更新本地的Topic route info，发送心跳信息到所有的 broker，动态调整线程池的大小，把当前producer加入到指定的组中等等。
+客户端会缓存路由信息TopicPublishInfo, 同时定期从NameServer取Topic路由信息，每个Broker与NameServer集群中的所有节点建立长连接，定时注册Topic信息到所有的NameServer。
+Producer在发送消息的时候会去查询本地的topicPublishInfoTable（一个ConcurrentHashMap），如果没有命中的话就会询问NameServer得到路由信息(RequestCode=GET_ROUTEINTO_BY_TOPIC) 如果nameserver中也没有查询到（表示该主题的消息第一次发送），那么将会发送一个default的topic进行路由查询。具体过程如下图所示。
+Producer 在得到了具体的通信地址后，发送过程就显而易见了。通过代码可以看到在选择消息队列进行发送时采用随机方式，同时和上一次发送的broker保持不同，防止热点。
+Broker处理来自Producer的消息 每个producer在发送消息的时候都和对应的Broker建立了长连接，此时broker已经准备好接收Message，Broker的SendMessageProcessor.sendMessage处理消息的存储，具体过程如下。接收到消息后，会先写入Commit Log文件（顺序写，写满了会新建一个新的文件），然后更新Consume queue文件（存储如何由topic定位到具体的消息）。
+RocketMQ 存储特点 RocketMQ的消息采用顺序写到commitlog文件，然后利用consume queue文件作为逻辑队列（索引），如图。RocketMQ采用零拷贝mmap+write的方式来回应Consumer的请求，RocketMQ宣称大部分请求都会在Page Cache层得到满足，所以消息过多不会因为磁盘读使得性能下降，这里自己的理解是，在64bit机器下，虚存地址空间（vm_area_struct）不是问题，所以相关的文件都会被映射到内存中（有定期删除文件的操作），即使此刻不在内存，操作系统也会因为缺页异常进行换入，虽然地址空间不是问题，但是一个进程映射文件的个数(/proc/sys/vm/max_map_count)是有限的，所以可能在这里发生OOM。
+通过Broker中的存储目录（默认路径是 $HOME/store）也能看到存储的逻辑视图：
+顺序消息是如何保证的？ 需要业务层自己决定哪些消息应该顺序到达，然后发送的时候通过规则（hash）映射到同一个队列，因为没有谁比业务自己更加知道关于消息顺序的特点。这样的顺序是相对顺序，局部顺序，因为发送方只保证把这些消息顺序的发送到broker上的同一队列，但是不保证其他Producer也会发送消息到那个队列，所以需要Consumer在拉到消息后做一些过滤。
+RocketMQ 刷盘实现 Broker 在消息的存取时直接操作的是内存（内存映射文件），这可以提供系统的吞吐量，但是无法避免机器掉电时数据丢失，所以需要持久化到磁盘中。刷盘的最终实现都是使用NIO中的 MappedByteBuffer.force() 将映射区的数据写入到磁盘，如果是同步刷盘的话，在Broker把消息写到CommitLog映射区后，就会等待写入完成。异步而言，只是唤醒对应的线程，不保证执行的时机，流程如图所示。
+消息过滤 类似于重复数据删除技术（Data Deduplication），可以在源端做，也可以在目的端实现，就是网络和存储的权衡，如果在Broker端做消息过滤就需要逐一比对consume queue 的 tagsCode 字段（hashcode）,如果符合则传输给消费者，因为是 hashcode，所以存在误判，需要在 Consumer 接收到消息后进行字符串级别的过滤，确保准确性。
+小结 这次代码阅读主要着眼于消息的发送过程和Broker上的存储，其他方面的细节有待深入。</description>
+    </item>
+    
+  </channel>
+</rss>

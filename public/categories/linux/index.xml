@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on 编程之路</title>
+    <link>http://vonzhou.com/categories/linux/</link>
+    <description>Recent content in Linux on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 31 Aug 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/categories/linux/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Linux常用命令总结</title>
+      <link>http://vonzhou.com/2018/linux-commands/</link>
+      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/linux-commands/</guid>
+      <description>列举平时常用但不易记住的Linux命令，工欲善其事，必先利其器，掌握了这些常用的工具命令就会在工作学习中得心应手。每掌握一个新的命令或者选项，可能你就会发现新的天地，加之不同命令的组合（管道）和重定向，必会受益匪浅。
+进程 Process top top 命令用于动态查看系统的进程信息。top的输出分为上部的综述信息及下部的任务列表信息。
+➜ top top - 16:42:10 up 28 days, 1:33, 5 users, load average: 0.54, 0.83, 0.95 Tasks: 383 total, 1 running, 331 sleeping, 0 stopped, 0 zombie %Cpu(s): 3.1 us, 1.3 sy, 0.0 ni, 91.9 id, 3.6 wa, 0.0 hi, 0.2 si, 0.0 st KiB Mem : 16207712 total, 6220896 free, 8091128 used, 1895688 buff/cache KiB Swap: 16557052 total, 11717176 free, 4839876 used. 7169268 avail Mem PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND 9807 storm 20 0 1240256 132344 39220 S 1.</description>
+    </item>
+    
+  </channel>
+</rss>

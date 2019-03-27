@@ -1,0 +1,483 @@
+---
+title: "Linux常用命令总结"
+date: 2018-08-31
+draft: false
+categories: ["Linux"]
+tags: ["Linux"]
+---
+
+
+列举平时常用但不易记住的Linux命令，工欲善其事，必先利其器，掌握了这些常用的工具命令就会在工作学习中得心应手。每掌握一个新的命令或者选项，可能你就会发现新的天地，加之不同命令的组合（管道）和重定向，必会受益匪浅。
+
+
+## 进程 Process
+
+### top
+
+top 命令用于动态查看系统的进程信息。top的输出分为上部的综述信息及下部的任务列表信息。
+
+```bash
+➜   top    
+top - 16:42:10 up 28 days,  1:33,  5 users,  load average: 0.54, 0.83, 0.95
+Tasks: 383 total,   1 running, 331 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  3.1 us,  1.3 sy,  0.0 ni, 91.9 id,  3.6 wa,  0.0 hi,  0.2 si,  0.0 st
+KiB Mem : 16207712 total,  6220896 free,  8091128 used,  1895688 buff/cache
+KiB Swap: 16557052 total, 11717176 free,  4839876 used.  7169268 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                                                            
+ 9807 storm     20   0 1240256 132344  39220 S   1.3  0.8   2:16.22 sublime_text                                                                       
+16901 storm     20   0 3563824  80832  11560 S   1.0  0.5 147:04.65 mysql-workbench                                                                    
+29806 storm     20   0 1493396 166300  43012 S   1.0  1.0 227:12.95 chromium-browse                                                                    
+11794 storm     20   0   42080   3820   2968 R   0.7  0.0   0:02.40 top                                                                                
+    8 root      20   0       0      0      0 I   0.3  0.0  59:51.17 rcu_sched                                                                          
+  223 root      20   0       0      0      0 S   0.3  0.0  10:42.25 jbd2/sda2-8                                                                        
+  249 root       0 -20       0      0      0 I   0.3  0.0   0:01.81 kworker/3:1H                                                                       
+ 5355 storm     25   5 7293144 1.083g   6828 S   0.3  7.0   2:00.27 java                                                                               
+ 9243 mysql     20   0 2289984  68336   3656 S   0.3  0.4 435:16.33 mysqld                                                                             
+10821 storm     20   0 3565716 135776   6840 S   0.3  0.8   6:37.23 java                                                                               
+19014 storm     20   0 3115864 150332  48100 S   0.3  0.9 193:51.63 chromium-browse
+```
+
+综述信息包括：
+（1）系统运行的时间，和uptime命令输出一样，比如这里的 16:42:10 up 28 days,  1:33 表示当前时间是 16:42:10 ，运行了28天1小时33分。
+
+（2）会话个数，比如这里的  5 users，表示当前有5个会话连接，可以用who命令看到具体情况。
+
+（3）系统负载，系统在过去1分钟，5分钟，15分钟的平均负载，==如果平均负载值超过了CPU的个数（可以使用nproc或者 cat /proc/cpuinfo 命令看）就说明负载很重了，要重视。==
+
+（4）处于运行、睡眠、停止、僵尸状态的进程数量统计。
+
+（5）CPU使用情况，us，sy分别表示CPU在用户空间和内核空间花费的时间，用于执行修改了nice值得进程花费的时间会显示在ni这里，id表示CPU空闲时间，wa表示等待IO完成消耗的时间，hi，si分别表示CPU用于处理硬中断，软终端所用时间，st表示在虚拟化环境中，一个虚拟CPU等待真实CPU的时间（因为Hypervisor在服务另一个虚拟处理器），CPU资源被Hypervisor偷去了（Steal Time）。
+
+（6）内存及交换分区使用情况，总共有多少，使用了多少，空闲多少。
+
+接下来看任务列表信息栏，表头的各个字段含义为：
+
+
+
+ PID |USER |PR|NI| VIRT |RES|SHR|%MEM  |S|%CPU|TIME+|COMMAND
+-------|------|------|------|------|------|------|------|------|------|------|------
+进程ID|进程所属用户|调度优先级|nice值|虚拟内存大小|使用的物理内存|共享内存|使用内存的比例|进程状态|CPU份额|CPU时间（秒）|具体的命令
+
+
+**常用1**：根据资源使用情况排序进程列表
+
+top 之后可以通过以下键实现对应的排序，默认是降序，可以使用R反转。也可以使用 top -o %CPU 指定排序的列。
+
+M ： 根据内存使用量排序
+
+P ： 根据CPU使用排序
+
+N ： 根据进程ID号排序
+
+T ： 根据运行时长排序
+
+**常用2**：列出线程
+
+通过H键来控制是否列出线程，列出线程后综述信息中也会多出线程的统计信息。也可以运行top命令时指定选项 top -H 。
+
+
+**常用3**：列出命令的完整路径
+
+通过c键来控制是否列出命令对应的完整路径。
+
+
+**常用4**：列出特定用户的进程
+
+通过u键，可以输入用户名，列出从属的进程信息。也可以运行top命令时指定选项，如 top -u root 。
+
+**常用5**：根据各种条件过滤进程
+
+通过O键，可以各种条件来一层层过滤得到自己关注的进程，比如 COMMAND=java 得到命令包含java的进程，%CPU>3.0 得到CPU占用大于3的进程。
+
+
+**常用6**：查看一个进程对应的线程 top -H -p PID
+
+
+### ps
+
+ps命令用于输出当前系统的进程信息，和top的持续输出不同，ps输出的是一个快照。
+
+**常用**：列出所有进程
+
+```
+➜  ~ps -ef 
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 15:22 ?        00:00:01 /sbin/init splash
+root         2     0  0 15:22 ?        00:00:00 [kthreadd]
+root         4     2  0 15:22 ?        00:00:00 [kworker/0:0H]
+root         6     2  0 15:22 ?        00:00:00 [mm_percpu_wq]
+storm     5892 21695  0 17:28 pts/36   00:00:00 less 3D_spatial_network.txt
+......
+```
+
+-e：所有进程，等同于 -A。
+-f：可以看到更多的信息，比如完整的程序名。
+
+### lsof
+
+lsof（list open files）可以列出系统打开的文件描述符（包括普通文件，网络端口号，管道等），也十分强大。在下面的匹配模式中，^开头都表示非，相反的模式。
+
+
+**常用1**：列出以特定字符串开头的进程打开的文件情况
+
+```
+➜   sudo lsof -c mysql
+[sudo] password for storm: 
+COMMAND     PID  USER   FD      TYPE             DEVICE SIZE/OFF     NODE NAME
+mysqld     9243 mysql  cwd       DIR                8,2     4096 38283055 /var/lib/mysql
+mysqld     9243 mysql  rtd       DIR                8,2     4096        2 /
+mysqld     9243 mysql  txt       REG                8,2 24895464 46140873 /usr/sbin/mysqld
+mysqld     9243 mysql  DEL       REG               0,18             49257 /[aio]
+mysqld     9243 mysql  DEL       REG               0,18             49256 /[aio]
+mysqld     9243 mysql  DEL       REG               0,18             49255 /[aio]
+```
+
+**常用2**：特定进程打开的文件
+
+```
+➜  ~ lsof -p 9305
+COMMAND  PID  USER   FD      TYPE             DEVICE SIZE/OFF     NODE NAME
+java    9305 storm  cwd       DIR                8,2     4096 56235542 /home/storm
+java    9305 storm  rtd       DIR                8,2     4096        2 /
+java    9305 storm  txt       REG                8,2     7414 13239133 /home/storm/dev/idea-IU-182.3684.101/jre64/bin/java
+java    9305 storm  mem       REG                8,2    31312 46146073 /usr/lib/x86_64-linux-gnu/libnotify.so.4.0.0
+java    9305 storm  mem       REG                8,2 65012836 46268507 /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar
+```
+
+
+**常用3**：列出网络连接信息，top -i [i]，i用于给定要匹配的地址模式
+
+```
+➜  ~ lsof -i
+COMMAND     PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+java       6983 storm   32u  IPv6  362378      0t0  UDP *:38183 
+java       6983 storm   33u  IPv6  363325      0t0  TCP *:http-alt (LISTEN)
+java       9305 storm   21u  IPv4 3089042      0t0  TCP localhost:37877->localhost:35762 (ESTABLISHED)
+.....
+➜  ~ lsof -i tcp
+COMMAND     PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+java       6983 storm   33u  IPv6  363325      0t0  TCP *:http-alt (LISTEN)
+java       9305 storm   21u  IPv4 3089045      0t0  TCP localhost:37877->localhost:35766 (ESTABLISHED)
+....
+➜  ~ lsof -i udp 
+COMMAND     PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+java       6983 storm   32u  IPv6  362378      0t0  UDP *:38183 
+chromium- 19014 storm  118u  IPv4 2483939      0t0  UDP *:mdns 
+➜  ~ lsof -i tcp:37877
+COMMAND  PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+java    9305 storm   21u  IPv4 3090619      0t0  TCP localhost:37877->localhost:35772 (ESTABLISHED)
+java    9305 storm  261u  IPv4 2323357      0t0  TCP *:37877 (LISTEN)
+java    9451 storm   77u  IPv6 3089068      0t0  TCP localhost:35772->localhost:37877 (ESTABLISHED)
+➜  ~ lsof -i udp:38183
+COMMAND  PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+java    6983 storm   32u  IPv6 362378      0t0  UDP *:38183
+```
+
+**常用4**：恢复误删除的文件
+
+一个文件如果正在被进程使用（没有close），误删后，可以被恢复。一种常见的情况是一个正在被使用的日志文件，被删除了，但是句柄没有被释放，占用的磁盘空间并没有得到释放，此时可以先恢复，然后 cat '' > /path/to/log，或者直接kill掉进程。
+
+PID=27878的进程此时使用了less打开了文件3D_spatial_network.txt。
+
+```
+➜  ~ lsof -c less                                         
+COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF     NODE NAME
+less    27878 storm  cwd    DIR    8,2     4096 56235542 /home/storm
+less    27878 storm  rtd    DIR    8,2     4096        2 /
+less    27878 storm  txt    REG    8,2   170728 45875271 /bin/less
+less    27878 storm  mem    REG    8,2  2981280 46137392 /usr/lib/locale/locale-archive
+less    27878 storm  mem    REG    8,2  1868984 44307626 /lib/x86_64-linux-gnu/libc-2.23.so
+less    27878 storm  mem    REG    8,2   167240 44307045 /lib/x86_64-linux-gnu/libtinfo.so.5.9
+less    27878 storm  mem    REG    8,2   162632 44307624 /lib/x86_64-linux-gnu/ld-2.23.so
+less    27878 storm    0u   CHR 136,20      0t0       23 /dev/pts/20
+less    27878 storm    1u   CHR 136,20      0t0       23 /dev/pts/20
+less    27878 storm    2u   CHR 136,20      0t0       23 /dev/pts/20
+less    27878 storm    3r   CHR    5,0      0t0       13 /dev/tty
+less    27878 storm    4r   REG    8,2 20673913 56235819 /home/storm/3D_spatial_network.txt
+```
+
+现在删除3D_spatial_network.txt文件后，可以在lsof中看到。
+
+```
+➜  ~ rm 3D_spatial_network.txt 
+➜  ~ lsof -c less             
+COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF     NODE NAME
+less    27878 storm  cwd    DIR    8,2     4096 56235542 /home/storm
+less    27878 storm  rtd    DIR    8,2     4096        2 /
+less    27878 storm  txt    REG    8,2   170728 45875271 /bin/less
+less    27878 storm  mem    REG    8,2  2981280 46137392 /usr/lib/locale/locale-archive
+less    27878 storm  mem    REG    8,2  1868984 44307626 /lib/x86_64-linux-gnu/libc-2.23.so
+less    27878 storm  mem    REG    8,2   167240 44307045 /lib/x86_64-linux-gnu/libtinfo.so.5.9
+less    27878 storm  mem    REG    8,2   162632 44307624 /lib/x86_64-linux-gnu/ld-2.23.so
+less    27878 storm    0u   CHR 136,20      0t0       23 /dev/pts/20
+less    27878 storm    1u   CHR 136,20      0t0       23 /dev/pts/20
+less    27878 storm    2u   CHR 136,20      0t0       23 /dev/pts/20
+less    27878 storm    3r   CHR    5,0      0t0       13 /dev/tty
+less    27878 storm    4r   REG    8,2 20673913 56235819 /home/storm/3D_spatial_network.txt (deleted)  // 这里
+➜  ~ ls -alh 3D_spatial_network.txt
+ls: cannot access '3D_spatial_network.txt': No such file or directory
+```
+
+可以根据PID和FD（文件描述符）来恢复文件。
+
+```
+➜  ~ cp /proc/27878/fd/4 3D_spatial_network.txt
+➜  ~ ls -alh 3D_spatial_network.txt
+-rw-rw-r-- 1 storm storm 20M Aug 29 15:54 3D_spatial_network.txt
+```
+
+## 网络 Network
+
+### netstat
+
+netstat是查看网络端口情况的必备命令。
+
+常用：列出所有的TCP，UDP端口占用情况
+
+```
+➜  ~ netstat -atunp 
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -               
+....
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           -               
+udp6       0      0 :::33527                :::*                                1366/java                     
+```
+
+-a（--all）：显示包括LISTEN状态的连接，默认没有。
+
+-t（--tcp）：TCP连接。
+
+-u（--udp）：UDP连接。
+
+-n（--numeric）：显示数字形式的地址，比如 localhost:mysql 会展示为 127.0.0.1:3306。
+
+-l（--listening）：仅显示处于监听状态的套接字。
+
+-p（--program）： 显示PID和程序名。
+
+### [tcpdump](https://github.com/vonzhou/Blog/tree/master/Contents/Linux/tcpdump)
+
+## 文件操作 File Operation
+
+### grep
+
+grep（Global Regular Expression Print的缩写）命令是一个强大的文本搜索工具，它使用正则表达式搜索文本，并把匹配的行输出。
+
+**常用1**：在文件中查找特定的字符串
+
+```
+➜  ~ grep  'linux' 1.log  
+hello linux
+➜  ~ grep -n -e 'linux' 1.log 2.log
+1.log:1:hello linux
+2.log:2:linux is a great os
+```
+
+-e（--regexp=PATTERN）：指定要匹配的模式，如果要搜索多种模式，则形如 -e 'pattern1' -e 'pattern'，否则会把后面的当做文件名。
+
+-n：显示匹配的行所处的行号。
+
+
+**常用2**：利用管道，在其他命令的输出中查找
+
+最常见的是和cat，tail配合使用。
+
+```
+➜  ~ cat 3D_spatial_network.txt| grep 94532185752113
+42991635,8.5053563,57.045265,7.94532185752113
+```
+
+**常用3**：输出匹配行的前面几行（-B），后面几行（-A）上下文
+
+```
+➜  ~ cat 3D_spatial_network.txt| grep 94532185752113 -A 3 -B 3
+42991632,8.560503,57.0228637,23.5659512030544
+42991632,8.5595327,57.0230085,23.0573080298429
+42991634,8.5052981,57.0427326,9.32131212369931
+42991635,8.5053563,57.045265,7.94532185752113
+42991635,8.5038165,57.0452699,6.83530187642383
+42991636,8.5038165,57.0452699,7.03679520220392
+42991637,8.5058627,57.0443316,8.86855661728298
+```
+
+
+**常用4**：在目录中查找特定的文本
+
+-r（--recursive）：递归处理目录。
+
+```
+➜  ~ grep -nr 'simple' logs 
+logs/1.log:4:simple is beauty
+```
+
+### df
+
+df命令用于查看文件系统中各个挂载点的磁盘空间使用情况。
+
+
+**常用1**：以易读方式输出
+
+```
+➜  ~ df -h      
+Filesystem      Size  Used Avail Use% Mounted on
+udev            7.8G     0  7.8G   0% /dev
+tmpfs           1.6G   89M  1.5G   6% /run
+/dev/sda2       901G  427G  428G  50% /
+```
+
+**常用2**：列出inode使用情况，有时候会出现磁盘空间未满，inode不足，可能是因为小文件太多，取决于虚拟主机的inode的配额。
+
+```
+➜  ~ df -ih 
+Filesystem     Inodes IUsed IFree IUse% Mounted on
+udev             2.0M   509  2.0M    1% /dev
+tmpfs            2.0M   808  2.0M    1% /run
+/dev/sda2         58M  605K   57M    2% /
+```
+
+### du
+
+
+du命令用于显示某目录下各个文件或文件夹占用的磁盘空间大小。
+
+**常用**：du -ah -d 1
+
+```
+➜  test du -ah -d 1
+4.0K	./editDistance.go
+20M	./3D_spatial_network.txt
+4.0K	./hamming.go
+4.0K	./simHashTest.go
+116M	./src
+136M	.
+```
+
+-a（--all） : 显示所有文件情况，而不仅仅是文件夹。
+
+-h（--human-readable）：占用的磁盘空间大小会转化为以KB，MB为单位，而不是字节。
+
+-d（--max-depth=N）：对于目录，可以指定递归的深度。
+
+
+### find
+
+find命令是查找文件的利器。
+
+**常用**：删除n天之前的文件
+
+```
+find /path/to/directory/ -mindepth 1 -mtime +5 -delete
+```
+
+也可以使用：
+
+```
+find /path/to/dir -mtime +5 | xargs rm -rf
+```
+
+find 常用的选项有：
+
+-name：指定要寻找的文件名符合的模式。
+
+-i: 忽略大小写。
+
+-maxdepth：要递归的最大深度， -mindepth指定最小深度。
+
+-mtime：指定修改时间在n天之前（+n），或在n天之内（-n）。
+
+### ls
+
+**常用**：统计一个目录下文件个数
+
+```
+ls -1 folder | wc -l  
+```
+
+-1：注意是数字1，表示一个文件占一行
+
+### ln
+
+**常用**：创建符号链接（软链接）
+```
+➜  ~ cat 'hello' > hello
+➜  ~ ln -s hello hello2
+➜  ~ ls -alh hello2
+lrwxrwxrwx 1 storm storm 5 Aug 31 15:20 hello2 -> hello 
+```
+
+-s（--symbolic）：软链接 hello2 会指向原文件 hello
+
+### scp
+
+**常用**：拷贝文件到服务器，或者相反
+
+```
+C:\Users\vonzh>scp -P 22 D:\\log.txt storm@10.240.209.160:/tmp
+storm@10.240.209.160's password:
+log.txt                                                                               100% 2316KB   2.3MB/s   00:00
+```
+
+-P：指定目标主机SSH端口号。另一种实现文件拷贝的方式是**采用Python提供的SimpleHTTPServer，然后在对应机器上使用wget下载，如果是用VPN连的服务器话，要使用隧道的IP**。
+
+```
+python -m SimpleHTTPServer 9999
+```
+
+### unzip
+
+**常用1**：解压zip到指定目录
+
+```
+➜  ~ zip test.zip 3D_spatial_network.txt hello
+  adding: 3D_spatial_network.txt (deflated 63%)
+  adding: hello (stored 0%)
+➜  ~ unzip -d test2 test.zip 
+Archive:  test.zip
+  inflating: test2/3D_spatial_network.txt  
+ extracting: test2/hello             
+➜  ~ ls -alh test2
+total 20M
+drwxrwxr-x  2 storm storm 4.0K Aug 31 15:37 .
+drwxr-xr-x 43 storm storm 4.0K Aug 31 15:37 ..
+-rw-rw-r--  1 storm storm  20M Aug 29 15:54 3D_spatial_network.txt
+-rw-rw-r--  1 storm storm    0 Aug 31 15:19 hello
+```
+
+**常用2**：列出zip文件中的文件名
+
+```
+unzip -Z -1 archive.zip
+```
+
+
+-Z：如果zip命令的第一个参数是-Z，则会相当于调用zipinfo命令。
+
+-1：数字1，zipinfo命令的选项，表示只显示文件名，每个一行，类似ls中的-1。
+
+### zip
+
+```bash
+zip -r test.zip /path/to/test
+```
+
+### mkdir
+
+```bash
+mkdir -p /path/to/dir
+```
+
+-p: 父目录不存在则会创建
+
+### chattr
+
+设置一个目录用户不能删除，`-a` 可以取消这个权限保护。
+
+```
+sudo chattr +a /home/user1/protected
+```
+
+
+
+
+

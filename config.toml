@@ -1,0 +1,74 @@
+baseURL = "http://vonzhou.com"
+languageCode = "en-us"
+title = "编程之路"
+theme = "LeaveIt"
+
+paginate = 12
+enableEmoji = true
+enableRobotsTXT = true
+googleAnalytics = ""
+
+preserveTaxonomyNames = true
+
+[blackfriday]
+  hrefTargetBlank = true
+  nofollowLinks = true
+  noreferrerLinks = true
+
+[Permalinks]
+ posts = "/:year/:filename/"
+
+[menu]
+  [[menu.main]]
+    name = "博客"
+    url = "/posts/"
+    weight = 1
+  
+  [[menu.main]]
+    name = "读书"
+    url = "https://github.com/vonzhou/readings"
+    weight = 2
+
+  [[menu.main]]
+    name = "分类"
+    url = "/categories/"
+    weight = 3
+
+  [[menu.main]]
+    name = "标签"
+    url = "/tags/"
+    weight = 4
+
+  [[menu.main]]
+    name = "关于"
+    url = "/about/"
+    weight = 5
+
+  [[menu.main]]
+    name = "留言"
+    url = "https://github.com/vonzhou/hugo-blog/issues"
+    weight = 6
+  
+
+[params]
+    since = 2011
+    author = "vonzhou"                           # Author's name
+    avatar = "/images/avatar.jpg"           # Author's avatar
+    subtitle = "此去经年，应是良辰好景虚设。便纵有千种风情，更与何人说？"         # Subtitle
+    cdn_url = ""           # Base CDN URL
+    home_mode = "" # post or other
+
+    google_verification = ""
+   
+    description = "" # site description
+    keywords = "" # site keywords
+
+    beian = ""
+    baiduAnalytics = ""
+
+    license= ''
+
+[params.social]
+    GitHub = "vonzhou"
+    Email   = "944671035@qq.com"
+

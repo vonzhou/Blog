@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/zuul-forward-multipart-and-json/" />
+  <link rel="next" href="http://vonzhou.com/2018/java-condition/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/kafka-source-begin/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Kafka源码阅读环境搭建 | 编程之路
+       
+  </title>
+  <meta name="title" content="Kafka源码阅读环境搭建 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Kafka源码阅读环境搭建",
+    "headline" : "Kafka源码阅读环境搭建",
+    "description" : "记录Kafka源码阅读环境的搭建过程。
+序 在大数据系统中Kafka应用广泛，借助源码阅读可以加深对组件的理解，同时可以拾起Scala语言。
+安装依赖软件  JDK Scala Gradle  构建IDEA工程 在源码目录下运行 gradle idea。
+遇到的问题：
+* What went wrong: A problem occurred evaluating root project 'kafka-0.10.0.1-src'. &gt; Failed to apply plugin [class 'org.gradle.api.plugins.scala.ScalaBasePlugin'] &gt; No such property: useAnt for class: org.gradle.api.tasks.scala.ScalaCompileOptions  需要在build.gradle开头加入：
+ScalaCompileOptions.metaClass.daemonServer = true ScalaCompileOptions.metaClass.fork = true ScalaCompileOptions.metaClass.useAnt = false ScalaCompileOptions.metaClass.useCompileDaemon = false  然后构建完成。
+打开工程 然后用IDEA打开工程，kafka server的启动类是 kafka.Kafka，启动时需要指定配置文件 config/server.properties。
+这里我修改了日志路径和ZK的地址。
+log.dirs=D:\\dev\\kafka-logs zookeeper.connect=ubuntu:2181  配置启动选项，指定server.properties配置文件。
+运行后可以看到kafka成功启动的日志：
+[2018-11-07 14:17:20,673] INFO Initiating client connection, connectString=ubuntu:2181 sessionTimeout=6000 watcher=org.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-11-07 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-11-07 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/kafka-source-begin/",
+    "wordCount" : "461",
+    "keywords" : [ "Kafka","Scala", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Kafka源码阅读环境搭建</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-11-07 itemprop="datePublished">November 7, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/kafka/"> Kafka </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>记录Kafka源码阅读环境的搭建过程。</p>
+
+<h2 id="序">序</h2>
+
+<p>在大数据系统中Kafka应用广泛，借助源码阅读可以加深对组件的理解，同时可以拾起Scala语言。</p>
+
+<h2 id="安装依赖软件">安装依赖软件</h2>
+
+<ul>
+<li>JDK</li>
+<li>Scala</li>
+<li>Gradle</li>
+</ul>
+
+<h2 id="构建idea工程">构建IDEA工程</h2>
+
+<p>在源码目录下运行 gradle idea。</p>
+
+<p>遇到的问题：</p>
+
+<pre><code class="language-java">* What went wrong:  
+A problem occurred evaluating root project 'kafka-0.10.0.1-src'.  
+&gt; Failed to apply plugin [class 'org.gradle.api.plugins.scala.ScalaBasePlugin']  
+   &gt; No such property: useAnt for class: org.gradle.api.tasks.scala.ScalaCompileOptions  
+</code></pre>
+
+<p>需要在build.gradle开头加入：</p>
+
+<pre><code>ScalaCompileOptions.metaClass.daemonServer = true  
+ScalaCompileOptions.metaClass.fork = true  
+ScalaCompileOptions.metaClass.useAnt = false  
+ScalaCompileOptions.metaClass.useCompileDaemon = false 
+</code></pre>
+
+<p>然后构建完成。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/kafka-source-begin-1.jpg" alt="构建过程" class="lazyload"><figcaption class="image-caption">构建过程</figcaption></figure></p>
+
+<h2 id="打开工程">打开工程</h2>
+
+<p>然后用IDEA打开工程，kafka server的启动类是 <code>kafka.Kafka</code>，启动时需要指定配置文件 <code>config/server.properties</code>。</p>
+
+<p>这里我修改了日志路径和ZK的地址。</p>
+
+<pre><code>log.dirs=D:\\dev\\kafka-logs
+zookeeper.connect=ubuntu:2181
+</code></pre>
+
+<p>配置启动选项，指定server.properties配置文件。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/kafka-source-begin-2.jpg" alt="配置启动项" class="lazyload"><figcaption class="image-caption">配置启动项</figcaption></figure></p>
+
+<p>运行后可以看到kafka成功启动的日志：</p>
+
+<pre><code class="language-java">[2018-11-07 14:17:20,673] INFO Initiating client connection, connectString=ubuntu:2181 sessionTimeout=6000 watcher=org.I0Itec.zkclient.ZkClient@6a79c292 (org.apache.zookeeper.ZooKeeper)
+[2018-11-07 14:17:21,029] INFO Waiting for keeper state SyncConnected (org.I0Itec.zkclient.ZkClient)
+[2018-11-07 14:17:21,032] INFO Opening socket connection to server ubuntu/10.240.209.160:2181. Will not attempt to authenticate using SASL (unknown error) (org.apache.zookeeper.ClientCnxn)
+[2018-11-07 14:17:21,039] INFO Socket connection established to ubuntu/10.240.209.160:2181, initiating session (org.apache.zookeeper.ClientCnxn)
+[2018-11-07 14:17:21,051] INFO Session establishment complete on server ubuntu/10.240.209.160:2181, sessionid = 0x100000ae61d005b, negotiated timeout = 6000 (org.apache.zookeeper.ClientCnxn)
+[2018-11-07 14:17:21,054] INFO zookeeper state changed (SyncConnected) (org.I0Itec.zkclient.ZkClient)
+[2018-11-07 14:17:21,318] INFO Cluster ID = W3aGwjIPScGmQWjSVjuapQ (kafka.server.KafkaServer)
+[2018-11-07 14:17:21,357] INFO Log directory 'D:\dev\kafka-logs' not found, creating it. (kafka.log.LogManager)
+[2018-11-07 14:17:21,367] INFO Loading logs. (kafka.log.LogManager)
+[2018-11-07 14:17:21,377] INFO Logs loading complete in 10 ms. (kafka.log.LogManager)
+[2018-11-07 14:17:21,441] INFO Starting log cleanup with a period of 300000 ms. (kafka.log.LogManager)
+[2018-11-07 14:17:21,444] INFO Starting log flusher with a default period of 9223372036854775807 ms. (kafka.log.LogManager)
+[2018-11-07 14:17:21,449] WARN No meta.properties file under dir D:\dev\kafka-logs\meta.properties (kafka.server.BrokerMetadataCheckpoint)
+[2018-11-07 14:17:21,498] INFO Awaiting socket connections on 0.0.0.0:9092. (kafka.network.Acceptor)
+[2018-11-07 14:17:21,501] INFO [Socket Server on Broker 0], Started 1 acceptor threads (kafka.network.SocketServer)
+[2018-11-07 14:17:21,525] INFO [ExpirationReaper-0], Starting  (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+[2018-11-07 14:17:21,526] INFO [ExpirationReaper-0], Starting  (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+[2018-11-07 14:17:21,563] INFO Creating /controller (is it secure? false) (kafka.utils.ZKCheckedEphemeral)
+[2018-11-07 14:17:21,579] INFO Result of znode creation is: OK (kafka.utils.ZKCheckedEphemeral)
+[2018-11-07 14:17:21,581] INFO 0 successfully elected as leader (kafka.server.ZookeeperLeaderElector)
+[2018-11-07 14:17:21,683] INFO [ExpirationReaper-0], Starting  (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+[2018-11-07 14:17:21,686] INFO [ExpirationReaper-0], Starting  (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+[2018-11-07 14:17:21,687] INFO [ExpirationReaper-0], Starting  (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+[2018-11-07 14:17:21,699] INFO [GroupCoordinator 0]: Starting up. (kafka.coordinator.GroupCoordinator)
+[2018-11-07 14:17:21,706] INFO [GroupCoordinator 0]: Startup complete. (kafka.coordinator.GroupCoordinator)
+[2018-11-07 14:17:21,707] INFO [Group Metadata Manager on Broker 0]: Removed 0 expired offsets in 2 milliseconds. (kafka.coordinator.GroupMetadataManager)
+[2018-11-07 14:17:21,741] INFO Will not load MX4J, mx4j-tools.jar is not in the classpath (kafka.utils.Mx4jLoader$)
+[2018-11-07 14:17:21,766] INFO New leader is 0 (kafka.server.ZookeeperLeaderElector$LeaderChangeListener)
+[2018-11-07 14:17:21,790] INFO Creating /brokers/ids/0 (is it secure? false) (kafka.utils.ZKCheckedEphemeral)
+[2018-11-07 14:17:21,799] INFO Result of znode creation is: OK (kafka.utils.ZKCheckedEphemeral)
+[2018-11-07 14:17:21,803] INFO Registered broker 0 at path /brokers/ids/0 with addresses: PLAINTEXT -&gt; EndPoint(HIH-L-5338.cn.net.ntes,9092,PLAINTEXT) (kafka.utils.ZkUtils)
+[2018-11-07 14:17:21,804] WARN No meta.properties file under dir D:\dev\kafka-logs\meta.properties (kafka.server.BrokerMetadataCheckpoint)
+[2018-11-07 14:17:21,826] WARN Error while loading kafka-version.properties :null (org.apache.kafka.common.utils.AppInfoParser)
+[2018-11-07 14:17:21,827] INFO Kafka version : unknown (org.apache.kafka.common.utils.AppInfoParser)
+[2018-11-07 14:17:21,827] INFO Kafka commitId : unknown (org.apache.kafka.common.utils.AppInfoParser)
+[2018-11-07 14:17:21,829] INFO [Kafka Server 0], started (kafka.server.KafkaServer)
+</code></pre>
+
+<h2 id="验证">验证</h2>
+
+<p>然后用kafka二进制包（注意是下载的二进制包，而不是源码包）中自带的脚本收发消息进行验证。</p>
+
+<pre><code> D:\GitHub\kafka\bin\windows&gt; .\kafka-topics.bat --create --zookeeper ubuntu:2181 --replication-factor 1 --partitions 1 --topic test
+错误: 找不到或无法加载主类 C:\ProgramFiles\Java\jdk1.8.0_181\lib\dt.jar;
+</code></pre>
+
+<p>修改kafka-run-class.bat中的：</p>
+
+<pre><code class="language-bash">set COMMAND=%JAVA% %KAFKA_HEAP_OPTS% %KAFKA_JVM_PERFORMANCE_OPTS% %KAFKA_JMX_OPTS% %KAFKA_LOG4J_OPTS% -cp %CLASSPATH% %KAFKA_OPTS% %*
+</code></pre>
+
+<p>为：</p>
+
+<pre><code class="language-bash">set COMMAND=%JAVA% %KAFKA_HEAP_OPTS% %KAFKA_JVM_PERFORMANCE_OPTS% %KAFKA_JMX_OPTS% %KAFKA_LOG4J_OPTS% -cp &quot;%CLASSPATH%&quot; %KAFKA_OPTS% %*
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/kafka-source-begin-3.jpg" alt="消息收发" class="lazyload"><figcaption class="image-caption">消息收发</figcaption></figure></p>
+
+<p>就此Kafka源码阅读环境搭建完成。</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/kafka-source-begin/>http://vonzhou.com/2018/kafka-source-begin/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/kafka/">
+                    #Kafka</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/scala/">
+                    #Scala</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/zuul-forward-multipart-and-json/" class="prev" rel="prev" title="解决Zuul无法同时转发Multipart和JSON请求的问题"><i class="iconfont icon-left"></i>&nbsp;解决Zuul无法同时转发Multipart和JSON请求的问题</a>
+         
+        
+        <a href="http://vonzhou.com/2018/java-condition/" class="next" rel="next" title="深入理解条件变量 Condition">深入理解条件变量 Condition&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

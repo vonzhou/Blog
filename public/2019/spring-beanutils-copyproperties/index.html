@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2019/jvm-gc-summary/" />
+  <link rel="next" href="http://vonzhou.com/2019/kafka-producer-fullgc-story/" />
+  <link rel="canonical" href="http://vonzhou.com/2019/spring-beanutils-copyproperties/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           BeanUtils.copyProperties 源码分析 | 编程之路
+       
+  </title>
+  <meta name="title" content="BeanUtils.copyProperties 源码分析 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "BeanUtils.copyProperties 源码分析",
+    "headline" : "BeanUtils.copyProperties 源码分析",
+    "description" : "概述  利用反射 字段不一致也不会报错，因为会根据目标对象的属性去源对象中找对应的属性描述符，存在才拷贝 相同字段，类型不同，也不会有问题，因为拷贝之时会判断该字段源对象的读方法返回值，是否可应用用目标对象的写方法参数  实例 public class CopyPropertiesDemo { public static void main(String[] args) { Student s = new Student(); s.setName(&quot;vz&quot;); s.setFoo(1024); s.setBar(-1); Father f = new Father(); BeanUtils.copyProperties(s, f); System.out.println(f); } static class Student{ private String name; private int foo; private int bar; // setters and getters } static class Father{ private String name; private int age; private int salary; private double foo; private Integer bar; // setters and getters @Override public String toString() { return &quot;Father{&quot; + &quot;name='&quot; + name + '\'' + &quot;, age=&quot; + age + &quot;, salary=&quot; + salary + &quot;, foo=&quot; + foo + &quot;, bar=&quot; + bar + '}'; } } }  输出：",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2019",
+    "datePublished": "2019-02-27 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2019-02-27 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2019/spring-beanutils-copyproperties/",
+    "wordCount" : "574",
+    "keywords" : [ "Java","Spring", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">BeanUtils.copyProperties 源码分析</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2019-02-27 itemprop="datePublished">February 27, 2019</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/spring/"> Spring </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="概述">概述</h2>
+
+<ul>
+<li>利用反射</li>
+<li>字段不一致也不会报错，因为会根据目标对象的属性去源对象中找对应的属性描述符，存在才拷贝</li>
+<li>相同字段，类型不同，也不会有问题，因为拷贝之时会判断该字段源对象的读方法返回值，是否可应用用目标对象的写方法参数</li>
+</ul>
+
+<h2 id="实例">实例</h2>
+
+<pre><code class="language-java">public class CopyPropertiesDemo {
+
+    public static void main(String[] args) {
+
+        Student s = new Student();
+        s.setName(&quot;vz&quot;);
+        s.setFoo(1024);
+        s.setBar(-1);
+
+        Father f = new Father();
+        BeanUtils.copyProperties(s, f);
+        System.out.println(f);
+    }
+
+    static class Student{
+        private String name;
+        private int foo;
+        private int bar;
+        // setters and getters
+    }
+
+
+    static class Father{
+        private String name;
+        private int age;
+        private int salary;
+        private double foo;
+        private Integer bar;
+        // setters and getters
+
+        @Override
+        public String toString() {
+            return &quot;Father{&quot; +
+                    &quot;name='&quot; + name + '\'' +
+                    &quot;, age=&quot; + age +
+                    &quot;, salary=&quot; + salary +
+                    &quot;, foo=&quot; + foo +
+                    &quot;, bar=&quot; + bar +
+                    '}';
+        }
+    }
+}
+</code></pre>
+
+<p>输出：</p>
+
+<pre><code>Father{name='vz', age=0, salary=0, foo=0.0, bar=-1}
+</code></pre>
+
+<h2 id="copyproperties-源码分析">copyProperties 源码分析</h2>
+
+<p>copyProperties 的实现总体上很清晰：利用反射，调用source对象的get方法，然后set到target对象中。</p>
+
+<pre><code class="language-java">public static void copyProperties(Object source, Object target) throws BeansException {
+        copyProperties(source, target, null, (String[]) null);
+    }
+
+private static void copyProperties(Object source, Object target, Class&lt;?&gt; editable, String... ignoreProperties)
+            throws BeansException {
+        Class&lt;?&gt; actualEditable = target.getClass();
+
+        PropertyDescriptor[] targetPds = getPropertyDescriptors(actualEditable);
+        List&lt;String&gt; ignoreList = (ignoreProperties != null ? Arrays.asList(ignoreProperties) : null);
+
+        for (PropertyDescriptor targetPd : targetPds) {
+            Method writeMethod = targetPd.getWriteMethod();
+            if (writeMethod != null &amp;&amp; (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
+                PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
+                if (sourcePd != null) {
+                    Method readMethod = sourcePd.getReadMethod();
+                    if (readMethod != null &amp;&amp;
+                            ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType())) {
+                        try {
+                            if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
+                                readMethod.setAccessible(true);
+                            }
+                            Object value = readMethod.invoke(source);
+                            if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
+                                writeMethod.setAccessible(true);
+                            }
+                            writeMethod.invoke(target, value);
+                        }
+                        catch (Throwable ex) {
+                            throw new FatalBeanException(
+                                    &quot;Could not copy property '&quot; + targetPd.getName() + &quot;' from source to target&quot;, ex);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+</code></pre>
+
+<h2 id="获取-propertydescriptor">获取 PropertyDescriptor</h2>
+
+<p>PropertyDescriptor 描述的是Java Bean的一个属性，具有读写(getter/setter)方法，</p>
+
+<pre><code class="language-java">public static PropertyDescriptor[] getPropertyDescriptors(Class&lt;?&gt; clazz) throws BeansException {
+        CachedIntrospectionResults cr = CachedIntrospectionResults.forClass(clazz);
+        return cr.getPropertyDescriptors();
+    }
+
+</code></pre>
+
+<p><code>CachedIntrospectionResults</code>缓存了Java Bean对应Class的<code>PropertyDescriptor</code>信息，存储数据结构是<code>ConcurrentHashMap</code>：</p>
+
+<pre><code class="language-java">static final ConcurrentMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt; strongClassCache =
+            new ConcurrentHashMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt;(64);
+</code></pre>
+
+<p>先从缓存中查询，如果没有，则进行实际的解析，构造。</p>
+
+<pre><code class="language-java">static CachedIntrospectionResults forClass(Class&lt;?&gt; beanClass) throws BeansException {
+        CachedIntrospectionResults results = strongClassCache.get(beanClass);
+        if (results != null) {
+            return results;
+        }
+        results = softClassCache.get(beanClass);
+        if (results != null) {
+            return results;
+        }
+
+        // TODO 具体的解析过程
+        results = new CachedIntrospectionResults(beanClass);
+        ConcurrentMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt; classCacheToUse;
+
+        // TODO cachesafe ？
+        if (ClassUtils.isCacheSafe(beanClass, CachedIntrospectionResults.class.getClassLoader()) ||
+                isClassLoaderAccepted(beanClass.getClassLoader())) {
+            classCacheToUse = strongClassCache;
+        }
+        else {
+            classCacheToUse = softClassCache;
+        }
+
+        CachedIntrospectionResults existing = classCacheToUse.putIfAbsent(beanClass, results);
+        return (existing != null ? existing : results);
+    }
+
+</code></pre>
+
+<p>接下来看<code>CachedIntrospectionResults</code>构造函数，先是利用<code>Introspector</code>解析class的<code>BeanInfo</code>（实现类是<code>GenericBeanInfo</code>），然后更新缓存。</p>
+
+<pre><code class="language-java">private CachedIntrospectionResults(Class&lt;?&gt; beanClass) throws BeansException {
+        try {
+            BeanInfo beanInfo = null;
+            if (beanInfo == null) {
+                // If none of the factories supported the class, fall back to the default
+                beanInfo = (shouldIntrospectorIgnoreBeaninfoClasses ?
+                        Introspector.getBeanInfo(beanClass, Introspector.IGNORE_ALL_BEANINFO) :
+                        Introspector.getBeanInfo(beanClass)); // 这里
+            }
+            this.beanInfo = beanInfo;
+
+
+            this.propertyDescriptorCache = new LinkedHashMap&lt;String, PropertyDescriptor&gt;();
+
+            // This call is slow so we do it once.
+            PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
+            for (PropertyDescriptor pd : pds) {
+                if (Class.class == beanClass &amp;&amp;
+                        (&quot;classLoader&quot;.equals(pd.getName()) ||  &quot;protectionDomain&quot;.equals(pd.getName()))) {
+                    // Ignore Class.getClassLoader() and getProtectionDomain() methods - nobody needs to bind to those
+                    continue;
+                }
+                pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
+                this.propertyDescriptorCache.put(pd.getName(), pd);
+            }
+
+            this.typeDescriptorCache = new ConcurrentReferenceHashMap&lt;PropertyDescriptor, TypeDescriptor&gt;();
+        }
+        catch (IntrospectionException ex) {
+            throw new FatalBeanException(&quot;Failed to obtain BeanInfo for class [&quot; + beanClass.getName() + &quot;]&quot;, ex);
+        }
+    }
+
+</code></pre>
+
+<h2 id="判断是否可赋值-assignable">判断是否可赋值（Assignable）</h2>
+
+<p>看工具类<code>ClassUtils</code>。</p>
+
+<pre><code class="language-java">public static boolean isAssignable(Class&lt;?&gt; lhsType, Class&lt;?&gt; rhsType) {
+        if (lhsType.isAssignableFrom(rhsType)) {
+            return true;
+        }
+        if (lhsType.isPrimitive()) {
+            Class&lt;?&gt; resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
+            if (lhsType == resolvedPrimitive) {
+                return true;
+            }
+        }
+        else {
+            Class&lt;?&gt; resolvedWrapper = primitiveTypeToWrapperMap.get(rhsType);
+            if (resolvedWrapper != null &amp;&amp; lhsType.isAssignableFrom(resolvedWrapper)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+</code></pre>
+
+<p><code>java.lang.Class.isAssignableFrom</code>方法是native的，判断当前类型是否是另一个的超类，或者父接口，或者类型一样，可以看个例子：</p>
+
+<pre><code class="language-java">public class IsAssignableFromDemo {
+    public static void main(String[] args) {
+        System.out.println(Object.class.isAssignableFrom(Object.class)); // true
+        System.out.println(Object.class.isAssignableFrom(String.class)); // true
+        System.out.println(List.class.isAssignableFrom(ArrayList.class)); // true
+        System.out.println(int.class.isAssignableFrom(long.class)); //false
+        System.out.println(int.class.isAssignableFrom(int.class));//true
+    }
+}
+
+</code></pre>
+
+<p><code>isAssignable</code>同时也会考虑原始类型及包装类型的情况，比如 int a 可以被拷贝到另一个对象的 Integer a 中。</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2019/spring-beanutils-copyproperties/>http://vonzhou.com/2019/spring-beanutils-copyproperties/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/java/">
+                    #Java</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2019/jvm-gc-summary/" class="prev" rel="prev" title="JVM垃圾回收总结"><i class="iconfont icon-left"></i>&nbsp;JVM垃圾回收总结</a>
+         
+        
+        <a href="http://vonzhou.com/2019/kafka-producer-fullgc-story/" class="next" rel="next" title="记一次使用KafkaProducer引发的Full GC问题">记一次使用KafkaProducer引发的Full GC问题&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

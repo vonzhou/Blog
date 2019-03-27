@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2019/enum-singleton/" />
+  <link rel="next" href="http://vonzhou.com/2019/jvm-gc-summary/" />
+  <link rel="canonical" href="http://vonzhou.com/2019/innodb-row-lock/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           InnoDB 行锁的实现 | 编程之路
+       
+  </title>
+  <meta name="title" content="InnoDB 行锁的实现 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "InnoDB 行锁的实现",
+    "headline" : "InnoDB 行锁的实现",
+    "description" : "InnoDB 实现行锁（row lock）的3种算法：
+ Record Lock：单行记录上锁 Gap Lock：间隙锁，锁定一个范围，不包括记录本身 Next-key Lock：等价于Gap Lock + Record Lock，即锁定一个范围同时锁定记录本身，为了解决Phantom Problem。  行加锁过程 InnoDB的行锁其实是索引记录锁，InnoDB存储引擎下每个表有一个主键（聚集索引），辅助索引中包含主键，根据查询使用的索引不同加锁也不同。
+ 通过主键加锁，仅对聚集索引记录进行加锁，Record Lock 通过辅助索引进行加锁，需要先对辅助索引加锁 Gap Lock，再对聚集索引加锁 Record Lock 当辅助索引是唯一索引的时候，Next-key Lock会降级为 Record Lock  实例 唯一索引行锁定 create table t (a int primary key); insert into t values(1),(2),(5);  会话A会对a=5的行进行X锁定，由于a是主键且唯一，所以只会对这一行进行锁定，所以在会话B中插入a=4不会阻塞。
+辅助索引行锁定 create table t2 (a int, b int, primary key(a), key(b)); insert into t2 values(1,1),(3,1),(5,3),(7,6),(10,8);  会话A对a=5的聚簇索引行加了Record Lock，所以会话B会阻塞。
+会话A不仅对a=5的聚簇索引行加了Record Lock，也会对辅助索引加 Next-Key Lock，锁定的范围是 (1,3],(3,6)。",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2019",
+    "datePublished": "2019-02-16 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2019-02-16 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2019/innodb-row-lock/",
+    "wordCount" : "79",
+    "keywords" : [ "MySQL","InnoDB","Lock", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">InnoDB 行锁的实现</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2019-02-16 itemprop="datePublished">February 16, 2019</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/mysql/"> MySQL </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>InnoDB 实现行锁（row lock）的3种算法：</p>
+
+<ul>
+<li><code>Record Lock</code>：单行记录上锁</li>
+<li><code>Gap Lock</code>：间隙锁，锁定一个范围，不包括记录本身</li>
+<li><code>Next-key Lock</code>：等价于<code>Gap Lock</code> + <code>Record Lock</code>，即锁定一个范围同时锁定记录本身，为了解决Phantom Problem。</li>
+</ul>
+
+<h2 id="行加锁过程">行加锁过程</h2>
+
+<p>InnoDB的行锁其实是索引记录锁，InnoDB存储引擎下每个表有一个主键（聚集索引），辅助索引中包含主键，根据查询使用的索引不同加锁也不同。</p>
+
+<ol>
+<li>通过主键加锁，仅对聚集索引记录进行加锁，<code>Record Lock</code></li>
+<li>通过辅助索引进行加锁，需要先对辅助索引加锁 <code>Gap Lock</code>，再对聚集索引加锁 <code>Record Lock</code></li>
+<li>当辅助索引是唯一索引的时候，<code>Next-key Lock</code>会降级为 <code>Record Lock</code></li>
+</ol>
+
+<h2 id="实例">实例</h2>
+
+<h3 id="唯一索引行锁定">唯一索引行锁定</h3>
+
+<pre><code class="language-sql">create table t (a int primary key);
+insert into t values(1),(2),(5);
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/innodb-row-lock-1.jpg" alt="唯一索引行锁定" class="lazyload"><figcaption class="image-caption">唯一索引行锁定</figcaption></figure></p>
+
+<p>会话A会对a=5的行进行X锁定，由于a是主键且唯一，所以只会对这一行进行锁定，所以在会话B中插入a=4不会阻塞。</p>
+
+<h3 id="辅助索引行锁定">辅助索引行锁定</h3>
+
+<pre><code class="language-sql">create table t2 (a int, b int, primary key(a), key(b));
+insert into t2 values(1,1),(3,1),(5,3),(7,6),(10,8);
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/innodb-row-lock-2.jpg" alt="辅助索引行锁定-记录锁" class="lazyload"><figcaption class="image-caption">辅助索引行锁定-记录锁</figcaption></figure></p>
+
+<p>会话A对a=5的聚簇索引行加了Record Lock，所以会话B会阻塞。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/innodb-row-lock-3.jpg" alt="辅助索引行锁定-间隙锁" class="lazyload"><figcaption class="image-caption">辅助索引行锁定-间隙锁</figcaption></figure></p>
+
+<p>会话A不仅对a=5的聚簇索引行加了Record Lock，也会对辅助索引加 Next-Key Lock，锁定的范围是 (1,3],(3,6)。</p>
+
+<p>所以在会话B中执行<code>insert into t2 values(13,3);</code>, <code>insert into t2 values(14,5);</code>也是同样的情况。</p>
+
+<p>但是插入<code>b=0</code>, <code>b=1</code>, <code>b=5</code>, <code>b=6</code>时不会阻塞。</p>
+
+<h2 id="相关">相关</h2>
+
+<p><a href="https://dev.mysql.com/doc/refman/5.5/en/innodb-locking.html" rel="nofollow noreferrer" target="_blank">14.10.1 InnoDB Locking</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2019/innodb-row-lock/>http://vonzhou.com/2019/innodb-row-lock/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/mysql/">
+                    #MySQL</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/innodb/">
+                    #InnoDB</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/lock/">
+                    #Lock</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2019/enum-singleton/" class="prev" rel="prev" title="为什么枚举是实现单例最好的方式？"><i class="iconfont icon-left"></i>&nbsp;为什么枚举是实现单例最好的方式？</a>
+         
+        
+        <a href="http://vonzhou.com/2019/jvm-gc-summary/" class="next" rel="next" title="JVM垃圾回收总结">JVM垃圾回收总结&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>
