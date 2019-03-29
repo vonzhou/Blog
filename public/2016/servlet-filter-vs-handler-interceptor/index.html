@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2016/stringbuffer-vs-stringbuilder/" />
+  <link rel="next" href="http://vonzhou.com/2016/kafka-design/" />
+  <link rel="canonical" href="http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Servlet Filter与HandlerInterceptor的对比 | 编程之路
+       
+  </title>
+  <meta name="title" content="Servlet Filter与HandlerInterceptor的对比 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Servlet Filter与HandlerInterceptor的对比",
+    "headline" : "Servlet Filter与HandlerInterceptor的对比",
+    "description" : "前言 好久么有写博客了，这是之前总结的一篇。
+对于Servlet Filter，官方文档中说的很好， 并且给出了常见的应用场景。
+A filter is an object that performs filtering tasks on either the request to a resource (a servlet or static content), or on the response from a resource, or both. Filters perform filtering in the doFilter method. Every Filter has access to a FilterConfig object from which it can obtain its initialization parameters, and a reference to the ServletContext which it can use, for example, to load resources needed for filtering tasks.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2016",
+    "datePublished": "2016-11-13 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2016-11-13 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/",
+    "wordCount" : "391",
+    "keywords" : [ "Spring","Spring MVC","Servlet", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Servlet Filter与HandlerInterceptor的对比</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2016-11-13 itemprop="datePublished">November 13, 2016</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/spring/"> Spring </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="前言">前言</h2>
+
+<p>好久么有写博客了，这是之前总结的一篇。</p>
+
+<p>对于Servlet Filter，官方文档中说的很好， 并且给出了常见的应用场景。</p>
+
+<p>A filter is an object that performs filtering tasks on either the request to a resource (a servlet or static content), or on the response from a resource, or both. Filters perform filtering in the doFilter method. Every Filter has access to a FilterConfig object from which it can obtain its initialization parameters, and a reference to the ServletContext which it can use, for example, to load resources needed for filtering tasks.</p>
+
+<p>Filters are configured in the deployment descriptor of a web application.</p>
+
+<p>Examples that have been identified for this design are:</p>
+
+<ul>
+<li>Authentication Filters</li>
+<li>Logging and Auditing Filters</li>
+<li>Image conversion Filters</li>
+<li>Data compression Filters</li>
+<li>Encryption Filters</li>
+<li>Tokenizing Filters</li>
+<li>Filters that trigger resource access events</li>
+<li>XSL/T filters</li>
+<li>Mime-type chain Filter</li>
+</ul>
+
+<p>接下来用简单的例子进行理解。</p>
+
+<h2 id="示例">示例</h2>
+
+<p>实现Filter接口。</p>
+
+<pre><code class="language-java">public class SimpleServletFilter implements Filter{
+    private static Logger logger = Logger.getLogger(SimpleServletFilter.class);
+
+    public void init(FilterConfig filterConfig) throws ServletException {
+        logger.info(&quot;SimpleServletFilter init....&quot;);
+    }
+
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String id = request.getParameter(&quot;id&quot;);
+        if(id != null &amp;&amp; !id.isEmpty() &amp;&amp; !id.equals(&quot;123&quot;)){
+            chain.doFilter(request,response);
+        }
+
+        // Reply directly here
+        HttpServletResponse httpResponse = (HttpServletResponse)response;
+        httpResponse.getWriter().print(&quot;Another Page...enjoy&quot;);
+    }
+
+    public void destroy() {
+        logger.info(&quot;SimpleServletFilter destroy....&quot;);
+    }
+}
+</code></pre>
+
+<p>配置部署文件, filter所有的请求（？有问题，后面会说）。</p>
+
+<pre><code class="language-xml">&lt;filter&gt;
+        &lt;filter-name&gt;simpleFilter&lt;/filter-name&gt;
+        &lt;filter-class&gt;com.vonzhou.learning.filter.SimpleServletFilter&lt;/filter-class&gt;
+    &lt;/filter&gt;
+    &lt;filter-mapping&gt;
+        &lt;filter-name&gt;simpleFilter&lt;/filter-name&gt;
+        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+    &lt;/filter-mapping&gt;
+</code></pre>
+
+<p>通过运行日志输出，结合前文《HandlerInterceptor应用及执行过程分析》的对比,可以很清楚的看出filter和interceptor大概的生命周期。filter比interceptor更早出生，更晚死去。</p>
+
+<pre><code class="language-bash">2016-07-23 14:07:18,581  INFO SimpleServletFilter:16 - SimpleServletFilter init....
+[2016-07-23 02:07:18,965] Artifact spring-interceptor:war exploded: Artifact is deployed successfully
+[2016-07-23 02:07:18,965] Artifact spring-interceptor:war exploded: Deploy took 5,416 milliseconds
+2016-07-23 14:07:24,133  INFO LogInterceptor:32 - Will call public java.lang.String com.vonzhou.learning.controller.UserController.serveUser(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,java.util.Locale,org.springframework.ui.ModelMap)
+2016-07-23 14:07:25,164  INFO LogInterceptor:38 - before return view  page, i can get model = Some Data
+2016-07-23 14:07:25,848  INFO LogInterceptor:48 - Call cost time 1715 mills!
+2016-07-23 14:07:28,389  INFO LogInterceptor:32 - Will call public java.lang.String com.vonzhou.learning.controller.UserController.serveUser(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,java.util.Locale,org.springframework.ui.ModelMap)
+2016-07-23 14:07:29,393  INFO LogInterceptor:38 - before return view  page, i can get model = Some Data
+2016-07-23 14:07:29,395  INFO LogInterceptor:48 - Call cost time 1006 mills!
+/usr/local/apache-tomcat-8.0.33/bin/catalina.sh stop
+2016-07-23 14:08:12,607  INFO SimpleServletFilter:31 - SimpleServletFilter destroy....
+Disconnected from server
+</code></pre>
+
+<p><a href="https://github.com/vonzhou/SpringInAction3/tree/master/spring-interceptor" rel="nofollow noreferrer" target="_blank">完整代码</a></p>
+
+<h2 id="对比总结">对比总结</h2>
+
+<ul>
+<li>filter是比interceptor强大</li>
+<li>filter操纵request，response的能力更大，可以直接response回应客户端，【×但是在interceptor的preHandle方法中操纵response不起作用】都可以</li>
+<li>filter的粒度是更靠近前端的request级别，而interceptor处理的粒度测试靠近后端的Controller（或称为handler）的被映射的请求处理方法</li>
+<li>filter可以双向的，根据request或者response来响应，但是interceptor只能是拦截进入这一端</li>
+<li>过程中发现，如果对静态资源配置了<code>&lt;mvc:resources mapping=&quot;/resources/**&quot; location=&quot;/resources/&quot;/&gt;</code>，那么如果访问的静态资源文件存在的话，filter并不会起作用（web.xml中的filter配置如下）,即使把url-pattern指定为<code>&lt;url-pattern&gt;/resources/*&lt;/url-pattern&gt;</code>（其实/*就匹配了所有的请求）。说明了mvc:resources配置的静态文件并不会经过Servlet filter， 虽然说filter很强大。</li>
+</ul>
+
+<pre><code class="language-xml">&lt;filter&gt;
+    &lt;filter-name&gt;simpleFilter&lt;/filter-name&gt;
+    &lt;filter-class&gt;com.vonzhou.learning.filter.SimpleServletFilter&lt;/filter-class&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+    &lt;filter-name&gt;simpleFilter&lt;/filter-name&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+</code></pre>
+
+<p>前面我说在interceptor的preHandle方法中操纵response不起作用，其实不够全面, 比如在preHandle方法中设置断点，当response回复消息后，此时shutdown服务器，这时在客户端会收到这里的消息。 在interceptor中如果要直接响应HTTP，也是可以的，但是要return false，中断后续的处理逻辑。</p>
+
+<pre><code class="language-java">response.getWriter().println(&quot; --- From Interceptor, you are rejected.&quot;);
+response.flushBuffer();
+
+return false;
+</code></pre>
+
+<p>【×另一种情况就更加奇怪，如果在interceptor中的 preHandle 方法中 response write消息之后是 return false，此时返回的消息同时包含了filter中被拦截成功后应该返回的消息（见下面），所以这时就崩溃了，一片混乱，所以只能在使用 handlerinterceptor 的时候不要使用response回复消息了。】 这里是自己理解错误！</p>
+
+<p>关键点看自己在filter中实现怎样的逻辑，你可以只是filter请求的入口，像这样：</p>
+
+<pre><code class="language-java">if (meetFilterCondition(request)) {
+    chain.doFilter(request, response);
+} else {
+    // Reply directly here
+    replyDirectly(response);
+}
+</code></pre>
+
+<p>也可以在请求入口和响应的出口都做一些filter处理，像这样：</p>
+
+<pre><code class="language-java">if (meetFilterCondition(request)) {
+    chain.doFilter(request, response);
+} else {
+    // Reply directly here (1)
+    replyDirectly(response);
+}
+
+// filter outside  (2)
+doFilterResponse(response);
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring-mvc/">
+                    #Spring MVC</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/servlet/">
+                    #Servlet</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2016/stringbuffer-vs-stringbuilder/" class="prev" rel="prev" title="StringBuffer 和 StringBuilder 的区别是什么？"><i class="iconfont icon-left"></i>&nbsp;StringBuffer 和 StringBuilder 的区别是什么？</a>
+         
+        
+        <a href="http://vonzhou.com/2016/kafka-design/" class="next" rel="next" title="Kafka的设计">Kafka的设计&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

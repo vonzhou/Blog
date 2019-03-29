@@ -76,6 +76,17 @@ protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod 
     </item>
     
     <item>
+      <title>Servlet Filter与HandlerInterceptor的对比</title>
+      <link>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</link>
+      <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</guid>
+      <description>前言 好久么有写博客了，这是之前总结的一篇。
+对于Servlet Filter，官方文档中说的很好， 并且给出了常见的应用场景。
+A filter is an object that performs filtering tasks on either the request to a resource (a servlet or static content), or on the response from a resource, or both. Filters perform filtering in the doFilter method. Every Filter has access to a FilterConfig object from which it can obtain its initialization parameters, and a reference to the ServletContext which it can use, for example, to load resources needed for filtering tasks.</description>
+    </item>
+    
+    <item>
       <title>Spring源码阅读 - bean实例化浅析</title>
       <link>http://vonzhou.com/2016/spring-bean-instantiation/</link>
       <pubDate>Fri, 02 Sep 2016 00:00:00 +0000</pubDate>
@@ -109,6 +120,17 @@ public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefin
 DispatcherServlet 是一个实实在在的 Servlet，所以 Spring MVC 引入后不会改变 Servlet 容器的行为， 仍然是解析 web.xml 部署文件，只需要在里面配置这个 Servlet 即可。 比如下面配置 dispatcher Servlet 处理所有的请求，也体现了 DispatcherServlet 是前端控制器（Front Controller）。 contextConfigLocation 上下文参数用于配置路径的指定，如果没有的话就使用默认的值。
 &amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;web-app xmlns=&amp;quot;http://java.sun.com/xml/ns/javaee&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xsi:schemaLocation=&amp;quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&amp;quot; version=&amp;quot;3.0&amp;quot;&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.springframework.web.servlet.DispatcherServlet&amp;lt;/servlet-class&amp;gt; &amp;lt;load-on-startup&amp;gt;1&amp;lt;/load-on-startup&amp;gt; &amp;lt;/servlet&amp;gt; &amp;lt;servlet-mapping&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;url-pattern&amp;gt;/&amp;lt;/url-pattern&amp;gt; &amp;lt;/servlet-mapping&amp;gt; &amp;lt;listener&amp;gt; &amp;lt;listener-class&amp;gt;org.springframework.web.context.ContextLoaderListener&amp;lt;/listener-class&amp;gt; &amp;lt;/listener&amp;gt; &amp;lt;context-param&amp;gt; &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt; &amp;lt;param-value&amp;gt; /WEB-INF/dispatcher-servlet.xml classpath:service-context.xml &amp;lt;/param-value&amp;gt; &amp;lt;/context-param&amp;gt; &amp;lt;/web-app&amp;gt;  DispatcherServlet 初始化 DispatcherServlet 的父类 HttpServletBean 覆盖了 HttpServlet 的 init 方法，实现该 servlet 的初始化。
 /** * Map config parameters onto bean properties of this servlet, and * invoke subclass initialization.</description>
+    </item>
+    
+    <item>
+      <title>HandlerInterceptor应用及执行过程分析</title>
+      <link>http://vonzhou.com/2016/spring-handler-interceptor/</link>
+      <pubDate>Sat, 23 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/spring-handler-interceptor/</guid>
+      <description>HandlerInterceptor 实践 这两天花了很多时间在折腾使用AOP对Spring MVC Controller进行拦截，但是没有效果。然后尝试了下Spring的HandlerInterceptor，使用起来比较简单，思想也容易理解。下面是Spring Doc对HandlerInterceptor接口及相关方法的说明。
+HandlerInterceptor 接口：
+Workflow interface that allows for customized handler execution chains. Applications can register any number of existing or custom interceptors for certain groups of handlers, to add common pre-processing behavior without needing to modify each handler implementation. A HandlerInterceptor gets called before the appropriate HandlerAdapter triggers the execution of the handler itself. This mechanism can be used for a large field of preprocessing aspects, e.</description>
     </item>
     
   </channel>

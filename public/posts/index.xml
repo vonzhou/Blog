@@ -470,6 +470,19 @@ protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod 
     </item>
     
     <item>
+      <title>关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法</title>
+      <link>http://vonzhou.com/2017/arraylist-toarray/</link>
+      <pubDate>Sat, 18 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/arraylist-toarray/</guid>
+      <description>引言 最近在项目中调用一个接口, 接口的返回类型是 Map&amp;lt;String, Object&amp;gt;，且put进去的值类型是List&amp;lt;Dog&amp;gt;，当我取出进行强制类型转化的时候却抛出了ClassCastException，情景如下：
+public static void test2() { List&amp;lt;Dog&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(); list.add(new Dog()); System.out.println(list.toArray().getClass()); // 其实此时数组类型已为 [Ljava.lang.Object; Map&amp;lt;String, Object&amp;gt; dataMap = Maps.newHashMap(); dataMap.put(&amp;quot;x&amp;quot;, list.toArray()); Dog[] d = (Dog[]) dataMap.get(&amp;quot;x&amp;quot;); // 所以此时会抛出 ClassCastException }  所以在使用toArray方法的时候要确实理解。
+ArrayList.toArray() 理解 通过源码我们可以看到返回的是Object类型的数组，失去了原有的实际类型，虽然底层存储是具体类型的对象，这也正体现了文档中说的：该方法起到了bridge的作用（This method acts as bridge between array-based and collection-based APIs）。
+public Object[] toArray() { return Arrays.copyOf(elementData, size); }  但是如果我们使用 Arrays.asList 就不会出现上述的问题。
+public static void test1() { List&amp;lt;Dog&amp;gt; list = Arrays.</description>
+    </item>
+    
+    <item>
       <title>2016阅读书单</title>
       <link>http://vonzhou.com/2016/2016-read-book/</link>
       <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
@@ -487,6 +500,50 @@ protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod 
  月亮与六便士 -4.20 &amp;gt; 讲述了斯特里克兰德对艺术的不懈追求，是以保罗·高更为原型创作的小说。虽然情节不复杂，但是读起来优美，长于人物的描写。
  卡勒德·胡赛尼 《群山回唱》 - 4.28 &amp;gt; 时间从五十年代到2010年，有阿富汗的历史动乱，阿卜杜拉和帕丽从小时候的分散，到最后见面了，但是有些空缺却永远难以弥补。
  Craig Walls《Spring实战 3rd》 -4.</description>
+    </item>
+    
+    <item>
+      <title>Kafka的设计</title>
+      <link>http://vonzhou.com/2016/kafka-design/</link>
+      <pubDate>Sun, 27 Nov 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/kafka-design/</guid>
+      <description> 本文是阅读Kafka文档的一点笔记。
+概要 定义❓ 消息队列源于IPC，Unix中的IPC模型如下：
+消息队列的特点❓
+ IPC 解耦，异步处理 发布/订阅模式  分布式环境❓
+ 消息中间件 容错，可扩展性 ActiveMQ, Kafka, RabbitMQ, ZeroMQ, RocketMQ  Kafka的设计 ☐ distributed, real-time processing
+☐ partitioning
+☐ producer/consumer group
+☐ pagecache-centric
+持久化  磁盘并没有想象中的那么慢，特别是顺序写的时候（OS优化、预取、批量写）。     顺序写 随机写     600MB/sec 100k/sec     索引结构采用消费队列（而不是BTree）  高效 大量小的IO操作？ 批量操作（larger network packets, larger sequential disk operations, contiguous memory blocks）均摊网络通信的开销。
+大量字节拷贝？ 使用零拷贝技术，如Linux下的sendfile系统调用。
+Broker  存储 多副本 日志清理  Producer  Load balancing（random, hash func） Asynchronous send（latency vs throughput）  Consumer  pull consumer position  </description>
+    </item>
+    
+    <item>
+      <title>Servlet Filter与HandlerInterceptor的对比</title>
+      <link>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</link>
+      <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</guid>
+      <description>前言 好久么有写博客了，这是之前总结的一篇。
+对于Servlet Filter，官方文档中说的很好， 并且给出了常见的应用场景。
+A filter is an object that performs filtering tasks on either the request to a resource (a servlet or static content), or on the response from a resource, or both. Filters perform filtering in the doFilter method. Every Filter has access to a FilterConfig object from which it can obtain its initialization parameters, and a reference to the ServletContext which it can use, for example, to load resources needed for filtering tasks.</description>
+    </item>
+    
+    <item>
+      <title>StringBuffer 和 StringBuilder 的区别是什么？</title>
+      <link>http://vonzhou.com/2016/stringbuffer-vs-stringbuilder/</link>
+      <pubDate>Mon, 05 Sep 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/stringbuffer-vs-stringbuilder/</guid>
+      <description>String 的问题 因为String是immutable的，每次的操作都会创建一个新的String对象，当操作频繁的时候就会带来开销，而StringBuilder，StringBuffer内部维护的是字符数组，每次的操作都是改变字符数组的状态，避免创建大量的String对象。
+区别是什么？ StringBuffer是线程安全的（synchronized），而 StringBuilder不是，所以StringBuilder效率更高，锁的获取和释放会带来开销。
+看看代码 不论是创建StringBuffer 还是 StringBuilder对象，都是创建一个容量为16的字符数组。
+/** * The value is used for character storage. */ char[] value; /** * The count is the number of characters used. */ int count; AbstractStringBuilder(int capacity) { value = new char[capacity]; }  区别就是所有的方法中，比如append，前者有synchronized关键字修饰。
+StringBuffer的append方法：
+public synchronized StringBuffer append(String str) { toStringCache = null; super.append(str); return this; } StringBuilder的append方法： public StringBuilder append(String str) { super.append(str); return this; }  虽然实际的实现是一样的。</description>
     </item>
     
     <item>
@@ -544,6 +601,17 @@ RocketMQ 刷盘实现 Broker 在消息的存取时直接操作的是内存（内
 DispatcherServlet 是一个实实在在的 Servlet，所以 Spring MVC 引入后不会改变 Servlet 容器的行为， 仍然是解析 web.xml 部署文件，只需要在里面配置这个 Servlet 即可。 比如下面配置 dispatcher Servlet 处理所有的请求，也体现了 DispatcherServlet 是前端控制器（Front Controller）。 contextConfigLocation 上下文参数用于配置路径的指定，如果没有的话就使用默认的值。
 &amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt; &amp;lt;web-app xmlns=&amp;quot;http://java.sun.com/xml/ns/javaee&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xsi:schemaLocation=&amp;quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&amp;quot; version=&amp;quot;3.0&amp;quot;&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.springframework.web.servlet.DispatcherServlet&amp;lt;/servlet-class&amp;gt; &amp;lt;load-on-startup&amp;gt;1&amp;lt;/load-on-startup&amp;gt; &amp;lt;/servlet&amp;gt; &amp;lt;servlet-mapping&amp;gt; &amp;lt;servlet-name&amp;gt;dispatcher&amp;lt;/servlet-name&amp;gt; &amp;lt;url-pattern&amp;gt;/&amp;lt;/url-pattern&amp;gt; &amp;lt;/servlet-mapping&amp;gt; &amp;lt;listener&amp;gt; &amp;lt;listener-class&amp;gt;org.springframework.web.context.ContextLoaderListener&amp;lt;/listener-class&amp;gt; &amp;lt;/listener&amp;gt; &amp;lt;context-param&amp;gt; &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt; &amp;lt;param-value&amp;gt; /WEB-INF/dispatcher-servlet.xml classpath:service-context.xml &amp;lt;/param-value&amp;gt; &amp;lt;/context-param&amp;gt; &amp;lt;/web-app&amp;gt;  DispatcherServlet 初始化 DispatcherServlet 的父类 HttpServletBean 覆盖了 HttpServlet 的 init 方法，实现该 servlet 的初始化。
 /** * Map config parameters onto bean properties of this servlet, and * invoke subclass initialization.</description>
+    </item>
+    
+    <item>
+      <title>HandlerInterceptor应用及执行过程分析</title>
+      <link>http://vonzhou.com/2016/spring-handler-interceptor/</link>
+      <pubDate>Sat, 23 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/spring-handler-interceptor/</guid>
+      <description>HandlerInterceptor 实践 这两天花了很多时间在折腾使用AOP对Spring MVC Controller进行拦截，但是没有效果。然后尝试了下Spring的HandlerInterceptor，使用起来比较简单，思想也容易理解。下面是Spring Doc对HandlerInterceptor接口及相关方法的说明。
+HandlerInterceptor 接口：
+Workflow interface that allows for customized handler execution chains. Applications can register any number of existing or custom interceptors for certain groups of handlers, to add common pre-processing behavior without needing to modify each handler implementation. A HandlerInterceptor gets called before the appropriate HandlerAdapter triggers the execution of the handler itself. This mechanism can be used for a large field of preprocessing aspects, e.</description>
     </item>
     
     <item>

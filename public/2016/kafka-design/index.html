@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/" />
+  <link rel="next" href="http://vonzhou.com/2016/2016-read-book/" />
+  <link rel="canonical" href="http://vonzhou.com/2016/kafka-design/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           Kafka的设计 | 编程之路
+       
+  </title>
+  <meta name="title" content="Kafka的设计 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "Kafka的设计",
+    "headline" : "Kafka的设计",
+    "description" : " 本文是阅读Kafka文档的一点笔记。
+概要 定义❓ 消息队列源于IPC，Unix中的IPC模型如下：
+消息队列的特点❓
+ IPC 解耦，异步处理 发布/订阅模式  分布式环境❓
+ 消息中间件 容错，可扩展性 ActiveMQ, Kafka, RabbitMQ, ZeroMQ, RocketMQ  Kafka的设计 ☐ distributed, real-time processing
+☐ partitioning
+☐ producer/consumer group
+☐ pagecache-centric
+持久化  磁盘并没有想象中的那么慢，特别是顺序写的时候（OS优化、预取、批量写）。     顺序写 随机写     600MB/sec 100k/sec     索引结构采用消费队列（而不是BTree）  高效 大量小的IO操作？ 批量操作（larger network packets, larger sequential disk operations, contiguous memory blocks）均摊网络通信的开销。
+大量字节拷贝？ 使用零拷贝技术，如Linux下的sendfile系统调用。
+Broker  存储 多副本 日志清理  Producer  Load balancing（random, hash func） Asynchronous send（latency vs throughput）  Consumer  pull consumer position  ",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2016",
+    "datePublished": "2016-11-27 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2016-11-27 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2016/kafka-design/",
+    "wordCount" : "66",
+    "keywords" : [ "Kafka", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Kafka的设计</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2016-11-27 itemprop="datePublished">November 27, 2016</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/kafka/"> Kafka </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/kafka-design-1.jpg" alt="哲学思想" class="lazyload"><figcaption class="image-caption">哲学思想</figcaption></figure></p>
+
+<p>本文是阅读Kafka文档的一点笔记。</p>
+
+<h2 id="概要">概要</h2>
+
+<p>定义❓ 消息队列源于IPC，Unix中的IPC模型如下：</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/kafka-design-2.png" alt="IPC模型" class="lazyload"><figcaption class="image-caption">IPC模型</figcaption></figure></p>
+
+<p>消息队列的特点❓</p>
+
+<ul>
+<li>IPC</li>
+<li>解耦，异步处理</li>
+<li>发布/订阅模式</li>
+</ul>
+
+<p>分布式环境❓</p>
+
+<ul>
+<li>消息中间件</li>
+<li>容错，可扩展性</li>
+<li>ActiveMQ, Kafka, RabbitMQ, ZeroMQ, RocketMQ</li>
+</ul>
+
+<h2 id="kafka的设计">Kafka的设计</h2>
+
+<p>☐ distributed, real-time processing</p>
+
+<p>☐ partitioning</p>
+
+<p>☐ producer/consumer group</p>
+
+<p>☐ pagecache-centric</p>
+
+<h2 id="持久化">持久化</h2>
+
+<ul>
+<li>磁盘并没有想象中的那么慢，特别是顺序写的时候（OS优化、预取、批量写）。</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th>顺序写</th>
+<th>随机写</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>600MB/sec</td>
+<td>100k/sec</td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li>索引结构采用消费队列（而不是BTree）</li>
+</ul>
+
+<h2 id="高效">高效</h2>
+
+<p>大量小的IO操作？ 批量操作（larger network packets, larger sequential disk operations, contiguous memory blocks）均摊网络通信的开销。</p>
+
+<p>大量字节拷贝？ 使用零拷贝技术，如Linux下的sendfile系统调用。</p>
+
+<h2 id="broker">Broker</h2>
+
+<ul>
+<li>存储</li>
+<li>多副本</li>
+<li>日志清理</li>
+</ul>
+
+<h2 id="producer">Producer</h2>
+
+<ul>
+<li>Load balancing（random, hash func）</li>
+<li>Asynchronous send（latency vs throughput）</li>
+</ul>
+
+<h2 id="consumer">Consumer</h2>
+
+<ul>
+<li>pull</li>
+<li>consumer position</li>
+</ul>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/kafka-design-3.jpg" alt="组件交互" class="lazyload"><figcaption class="image-caption">组件交互</figcaption></figure></p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2016/kafka-design/>http://vonzhou.com/2016/kafka-design/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/kafka/">
+                    #Kafka</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/" class="prev" rel="prev" title="Servlet Filter与HandlerInterceptor的对比"><i class="iconfont icon-left"></i>&nbsp;Servlet Filter与HandlerInterceptor的对比</a>
+         
+        
+        <a href="http://vonzhou.com/2016/2016-read-book/" class="next" rel="next" title="2016阅读书单">2016阅读书单&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

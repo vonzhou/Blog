@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2016/2016-read-book/" />
+  <link rel="next" href="http://vonzhou.com/2017/spring-exception-handler/" />
+  <link rel="canonical" href="http://vonzhou.com/2017/arraylist-toarray/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法 | 编程之路
+       
+  </title>
+  <meta name="title" content="关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法",
+    "headline" : "关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法",
+    "description" : "引言 最近在项目中调用一个接口, 接口的返回类型是 Map&lt;String, Object&gt;，且put进去的值类型是List&lt;Dog&gt;，当我取出进行强制类型转化的时候却抛出了ClassCastException，情景如下：
+public static void test2() { List&lt;Dog&gt; list = new ArrayList&lt;&gt;(); list.add(new Dog()); System.out.println(list.toArray().getClass()); // 其实此时数组类型已为 [Ljava.lang.Object; Map&lt;String, Object&gt; dataMap = Maps.newHashMap(); dataMap.put(&quot;x&quot;, list.toArray()); Dog[] d = (Dog[]) dataMap.get(&quot;x&quot;); // 所以此时会抛出 ClassCastException }  所以在使用toArray方法的时候要确实理解。
+ArrayList.toArray() 理解 通过源码我们可以看到返回的是Object类型的数组，失去了原有的实际类型，虽然底层存储是具体类型的对象，这也正体现了文档中说的：该方法起到了bridge的作用（This method acts as bridge between array-based and collection-based APIs）。
+public Object[] toArray() { return Arrays.copyOf(elementData, size); }  但是如果我们使用 Arrays.asList 就不会出现上述的问题。
+public static void test1() { List&lt;Dog&gt; list = Arrays.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2017",
+    "datePublished": "2017-02-18 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2017-02-18 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2017/arraylist-toarray/",
+    "wordCount" : "425",
+    "keywords" : [ "Java","String", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2017-02-18 itemprop="datePublished">February 18, 2017</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/java/"> Java </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="引言">引言</h2>
+
+<p>最近在项目中调用一个接口, 接口的返回类型是 <code>Map&lt;String, Object&gt;</code>，且put进去的值类型是<code>List&lt;Dog&gt;</code>，当我取出进行强制类型转化的时候却抛出了<code>ClassCastException</code>，情景如下：</p>
+
+<pre><code class="language-java">public static void test2() {
+    List&lt;Dog&gt; list = new ArrayList&lt;&gt;();
+    list.add(new Dog());
+    System.out.println(list.toArray().getClass()); // 其实此时数组类型已为 [Ljava.lang.Object;
+
+    Map&lt;String, Object&gt; dataMap = Maps.newHashMap();
+    dataMap.put(&quot;x&quot;, list.toArray());
+    Dog[] d = (Dog[]) dataMap.get(&quot;x&quot;); // 所以此时会抛出 ClassCastException
+}
+</code></pre>
+
+<p>所以在使用toArray方法的时候要确实理解。</p>
+
+<h2 id="arraylist-toarray-理解">ArrayList.toArray() 理解</h2>
+
+<p>通过源码我们可以看到返回的是Object类型的数组，失去了原有的实际类型，虽然底层存储是具体类型的对象，这也正体现了文档中说的：该方法起到了bridge的作用（This method acts as bridge between array-based and collection-based APIs）。</p>
+
+<pre><code class="language-java">public Object[] toArray() {
+    return Arrays.copyOf(elementData, size);
+}
+</code></pre>
+
+<p>但是如果我们使用 Arrays.asList 就不会出现上述的问题。</p>
+
+<pre><code class="language-java">public static void test1() {
+    List&lt;Dog&gt; list = Arrays.asList(new Dog(), new BigDog());
+
+    System.out.println(list.toArray().getClass());
+
+    Map&lt;String, Object&gt; dataMap = Maps.newHashMap();
+    dataMap.put(&quot;x&quot;, list.toArray());
+    Dog[] d = (Dog[]) dataMap.get(&quot;x&quot;);
+}
+</code></pre>
+
+<p>对于 java.util.ArrayList 我们可以使用 toArray(T[] a) 方法来返回指定返回数组的类型。</p>
+
+<pre><code class="language-java">public &lt;T&gt; T[] toArray(T[] a) {
+    if (a.length &lt; size)
+        // Make a new array of a's runtime type, but my contents:
+        return (T[]) Arrays.copyOf(elementData, size, a.getClass());
+    System.arraycopy(elementData, 0, a, 0, size);
+    if (a.length &gt; size)
+        a[size] = null;
+    return a;
+}
+</code></pre>
+
+<h2 id="arrays-aslist-toarray-理解">Arrays.asList().toArray()理解</h2>
+
+<p>工具类Arrays的asList()方法实际中经常会用到，用于把指定的对象包装成一个固定大小的对象数组，但是其返回的ArrayList是其内部类，不同于java.util.ArrayList。</p>
+
+<pre><code class="language-java">public static &lt;T&gt; List&lt;T&gt; asList(T... a) {
+    return new ArrayList&lt;&gt;(a);
+}
+
+private static class ArrayList&lt;E&gt; extends AbstractList&lt;E&gt;
+    implements RandomAccess, java.io.Serializable
+{
+    private static final long serialVersionUID = -2764017481108945198L;
+    // 实际存储有保留原始类型
+    private final E[] a;
+
+    ArrayList(E[] array) {
+        a = Objects.requireNonNull(array);
+    }
+
+    @Override
+    public int size() {
+        return a.length;
+    }
+
+    @Override
+    public Object[] toArray() {
+        return a.clone();
+    }
+
+    @Override
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T[] toArray(T[] a) {
+        int size = size();
+        if (a.length &lt; size)
+            return Arrays.copyOf(this.a, size,
+                                 (Class&lt;? extends T[]&gt;) a.getClass());
+        System.arraycopy(this.a, 0, a, 0, size);
+        if (a.length &gt; size)
+            a[size] = null;
+        return a;
+    }
+
+    @Override
+    public E get(int index) {
+        return a[index];
+    }
+
+    @Override
+    public E set(int index, E element) {
+        E oldValue = a[index];
+        a[index] = element;
+        return oldValue;
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        E[] a = this.a;
+        if (o == null) {
+            for (int i = 0; i &lt; a.length; i++)
+                if (a[i] == null)
+                    return i;
+        } else {
+            for (int i = 0; i &lt; a.length; i++)
+                if (o.equals(a[i]))
+                    return i;
+        }
+        return -1;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return indexOf(o) != -1;
+    }
+
+    @Override
+    public Spliterator&lt;E&gt; spliterator() {
+        return Spliterators.spliterator(a, Spliterator.ORDERED);
+    }
+
+    @Override
+    public void forEach(Consumer&lt;? super E&gt; action) {
+        Objects.requireNonNull(action);
+        for (E e : a) {
+            action.accept(e);
+        }
+    }
+
+    @Override
+    public void replaceAll(UnaryOperator&lt;E&gt; operator) {
+        Objects.requireNonNull(operator);
+        E[] a = this.a;
+        for (int i = 0; i &lt; a.length; i++) {
+            a[i] = operator.apply(a[i]);
+        }
+    }
+
+    @Override
+    public void sort(Comparator&lt;? super E&gt; c) {
+        Arrays.sort(a, c);
+    }
+}
+</code></pre>
+
+<p>这里虽然我们看到 toArray 方法返回的依然是 Object[]，但是与 java.util.ArrayList 不同的是这里底层存储是泛型类型的数组 private final E[] a，所以保留了实际的类型，如下：</p>
+
+<pre><code class="language-java">public static void test5() {
+    Object[] objs = new Dog[1];
+    System.out.println(objs.getClass()); // 类型是 [Lcom.vonzhou.learn.other.ClassDemo$Dog
+
+    Object[] objs2 = new Object[1];
+    objs2[0] = new Dog();
+    System.out.println(objs2.getClass()); // 类型是 [Ljava.lang.Object;
+}
+</code></pre>
+
+<h2 id="总结">总结</h2>
+
+<p>类型系统很复杂，这里只是看到了表象。</p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2017/arraylist-toarray/>http://vonzhou.com/2017/arraylist-toarray/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/java/">
+                    #Java</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/string/">
+                    #String</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2016/2016-read-book/" class="prev" rel="prev" title="2016阅读书单"><i class="iconfont icon-left"></i>&nbsp;2016阅读书单</a>
+         
+        
+        <a href="http://vonzhou.com/2017/spring-exception-handler/" class="next" rel="next" title="ExceptionHandler 异常处理过程分析">ExceptionHandler 异常处理过程分析&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

@@ -6,10 +6,21 @@
     <description>Recent content in Servlet on 编程之路</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Aug 2016 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 13 Nov 2016 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://vonzhou.com/tags/servlet/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Servlet Filter与HandlerInterceptor的对比</title>
+      <link>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</link>
+      <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</guid>
+      <description>前言 好久么有写博客了，这是之前总结的一篇。
+对于Servlet Filter，官方文档中说的很好， 并且给出了常见的应用场景。
+A filter is an object that performs filtering tasks on either the request to a resource (a servlet or static content), or on the response from a resource, or both. Filters perform filtering in the doFilter method. Every Filter has access to a FilterConfig object from which it can obtain its initialization parameters, and a reference to the ServletContext which it can use, for example, to load resources needed for filtering tasks.</description>
+    </item>
     
     <item>
       <title>DispatcherServlet 源码阅读</title>

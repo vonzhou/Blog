@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2016/2015-read-book/" />
+  <link rel="next" href="http://vonzhou.com/2016/dispatcherservlet/" />
+  <link rel="canonical" href="http://vonzhou.com/2016/spring-handler-interceptor/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           HandlerInterceptor应用及执行过程分析 | 编程之路
+       
+  </title>
+  <meta name="title" content="HandlerInterceptor应用及执行过程分析 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "HandlerInterceptor应用及执行过程分析",
+    "headline" : "HandlerInterceptor应用及执行过程分析",
+    "description" : "HandlerInterceptor 实践 这两天花了很多时间在折腾使用AOP对Spring MVC Controller进行拦截，但是没有效果。然后尝试了下Spring的HandlerInterceptor，使用起来比较简单，思想也容易理解。下面是Spring Doc对HandlerInterceptor接口及相关方法的说明。
+HandlerInterceptor 接口：
+Workflow interface that allows for customized handler execution chains. Applications can register any number of existing or custom interceptors for certain groups of handlers, to add common pre-processing behavior without needing to modify each handler implementation. A HandlerInterceptor gets called before the appropriate HandlerAdapter triggers the execution of the handler itself. This mechanism can be used for a large field of preprocessing aspects, e.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2016",
+    "datePublished": "2016-07-23 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2016-07-23 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2016/spring-handler-interceptor/",
+    "wordCount" : "1779",
+    "keywords" : [ "Spring","Spring MVC", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/readings" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">HandlerInterceptor应用及执行过程分析</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2016-07-23 itemprop="datePublished">July 23, 2016</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/spring/"> Spring </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<h2 id="handlerinterceptor-实践">HandlerInterceptor 实践</h2>
+
+<p>这两天花了很多时间在折腾使用AOP对Spring MVC Controller进行拦截，但是没有效果。然后尝试了下Spring的HandlerInterceptor，使用起来比较简单，思想也容易理解。下面是Spring Doc对HandlerInterceptor接口及相关方法的说明。</p>
+
+<p>HandlerInterceptor 接口：</p>
+
+<p>Workflow interface that allows for customized handler execution chains. Applications can register any number of existing or custom interceptors for certain groups of handlers, to add common pre-processing behavior without needing to modify each handler implementation.
+A HandlerInterceptor gets called before the appropriate HandlerAdapter triggers the execution of the handler itself. This mechanism can be used for a large field of preprocessing aspects, e.g. for authorization checks, or common handler behavior like locale or theme changes. Its main purpose is to permit the factoring out of otherwise repetitive handler code.</p>
+
+<p>Typically an interceptor chain is defined per HandlerMapping bean, sharing its granularity. To be able to apply a certain interceptor chain to a group of handlers, one needs to map the desired handlers via one HandlerMapping bean. The interceptors themselves are defined as beans in the application context, referenced by the mapping bean definition via its “interceptors” property (in XML: a of elements).</p>
+
+<p>A HandlerInterceptor is basically similar to a Servlet Filter, but in contrast to the latter it allows custom pre-processing with the option to prohibit the execution of the handler itself, and custom post-processing. Filters are more powerful; for example they allow for exchanging the request and response objects that are handed down the chain. Note that a filter gets configured in web.xml, a HandlerInterceptor in the application context.</p>
+
+<p>As a basic guideline, fine-grained handler-related pre-processing tasks are candidates for HandlerInterceptor implementations, especially factored-out common handler code and authorization checks. On the other hand, a Filter is well-suited for request content and view content handling, like multipart forms and GZIP compression. This typically shows when one needs to map the filter to certain content types (e.g. images), or to all requests.</p>
+
+<p>preHandle 方法：</p>
+
+<p>Intercept the execution of a handler. Called after HandlerMapping determined an appropriate handler object, but before HandlerAdapter invokes the handler.
+DispatcherServlet processes a handler in an execution chain, consisting of any number of interceptors, with the handler itself at the end. With this method, each interceptor can decide to abort the execution chain, typically sending a HTTP error or writing a custom response.</p>
+
+<p>postHandle 方法：</p>
+
+<p>Intercept the execution of a handler. Called after HandlerAdapter actually invoked the handler, but before the DispatcherServlet renders the view. Can expose additional model objects to the view via the given ModelAndView.
+DispatcherServlet processes a handler in an execution chain, consisting of any number of interceptors, with the handler itself at the end. With this method, each interceptor can post-process an execution, getting applied in inverse order of the execution chain.</p>
+
+<p>afterCompletion 方法：</p>
+
+<p>Callback after completion of request processing, that is, after rendering the view. Will be called on any outcome of handler execution, thus allows for proper resource cleanup.
+Note: Will only be called if this interceptor’s preHandle method has successfully completed and returned true!
+As with the postHandle method, the method will be invoked on each interceptor in the chain in reverse order, so the first interceptor will be the last to be invoked.</p>
+
+<p>接下来是一个具体实例，<a href="https://github.com/vonzhou/SpringInAction3/tree/master/spring-interceptor" rel="nofollow noreferrer" target="_blank">完整代码</a>：</p>
+
+<pre><code class="language-java">public class LogInterceptor extends HandlerInterceptorAdapter {
+
+    private static Logger logger = Logger.getLogger(LogInterceptor.class);
+
+    //  Intercept the execution of a handler.
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+                             Object handler) throws Exception {
+
+        if(!isValidUser()){
+            logger.info(&quot;Invalid user from &quot; + request.getRemoteAddr());
+            response.sendRedirect(&quot;http://localhost:8888/user/error&quot;);
+            return false;
+        }
+
+        long startTime = System.currentTimeMillis();
+        request.setAttribute(&quot;startTime&quot;, startTime);
+        logger.info(&quot;Will call &quot; + handler.toString());
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        logger.info(&quot;before return view  page, i can get model = &quot; + modelAndView.getModelMap().get(&quot;hello&quot;));
+    }
+
+    // Callback after completion of request processing, that is, after rendering the view.
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        // Our Log Func
+        long curTime = System.currentTimeMillis();
+        long startTime = (Long)request.getAttribute(&quot;startTime&quot;);
+        long cost = curTime - startTime;
+        logger.info(&quot;Call cost time &quot; + cost + &quot; mills!&quot;);
+    }
+
+    // FAKE
+    private boolean isValidUser(){
+        return true;
+    }
+}
+</code></pre>
+
+<p>application context中对拦截器的配置：</p>
+
+<pre><code class="language-xml">&lt;mvc:interceptors&gt;
+        &lt;mvc:interceptor&gt;
+            &lt;mvc:mapping path=&quot;/**&quot;/&gt;
+            &lt;mvc:exclude-mapping path=&quot;/admin/**&quot;/&gt;
+            &lt;bean class=&quot;com.vonzhou.learning.interceptor.LogInterceptor&quot;/&gt;
+        &lt;/mvc:interceptor&gt;
+    &lt;/mvc:interceptors&gt;
+</code></pre>
+
+<p>所以当我们访问对应的URL时就会触发拦截器的执行，如下：</p>
+
+<pre><code class="language-bash">➜  ~ curl http://localhost:8888/user/service
+
+
+You are our user, Welcome!
+</code></pre>
+
+<p>server端的日志输出：</p>
+
+<pre><code class="language-bash">2016-07-23 10:25:37,374  INFO LogInterceptor:32 - Will call public java.lang.String com.vonzhou.learning.controller.UserController.serveUser(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,java.util.Locale,org.springframework.ui.ModelMap)
+2016-07-23 10:25:38,379  INFO LogInterceptor:38 - before return view  page, i can get model = Some Data
+2016-07-23 10:25:38,381  INFO LogInterceptor:50 - Call cost time 1007 mills!
+</code></pre>
+
+<h2 id="执行过程分析">执行过程分析</h2>
+
+<p>我们只看该逻辑相关的代码，其他的可以忽略掉，做到有目的的阅读源码。</p>
+
+<h3 id="httpservlet">HttpServlet</h3>
+
+<p>Service层处理HTTP请求的入口是service()方法（更深层次的需要看Tomcat的原理），分别处理HTTP不同的方法，这里我们看GET方法的逻辑。</p>
+
+<pre><code class="language-java">public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+    HttpServletRequest request;
+    HttpServletResponse response;
+    try {
+        request = (HttpServletRequest) req;
+        response = (HttpServletResponse) res;
+    } catch (ClassCastException e) {
+        throw new ServletException(&quot;non-HTTP request or response&quot;);
+    }
+    service(request, response);
+}
+
+protected void service(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+    String method = req.getMethod();
+
+    if (method.equals(METHOD_GET)) {
+        long lastModified = getLastModified(req);
+        if (lastModified == -1) {
+            // servlet doesn't support if-modified-since, no reason
+            // to go through further expensive logic
+            doGet(req, resp);
+        } else {
+            long ifModifiedSince = req.getDateHeader(HEADER_IFMODSINCE);
+            if (ifModifiedSince &lt; (lastModified / 1000 * 1000)) {
+                // If the servlet mod time is later, call doGet()
+                // Round down to the nearest second for a proper compare
+                // A ifModifiedSince of -1 will always be less
+                maybeSetLastModified(resp, lastModified);
+                doGet(req, resp);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            }
+        }
+
+    } else if (method.equals(METHOD_HEAD)) {
+        long lastModified = getLastModified(req);
+        maybeSetLastModified(resp, lastModified);
+        doHead(req, resp);
+
+    } else if (method.equals(METHOD_POST)) {
+        doPost(req, resp);
+
+    } else if (method.equals(METHOD_PUT)) {
+        doPut(req, resp);
+
+    } else if (method.equals(METHOD_DELETE)) {
+        doDelete(req, resp);
+
+    } else if (method.equals(METHOD_OPTIONS)) {
+        doOptions(req, resp);
+
+    } else if (method.equals(METHOD_TRACE)) {
+        doTrace(req, resp);
+
+    } else {
+        //
+        // Note that this means NO servlet supports whatever
+        // method was requested, anywhere on this server.
+        //
+
+        String errMsg = lStrings.getString(&quot;http.method_not_implemented&quot;);
+        Object[] errArgs = new Object[1];
+        errArgs[0] = method;
+        errMsg = MessageFormat.format(errMsg, errArgs);
+
+        resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, errMsg);
+    }
+}
+</code></pre>
+
+<h3 id="frameworkservlet">FrameworkServlet</h3>
+
+<p>进入到Spring的框架逻辑中，调用doService，然后发布一个事件，这里重点看处理请求的doService方法，FrameworkServlet中该方法为abstract，具体在DispatcherServlet中实现。</p>
+
+<pre><code class="language-java">@Override
+protected final void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+    processRequest(request, response);
+}
+
+protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+    long startTime = System.currentTimeMillis();
+    Throwable failureCause = null;
+
+    // Expose current LocaleResolver and request as LocaleContext.
+    LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+    LocaleContextHolder.setLocaleContext(buildLocaleContext(request), this.threadContextInheritable);
+
+    // Expose current RequestAttributes to current thread.
+    RequestAttributes previousRequestAttributes = RequestContextHolder.getRequestAttributes();
+    ServletRequestAttributes requestAttributes = null;
+    if (previousRequestAttributes == null || previousRequestAttributes.getClass().equals(ServletRequestAttributes.class)) {
+        requestAttributes = new ServletRequestAttributes(request);
+        RequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
+    }
+
+    if (logger.isTraceEnabled()) {
+        logger.trace(&quot;Bound request context to thread: &quot; + request);
+    }
+
+    try {
+        doService(request, response);
+    } catch (ServletException ex) {
+        failureCause = ex;
+        throw ex;
+    } catch (IOException ex) {
+        failureCause = ex;
+        throw ex;
+    } catch (Throwable ex) {
+        failureCause = ex;
+        throw new NestedServletException(&quot;Request processing failed&quot;, ex);
+    } finally {
+        // Clear request attributes and reset thread-bound context.
+        LocaleContextHolder.setLocaleContext(previousLocaleContext, this.threadContextInheritable);
+        if (requestAttributes != null) {
+            RequestContextHolder.setRequestAttributes(previousRequestAttributes, this.threadContextInheritable);
+            requestAttributes.requestCompleted();
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace(&quot;Cleared thread-bound request context: &quot; + request);
+        }
+
+        if (failureCause != null) {
+            this.logger.debug(&quot;Could not complete request&quot;, failureCause);
+        } else {
+            this.logger.debug(&quot;Successfully completed request&quot;);
+        }
+        if (this.publishEvents) {
+            // Whether or not we succeeded, publish an event.
+            long processingTime = System.currentTimeMillis() - startTime;
+            this.webApplicationContext.publishEvent(
+                    new ServletRequestHandledEvent(this,
+                            request.getRequestURI(), request.getRemoteAddr(),
+                            request.getMethod(), getServletConfig().getServletName(),
+                            WebUtils.getSessionId(request), getUsernameForRequest(request),
+                            processingTime, failureCause));
+        }
+    }
+}
+</code></pre>
+
+<h3 id="dispatcherservlet">DispatcherServlet</h3>
+
+<p>doDispatch中具体处理每个请求，包括Interceptor的拦截逻辑和Controller handler的业务逻辑。</p>
+
+<pre><code class="language-java">@Override
+protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    if (logger.isDebugEnabled()) {
+        String requestUri = urlPathHelper.getRequestUri(request);
+        logger.debug(&quot;DispatcherServlet with name '&quot; + getServletName() + &quot;' processing &quot; + request.getMethod() +
+                &quot; request for [&quot; + requestUri + &quot;]&quot;);
+    }
+
+    /**
+     * Make framework objects available to handlers and view objects.
+     * 为了处理器对象，视图对象可以访问某些某些全局的对象，设置到HTTP request的属性中
+     * */
+    request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());
+    request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
+    request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
+    request.setAttribute(THEME_SOURCE_ATTRIBUTE, getThemeSource());
+
+    try {
+        doDispatch(request, response);
+    } finally {
+    }
+}
+
+/**
+ * 具体分发请求到handler
+ * &lt;p&gt;The handler will be obtained by applying the servlet's HandlerMappings in order.
+ * The HandlerAdapter will be obtained by querying the servlet's installed HandlerAdapters
+ * to find the first that supports the handler class.
+ * &lt;p&gt;All HTTP methods are handled by this method. It's up to HandlerAdapters or handlers
+ * themselves to decide which methods are acceptable.
+ *
+ * @param request  current HTTP request
+ * @param response current HTTP response
+ * @throws Exception in case of any kind of processing failure
+ */
+protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    HttpServletRequest processedRequest = request;
+    HandlerExecutionChain mappedHandler = null;
+    int interceptorIndex = -1;
+
+    try {
+        ModelAndView mv;
+        boolean errorView = false;
+
+        try {
+            processedRequest = checkMultipart(request);
+
+            /**
+             * 获取该请求对应的 handler和interceptor（定位到了某个类）
+             * Determine handler for the current request.
+             * */
+            mappedHandler = getHandler(processedRequest, false);
+            if (mappedHandler == null || mappedHandler.getHandler() == null) {
+                noHandlerFound(processedRequest, response);
+                return;
+            }
+
+            /**
+             * 获得该请求对应的更具体的handler（适配器模式，包含更多的策略和配置），如AnnotationMethodHandlerAdapter
+             * Determine handler adapter for the current request.
+             * */
+            HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
+
+            /**
+             * 依次执行我们的Interceptor
+             * Apply preHandle methods of registered interceptors.
+             * */
+            HandlerInterceptor[] interceptors = mappedHandler.getInterceptors();
+            if (interceptors != null) {
+                for (int i = 0; i &lt; interceptors.length; i++) {
+                    HandlerInterceptor interceptor = interceptors[i];
+                    if (!interceptor.preHandle(processedRequest, response, mappedHandler.getHandler())) {
+                        /**
+                         * 如果该preHandle方法返回了false，那么就倒序依次执行前面的Interceptor的 afterCompletion 方法，然后返回
+                         * 所以不会执行后面的 Controller的handler方法，以及Interceptor的postHandle方法
+                         * */
+                        triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, null);
+                        return;
+                    }
+                    interceptorIndex = i;
+                }
+            }
+
+            /**
+             * 真正进入 Controller handler 进行请求处理
+             * Actually invoke the handler.
+             * */
+            mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+
+            // Do we need view name translation?
+            if (mv != null &amp;&amp; !mv.hasView()) {
+                mv.setViewName(getDefaultViewName(request));
+            }
+
+            //
+            /**
+             * 然后逆序依次执行我们的Interceptor的 postHandle 方法
+             * Apply postHandle methods of registered interceptors.
+             * */
+            if (interceptors != null) {
+                for (int i = interceptors.length - 1; i &gt;= 0; i--) {
+                    HandlerInterceptor interceptor = interceptors[i];
+                    interceptor.postHandle(processedRequest, response, mappedHandler.getHandler(), mv);
+                }
+            }
+        } catch (ModelAndViewDefiningException ex) {
+            logger.debug(&quot;ModelAndViewDefiningException encountered&quot;, ex);
+            mv = ex.getModelAndView();
+        } catch (Exception ex) {
+            Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);
+            mv = processHandlerException(processedRequest, response, handler, ex);
+            errorView = (mv != null);
+        }
+
+        // Did the handler return a view to render?
+        if (mv != null &amp;&amp; !mv.wasCleared()) {
+            render(mv, processedRequest, response);
+            if (errorView) {
+                WebUtils.clearErrorRequestAttributes(request);
+            }
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug(&quot;Null ModelAndView returned to DispatcherServlet with name '&quot; + getServletName() +
+                        &quot;': assuming HandlerAdapter completed request handling&quot;);
+            }
+        }
+
+        /** 此时所有的Interceptor都顺利完成了（preHandle -&gt; handler -&gt; postHandle），
+         * 此时倒序依次执行所有的Interceptor的 afterCompletion方法
+         * Trigger after-completion for successful outcome.
+         * */
+        triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, null);
+    } catch (Exception ex) {
+        // Trigger after-completion for thrown exception.
+        triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);
+        throw ex;
+    } catch (Error err) {
+        ServletException ex = new NestedServletException(&quot;Handler processing failed&quot;, err);
+        // Trigger after-completion for thrown exception.
+        triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);
+        throw ex;
+    } finally {
+        // Clean up any resources used by a multipart request.
+        if (processedRequest != request) {
+            cleanupMultipart(processedRequest);
+        }
+    }
+}
+
+private void triggerAfterCompletion(HandlerExecutionChain mappedHandler,
+                                    int interceptorIndex,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    Exception ex) throws Exception {
+
+    // Apply afterCompletion methods of registered interceptors.
+    if (mappedHandler != null) {
+        HandlerInterceptor[] interceptors = mappedHandler.getInterceptors();
+        if (interceptors != null) {
+            for (int i = interceptorIndex; i &gt;= 0; i--) {
+                HandlerInterceptor interceptor = interceptors[i];
+                try {
+                    interceptor.afterCompletion(request, response, mappedHandler.getHandler(), ex);
+                } catch (Throwable ex2) {
+                    logger.error(&quot;HandlerInterceptor.afterCompletion threw exception&quot;, ex2);
+                }
+            }
+        }
+    }
+}
+</code></pre>
+
+<h2 id="总结">总结</h2>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-handler-interceptor-1.jpg" alt="流程图" class="lazyload"><figcaption class="image-caption">流程图</figcaption></figure></p>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2016/spring-handler-interceptor/>http://vonzhou.com/2016/spring-handler-interceptor/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring-mvc/">
+                    #Spring MVC</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2016/2015-read-book/" class="prev" rel="prev" title="2015阅读的书单"><i class="iconfont icon-left"></i>&nbsp;2015阅读的书单</a>
+         
+        
+        <a href="http://vonzhou.com/2016/dispatcherservlet/" class="next" rel="next" title="DispatcherServlet 源码阅读">DispatcherServlet 源码阅读&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

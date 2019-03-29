@@ -101,6 +101,33 @@ JCOD provides good support for describing the structure of a class file (as well
     </item>
     
     <item>
+      <title>关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法</title>
+      <link>http://vonzhou.com/2017/arraylist-toarray/</link>
+      <pubDate>Sat, 18 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/arraylist-toarray/</guid>
+      <description>引言 最近在项目中调用一个接口, 接口的返回类型是 Map&amp;lt;String, Object&amp;gt;，且put进去的值类型是List&amp;lt;Dog&amp;gt;，当我取出进行强制类型转化的时候却抛出了ClassCastException，情景如下：
+public static void test2() { List&amp;lt;Dog&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(); list.add(new Dog()); System.out.println(list.toArray().getClass()); // 其实此时数组类型已为 [Ljava.lang.Object; Map&amp;lt;String, Object&amp;gt; dataMap = Maps.newHashMap(); dataMap.put(&amp;quot;x&amp;quot;, list.toArray()); Dog[] d = (Dog[]) dataMap.get(&amp;quot;x&amp;quot;); // 所以此时会抛出 ClassCastException }  所以在使用toArray方法的时候要确实理解。
+ArrayList.toArray() 理解 通过源码我们可以看到返回的是Object类型的数组，失去了原有的实际类型，虽然底层存储是具体类型的对象，这也正体现了文档中说的：该方法起到了bridge的作用（This method acts as bridge between array-based and collection-based APIs）。
+public Object[] toArray() { return Arrays.copyOf(elementData, size); }  但是如果我们使用 Arrays.asList 就不会出现上述的问题。
+public static void test1() { List&amp;lt;Dog&amp;gt; list = Arrays.</description>
+    </item>
+    
+    <item>
+      <title>StringBuffer 和 StringBuilder 的区别是什么？</title>
+      <link>http://vonzhou.com/2016/stringbuffer-vs-stringbuilder/</link>
+      <pubDate>Mon, 05 Sep 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2016/stringbuffer-vs-stringbuilder/</guid>
+      <description>String 的问题 因为String是immutable的，每次的操作都会创建一个新的String对象，当操作频繁的时候就会带来开销，而StringBuilder，StringBuffer内部维护的是字符数组，每次的操作都是改变字符数组的状态，避免创建大量的String对象。
+区别是什么？ StringBuffer是线程安全的（synchronized），而 StringBuilder不是，所以StringBuilder效率更高，锁的获取和释放会带来开销。
+看看代码 不论是创建StringBuffer 还是 StringBuilder对象，都是创建一个容量为16的字符数组。
+/** * The value is used for character storage. */ char[] value; /** * The count is the number of characters used. */ int count; AbstractStringBuilder(int capacity) { value = new char[capacity]; }  区别就是所有的方法中，比如append，前者有synchronized关键字修饰。
+StringBuffer的append方法：
+public synchronized StringBuffer append(String str) { toStringCache = null; super.append(str); return this; } StringBuilder的append方法： public StringBuilder append(String str) { super.append(str); return this; }  虽然实际的实现是一样的。</description>
+    </item>
+    
+    <item>
       <title>RocketMQ源码阅读 -  从消息发送到存储</title>
       <link>http://vonzhou.com/2016/rocketmq-from-msg-send-to-store/</link>
       <pubDate>Tue, 30 Aug 2016 00:00:00 +0000</pubDate>
