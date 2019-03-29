@@ -143,6 +143,148 @@ expr match {
     </item>
     
     <item>
+      <title>我的读书历程</title>
+      <link>http://vonzhou.com/readings/</link>
+      <pubDate>Mon, 18 Mar 2019 10:23:42 +0800</pubDate>
+      
+      <guid>http://vonzhou.com/readings/</guid>
+      <description>
+
+&lt;h2 id=&#34;computer-science-计算机科学&#34;&gt;Computer Science 计算机科学&lt;/h2&gt;
+
+&lt;h3 id=&#34;basics-通识-基础-经典&#34;&gt;Basics 通识/基础/经典&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《A Philosophy of Software Design》 &lt;a href=&#34;https://www.youtube.com/watch?v=bmSAYlu0NcY&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;视频&lt;/a&gt;&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《程序员修炼之道 从小工到专家》  2017.11.14    👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《代码大全》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《深入理解计算机系统 第2版》| &lt;a href=&#34;https://github.com/vonzhou/CSAPP&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;代码&lt;/a&gt; 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《TCP/IP详解卷1：协议》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《重构 改善既有代码的设计》&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;linux-unix&#34;&gt;Linux/Unix&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《性能之巅:洞悉系统、企业与云计算》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Unix环境高级编程》APUE 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Unix网络编程卷1：套接字联网API》 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Unix网络编程卷2：进程间通信》 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《深入理解Linux内核》 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Linux内核设计与实现 第3版》&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;java&#34;&gt;Java&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《RocketMQ实战与原理解析》2019.1.27&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《分布式Java应用 : 基础与实践》2019.1.25&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《实战Java高并发程序设计》| &lt;a href=&#34;https://github.com/vonzhou/learning-java/tree/master/src/PracticeJavaHighConcurrency&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;代码&lt;/a&gt;   2018.11.6 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《深入剖析Tomcat》 2018.10.28 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《MyBatis技术内幕》 2018.10.20 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《HotSpot实战》 2018.3.14 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Java并发编程实战》| &lt;a href=&#34;https://github.com/vonzhou/JavaConcurrencyInPractice&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;代码&lt;/a&gt;  2018.2.25  👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《深入理解Java虚拟机（第2版）》| &lt;a href=&#34;https://github.com/vonzhou/learning-java/tree/master/src/jvm&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;代码&lt;/a&gt;  👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《大型网站系统与Java中间件实践》  2018.5.22&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Java 8实战》| &lt;a href=&#34;https://github.com/vonzhou/Java8InAction&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;代码&lt;/a&gt; 2017.11.7&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;scala&#34;&gt;Scala&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《Scala编程（第3版）》     👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《快学Scala》&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;golang&#34;&gt;Golang&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Go语言实战》 2018.7.5&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;bigdata-大数据&#34;&gt;BigData 大数据&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Spark快速大数据分析》 2019.3.13&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《HBase权威指南》 2018.12.20&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《HBase不睡觉书》2018.11.3&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Storm分布式实时计算模式》 2018.10.13&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Hadoop: The Definitive Guide : 4th Edition》 2018.10.7  👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Kafka权威指南》 2018.6.15 👍&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;database-数据库&#34;&gt;Database 数据库&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《高性能MySQL》 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《MySQL技术内幕 InnoDB存储引擎》 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Redis设计与实现》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Redis开发与运维》  2017.11.12&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;architecture-架构&#34;&gt;Architecture 架构&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《系统架构:复杂系统的产品设计与开发》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《大型网站技术架构：核心原理与案例分析》&lt;br /&gt;&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Clean Architecture》 2019.1.8 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《Designing Data-Intensive Applications》 2018.1.30 👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《大型网站技术架构演进与性能优化》 2018.10.10&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《大型分布式网站架构设计与实践》 2017.2.21&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;entrepreneurship-创业-管理&#34;&gt;Entrepreneurship 创业/管理&lt;/h2&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《重来 Rework》&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;history-历史&#34;&gt;History 历史&lt;/h2&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《中国历代政治得失》 2019.2.23  👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《巨流河 台版》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《紫禁城的黄昏》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《万历十五年》   2017.11.12  👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《明朝那些事儿》&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;literature-文学&#34;&gt;Literature 文学&lt;/h2&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 王小波《沉默的大多数》    2019.3.11   👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《活着为了讲述》  2017.4.10   👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《百年孤独》   2018.2.18  👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《相约星期二》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《解忧杂货店》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《活着》   👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《围城》  👍&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《巨人的陨落》  2017.3.10&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;biography-传记&#34;&gt;Biography 传记&lt;/h2&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《DOOM启世录》 2017.12.4&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;thinking-思维&#34;&gt;Thinking 思维&lt;/h2&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《如何阅读一本书》 👍&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;finance-金融&#34;&gt;Finance 金融&lt;/h2&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《世界上最简单的会计书》  2019.3.20&lt;br /&gt;&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 周夏飞《公司理财》&lt;/label&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 唐朝《手把手教你读财报2》&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>波兰来客</title>
       <link>http://vonzhou.com/2019/bo-lan-lai-ke/</link>
       <pubDate>Fri, 15 Mar 2019 11:03:31 +0800</pubDate>
@@ -1437,768 +1579,347 @@ org.apache.kafka.clients.consumer.CommitFailedException: Commit cannot be comple
     </item>
     
     <item>
-      <title>IntegerCache源码阅读</title>
-      <link>http://vonzhou.com/2018/integercache/</link>
-      <pubDate>Wed, 19 Dec 2018 00:00:00 +0000</pubDate>
+      <title>《快学Scala》读书笔记</title>
+      <link>http://vonzhou.com/2018/scala-impatient/</link>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
       
-      <guid>http://vonzhou.com/2018/integercache/</guid>
-      <description>&lt;p&gt;先从一个思考题开始，考虑下面的代码输出是什么？&lt;/p&gt;
-
-&lt;p&gt;*例1*：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void test1() {
-    Integer a = 1; // 等价于 Integer a = valueOf(1)
-    Integer b = 1;
-    System.out.println(a == b); 
-
-    Integer c = 128;
-    Integer d = 128;
-    System.out.println(c == d); 
-
-    System.out.println(c.equals(d)); 
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;输出：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;true
-false
-true
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;把整数常量赋值给整数包装类型，实际上调用了Integer.valueOf方法，通过指令可以看到：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/integercache-1.jpg&#34; alt=&#34;integercache-1&#34; /&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static Integer valueOf(int i) {
-    if (i &amp;gt;= IntegerCache.low &amp;amp;&amp;amp; i &amp;lt;= IntegerCache.high)
-        return IntegerCache.cache[i + (-IntegerCache.low)];
-    return new Integer(i);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;初次访问IntegerCache类，会触发其初始化。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private static class IntegerCache {
-    static final int low = -128;
-    static final int high;
-    static final Integer cache[];
-
-    static {
-        // high value may be configured by property
-        int h = 127;
-        String integerCacheHighPropValue =
-            sun.misc.VM.getSavedProperty(&amp;quot;java.lang.Integer.IntegerCache.high&amp;quot;);
-        if (integerCacheHighPropValue != null) {
-            try {
-                int i = parseInt(integerCacheHighPropValue);
-                i = Math.max(i, 127);
-                // Maximum array size is Integer.MAX_VALUE
-                h = Math.min(i, Integer.MAX_VALUE - (-low) -1);
-            } catch( NumberFormatException nfe) {
-                // If the property cannot be parsed into an int, ignore it.
-            }
-        }
-        high = h;
-
-        cache = new Integer[(high - low) + 1];
-        int j = low;
-        for(int k = 0; k &amp;lt; cache.length; k++)
-            cache[k] = new Integer(j++);
-
-        // range [-128, 127] must be interned (JLS7 5.1.7)
-        assert IntegerCache.high &amp;gt;= 127;
-    }
-
-    private IntegerCache() {}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可以看到在[low, high]范围内的数值会使用Integer缓存对象，否则新生成一个Integer对象，其中low=-128,high默认是127，但是可以通过JVM选项来配置。比如我们设置&lt;code&gt;-XX:AutoBoxCacheMax=256&lt;/code&gt;后运行例1，输出：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;true
-true
-true
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;所以在进行Integer对象相等性比较的时候，不能直接使用 == (比较的是对象的hashcode，只有[low,high]之间的Integer是相同的), 而应该使用equals方法。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public boolean equals(Object obj) {
-    if (obj instanceof Integer) {
-        return value == ((Integer)obj).intValue();
-    }
-    return false;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;在进行普通对象和包装类对象的相等性判断时都应注意这一点。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>2018阅读书单</title>
-      <link>http://vonzhou.com/2018/2018-read-book/</link>
-      <pubDate>Sun, 16 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>http://vonzhou.com/2018/2018-read-book/</guid>
-      <description>&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;书名&lt;/th&gt;
-&lt;th&gt;评分&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;《七周七数据库》&lt;/td&gt;
-&lt;td&gt;☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《给投资新手的极简股票课》&lt;/td&gt;
-&lt;td&gt;☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《实战Java高并发程序设计》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《HBase不睡觉书》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《深入剖析Tomcat》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《MyBatis技术内幕》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《大数据技术丛书 : Storm分布式实时计算模式》&lt;/td&gt;
-&lt;td&gt;☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《大型网站技术架构演进与性能优化》&lt;/td&gt;
-&lt;td&gt;☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《Hadoop: The Definitive Guide 4th》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《人工智能》李开复&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《Go语言实战》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《Go语言圣经》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《Kafka权威指南》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《腾讯传 : 中国互联网公司进化论》&lt;/td&gt;
-&lt;td&gt;☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《大型网站系统与Java中间件开发实践》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《Spring Cloud微服务实战》&lt;/td&gt;
-&lt;td&gt;☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《第一本Docker书》&lt;/td&gt;
-&lt;td&gt;☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《HotSpot实战》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《刷新 : 重新发现商业与未来》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《百年孤独》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td&gt;《Designing Data-Intensive Applications》&lt;/td&gt;
-&lt;td&gt;☆☆☆☆☆&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>从连接池(JedisPool)获取Redis连接源码分析</title>
-      <link>http://vonzhou.com/2018/jedis-pool-get/</link>
-      <pubDate>Fri, 14 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>http://vonzhou.com/2018/jedis-pool-get/</guid>
-      <description>&lt;p&gt;本文追踪下SpringBoot中使用StringRedisTemplate，从JedisPool中获取连接的过程，了解了该过程可以更好的进行连接池的参数调优。&lt;/p&gt;
-
-&lt;p&gt;一图胜千言，从JedisPool获取一个连接的过程：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/jedis-pool-get.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;接下来走进代码。&lt;/p&gt;
-
-&lt;p&gt;在使用StringRedisTemplate或者RedisTemplate操作Redis的时候，其实都最终调用RedisTemplate.execute方法，以最简单的get开始。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.core.DefaultValueOperations
-public V get(final Object key) {
-
-    return execute(new ValueDeserializingRedisCallback(key) {
-
-        protected byte[] inRedis(byte[] rawKey, RedisConnection connection) {
-            return connection.get(rawKey);
-        }
-    }, true);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;执行之时，先根据我们提供的RedisConnectionFactory（实际的实现是JedisConnectionFactory，要么使用SpringBoot帮我们自动配置的实例，要么自己配置）来获取一个连接，然后就在这个RedisConnection上请求Redis Server。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.core.RedisTemplate
-public &amp;lt;T&amp;gt; T execute(RedisCallback&amp;lt;T&amp;gt; action, boolean exposeConnection, boolean pipeline) {
-    RedisConnectionFactory factory = getConnectionFactory();
-    RedisConnection conn = null;
-    try {
-
-        if (enableTransactionSupport) {
-            // only bind resources in case of potential transaction synchronization
-            conn = RedisConnectionUtils.bindConnection(factory, enableTransactionSupport);
-        } else {
-            // 1. 获取连接
-            conn = RedisConnectionUtils.getConnection(factory);
-        }
-
-        boolean existingConnection = TransactionSynchronizationManager.hasResource(factory);
-
-        RedisConnection connToUse = preProcessConnection(conn, existingConnection);
-
-        boolean pipelineStatus = connToUse.isPipelined();
-        if (pipeline &amp;amp;&amp;amp; !pipelineStatus) {
-            connToUse.openPipeline();
-        }
-
-        RedisConnection connToExpose = (exposeConnection ? connToUse : createRedisConnectionProxy(connToUse));
-        // 2. 执行实际的操作
-        T result = action.doInRedis(connToExpose);
-
-        // close pipeline
-        if (pipeline &amp;amp;&amp;amp; !pipelineStatus) {
-            connToUse.closePipeline();
-        }
-
-        // TODO: any other connection processing?
-        return postProcessResult(result, connToUse, existingConnection);
-    } finally {
-        RedisConnectionUtils.releaseConnection(conn, factory);
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;重点看连接获取的过程。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.core.RedisConnectionUtils
-public static RedisConnection doGetConnection(RedisConnectionFactory factory, boolean allowCreate, boolean bind,
-        boolean enableTransactionSupport) {
-    // 交给我们的工厂
-    RedisConnection conn = factory.getConnection();
-
-    if (bind) {
-        RedisConnection connectionToBind = conn;
-        if (enableTransactionSupport &amp;amp;&amp;amp; isActualNonReadonlyTransactionActive()) {
-            connectionToBind = createConnectionProxy(conn, factory);
-        }
-
-        connHolder = new RedisConnectionHolder(connectionToBind);
-
-        TransactionSynchronizationManager.bindResource(factory, connHolder);
-        if (enableTransactionSupport) {
-            potentiallyRegisterTransactionSynchronisation(connHolder, factory);
-        }
-
-        return connHolder.getConnection();
-    }
-
-    return conn;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Jedis连接工厂负责创建jedis实例，如果使用连接池，则从池中获取，否则直接创建新的。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.springframework.data.redis.connection.jedis.JedisConnectionFactory
-public RedisConnection getConnection() {
-
-    if (cluster != null) {
-        return getClusterConnection();
-    }
-
-    Jedis jedis = fetchJedisConnector();
-    JedisConnection connection = (usePool ? new JedisConnection(jedis, pool, dbIndex, clientName)
-            : new JedisConnection(jedis, null, dbIndex, clientName));
-    connection.setConvertPipelineAndTxResults(convertPipelineAndTxResults);
-    return postProcessConnection(connection);
-}
-
-protected Jedis fetchJedisConnector() {
-    try {
-        // 使用连接池的情形
-        if (usePool &amp;amp;&amp;amp; pool != null) {
-            return pool.getResource();
-        }
-
-        Jedis jedis = new Jedis(getShardInfo());
-        // force initialization (see Jedis issue #82)
-        jedis.connect();
-
-        potentiallySetClientName(jedis);
-        return jedis;
-    } catch (Exception ex) {
-        throw new RedisConnectionFailureException(&amp;quot;Cannot get Jedis connection&amp;quot;, ex);
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;接下来是Commons Pool里面的通用逻辑，先看池中的空闲对象（idle object）能否利用，不能的话就只能创建新的对象。此过程中，如果设置了等待超时时间，则超时资源得不到满足就抛出异常“Timeout waiting for idle object”，如果没有设置最大等待时间（maxWaitMillis），就会无限等待，这样如果获取连接的请求很多时就会耗尽系统的线程，要特别注意，实际生产中踩过。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// org.apache.commons.pool2.impl.GenericObjectPool
-public T borrowObject(long borrowMaxWaitMillis) throws Exception {
-    assertOpen();
-
-    AbandonedConfig ac = this.abandonedConfig;
-    if (ac != null &amp;amp;&amp;amp; ac.getRemoveAbandonedOnBorrow() &amp;amp;&amp;amp;
-            (getNumIdle() &amp;lt; 2) &amp;amp;&amp;amp;
-            (getNumActive() &amp;gt; getMaxTotal() - 3) ) {
-        removeAbandoned(ac);
-    }
-
-    PooledObject&amp;lt;T&amp;gt; p = null;
-
-    // Get local copy of current config so it is consistent for entire
-    // method execution
-    boolean blockWhenExhausted = getBlockWhenExhausted();
-
-    boolean create;
-    long waitTime = System.currentTimeMillis();
-
-    while (p == null) {
-        create = false;
-        if (blockWhenExhausted) {
-            // 1. 复用
-            p = idleObjects.pollFirst();
-            if (p == null) {
-                // 2. 创建新资源对象
-                p = create();
-                if (p != null) {
-                    create = true;
-                }
-            }
-            if (p == null) {
-                if (borrowMaxWaitMillis &amp;lt; 0) {
-                    // 默认的borrowMaxWaitMillis是-1，会一直阻塞直到满足
-                    p = idleObjects.takeFirst();
-                } else {
-                    p = idleObjects.pollFirst(borrowMaxWaitMillis,
-                            TimeUnit.MILLISECONDS);
-                }
-            }
-            if (p == null) {
-                throw new NoSuchElementException(
-                        &amp;quot;Timeout waiting for idle object&amp;quot;);
-            }
-            if (!p.allocate()) {
-                p = null;
-            }
-        } else {
-            p = idleObjects.pollFirst();
-            if (p == null) {
-                p = create();
-                if (p != null) {
-                    create = true;
-                }
-            }
-            if (p == null) {
-                throw new NoSuchElementException(&amp;quot;Pool exhausted&amp;quot;);
-            }
-            if (!p.allocate()) {
-                p = null;
-            }
-        }
-
-        if (p != null) {
-            try {
-                factory.activateObject(p);
-            } catch (Exception e) {
-                try {
-                    destroy(p);
-                } catch (Exception e1) {
-                    // Ignore - activation failure is more important
-                }
-                p = null;
-                if (create) {
-                    NoSuchElementException nsee = new NoSuchElementException(
-                            &amp;quot;Unable to activate object&amp;quot;);
-                    nsee.initCause(e);
-                    throw nsee;
-                }
-            }
-            if (p != null &amp;amp;&amp;amp; (getTestOnBorrow() || create &amp;amp;&amp;amp; getTestOnCreate())) {
-                boolean validate = false;
-                Throwable validationThrowable = null;
-                try {
-                    validate = factory.validateObject(p);
-                } catch (Throwable t) {
-                    PoolUtils.checkRethrow(t);
-                    validationThrowable = t;
-                }
-                if (!validate) {
-                    try {
-                        destroy(p);
-                        destroyedByBorrowValidationCount.incrementAndGet();
-                    } catch (Exception e) {
-                        // Ignore - validation failure is more important
-                    }
-                    p = null;
-                    if (create) {
-                        NoSuchElementException nsee = new NoSuchElementException(
-                                &amp;quot;Unable to validate object&amp;quot;);
-                        nsee.initCause(validationThrowable);
-                        throw nsee;
-                    }
-                }
-            }
-        }
-    }
-
-    updateStatsBorrow(p, System.currentTimeMillis() - waitTime);
-
-    return p.getObject();
-}
-
-
-private PooledObject&amp;lt;T&amp;gt; create() throws Exception {
-    int localMaxTotal = getMaxTotal();
-    long newCreateCount = createCount.incrementAndGet();
-    if (localMaxTotal &amp;gt; -1 &amp;amp;&amp;amp; newCreateCount &amp;gt; localMaxTotal ||
-            newCreateCount &amp;gt; Integer.MAX_VALUE) {
-        createCount.decrementAndGet();
-        return null;
-    }
-
-    final PooledObject&amp;lt;T&amp;gt; p;
-    try {
-        // 交由工厂
-        p = factory.makeObject();
-    } catch (Exception e) {
-        createCount.decrementAndGet();
-        throw e;
-    }
-
-    AbandonedConfig ac = this.abandonedConfig;
-    if (ac != null &amp;amp;&amp;amp; ac.getLogAbandoned()) {
-        p.setLogAbandoned(true);
-    }
-
-    createdCount.incrementAndGet();
-    allObjects.put(new IdentityWrapper&amp;lt;T&amp;gt;(p.getObject()), p);
-    return p;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;最终实际的jedis实例由JedisFactory创建。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// redis.clients.jedis.JedisFactory
-public PooledObject&amp;lt;Jedis&amp;gt; makeObject() throws Exception {
-final HostAndPort hostAndPort = this.hostAndPort.get();
-final Jedis jedis = new Jedis(hostAndPort.getHost(), hostAndPort.getPort(), connectionTimeout,
-    soTimeout, ssl, sslSocketFactory, sslParameters, hostnameVerifier);
-
-try {
-    jedis.connect();
-    if (null != this.password) {
-    jedis.auth(this.password);
-    }
-    if (database != 0) {
-    jedis.select(database);
-    }
-    if (clientName != null) {
-    jedis.clientSetname(clientName);
-    }
-} catch (JedisException je) {
-    jedis.close();
-    throw je;
-}
-
-return new DefaultPooledObject&amp;lt;Jedis&amp;gt;(jedis);
-
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>ArrayBlockingQueue与Disruptor的性能对比</title>
-      <link>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</link>
-      <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
-      
-      <guid>http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/</guid>
+      <guid>http://vonzhou.com/2018/scala-impatient/</guid>
       <description>
 
-&lt;p&gt;虽然Disruptor采用了lock-free的算法，但并非银弹，本文以最常用的场景来测试ArrayBlockingQueue和Disruptor的作为缓存队列的性能优劣。&lt;/p&gt;
+&lt;p&gt;这本书我是2013年买的，当时看了一部分，然后又忘了，现在重新阅读。&lt;/p&gt;
 
-&lt;h2 id=&#34;测试环境&#34;&gt;测试环境&lt;/h2&gt;
+&lt;p&gt;Scala将OOP和函数式编程有机结合，动静兼备。前面的基本招式通读后，基本上可以理解。但是后面的类型系统，协变型变，定界延续目前还搞不懂，暂时略过。&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;消息大小 20B&lt;/li&gt;
-&lt;li&gt;Windows 10, 4内核，8逻辑CPU&lt;/li&gt;
-&lt;li&gt;JDK 8&lt;/li&gt;
-&lt;/ul&gt;
+&lt;h2 id=&#34;1-基础&#34;&gt;1.基础&lt;/h2&gt;
 
-&lt;h2 id=&#34;测试用例&#34;&gt;测试用例&lt;/h2&gt;
+&lt;p&gt;Scala解释器的使用。&lt;/p&gt;
 
-&lt;p&gt;本文采用一个生产者来生产特定数量的消息，然后使用缓冲队列，由特定数量的消费者来共同消费处理这批消息。&lt;/p&gt;
+&lt;p&gt;val,var声明值和变量。&lt;/p&gt;
 
-&lt;p&gt;每条消息处理耗时20ms的情况 ， 4消费线程：&lt;/p&gt;
+&lt;p&gt;有7中数值类型：Byte,Char,Short,Int,Long,Float,Double,Boolean，和Java不同的是这些都是类。&lt;/p&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;方式&lt;/th&gt;
-&lt;th&gt;1K&lt;/th&gt;
-&lt;th&gt;1W&lt;/th&gt;
-&lt;th&gt;10W&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;p&gt;Scala中使用方法进行数值类型的转换，而不是强制类型转换。&lt;/p&gt;
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;ABQ&lt;/td&gt;
-&lt;td&gt;5s&lt;/td&gt;
-&lt;td&gt;52s&lt;/td&gt;
-&lt;td&gt;525s&lt;/td&gt;
-&lt;/tr&gt;
+&lt;p&gt;和&lt;code&gt;Java，C++&lt;/code&gt;不同的是，Scala中没有++,&amp;ndash;操作符，要使用+=1。&lt;/p&gt;
 
-&lt;tr&gt;
-&lt;td&gt;Disruptor&lt;/td&gt;
-&lt;td&gt;5s&lt;/td&gt;
-&lt;td&gt;52s&lt;/td&gt;
-&lt;td&gt;529s&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;&lt;code&gt;()&lt;/code&gt;操作符背后的实现原理是&lt;code&gt;apply&lt;/code&gt;方法。&lt;/p&gt;
 
-&lt;p&gt;每条消息处理耗时20ms的情况 ， 8消费线程：&lt;/p&gt;
+&lt;h2 id=&#34;2-控制结构和函数&#34;&gt;2.控制结构和函数&lt;/h2&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;方式&lt;/th&gt;
-&lt;th&gt;1K&lt;/th&gt;
-&lt;th&gt;1W&lt;/th&gt;
-&lt;th&gt;10W&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;p&gt;if表达式有值。&lt;/p&gt;
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;ABQ&lt;/td&gt;
-&lt;td&gt;2s&lt;/td&gt;
-&lt;td&gt;26s&lt;/td&gt;
-&lt;td&gt;263s&lt;/td&gt;
-&lt;/tr&gt;
+&lt;p&gt;{}块也有值，值是最后一个表达式的值。这个特性对于要分多步来初始化val的情况很有用。&lt;/p&gt;
 
-&lt;tr&gt;
-&lt;td&gt;Disruptor&lt;/td&gt;
-&lt;td&gt;2s&lt;/td&gt;
-&lt;td&gt;26s&lt;/td&gt;
-&lt;td&gt;263s&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;Unit等同于Java，C++中的void。&lt;/p&gt;
 
-&lt;p&gt;从中可以看到，平均下来5ms一条消息（每条消息耗时20ms，4个线程）。如果一条消息处理的时间比较长，则使用普通ABQ，Disruptor开销差别不大，因为大头时间在消息的处理上，锁争用的开销不明显。&lt;/p&gt;
+&lt;p&gt;赋值语句本身没有值，是Unit。&lt;/p&gt;
 
-&lt;p&gt;每条消息处理耗时20ms的情况 ， 4消费线程：&lt;/p&gt;
+&lt;p&gt;定义函数的时候，最好不使用return。&lt;/p&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;方式&lt;/th&gt;
-&lt;th&gt;1K&lt;/th&gt;
-&lt;th&gt;1W&lt;/th&gt;
-&lt;th&gt;10W&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;p&gt;Scala中没有Checked Exception。&lt;/p&gt;
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;ABQ&lt;/td&gt;
-&lt;td&gt;756ms&lt;/td&gt;
-&lt;td&gt;7.332s&lt;/td&gt;
-&lt;td&gt;72.73s&lt;/td&gt;
-&lt;/tr&gt;
+&lt;h2 id=&#34;3-数组相关操作&#34;&gt;3.数组相关操作&lt;/h2&gt;
 
-&lt;tr&gt;
-&lt;td&gt;Disruptor&lt;/td&gt;
-&lt;td&gt;826ms&lt;/td&gt;
-&lt;td&gt;7.279s&lt;/td&gt;
-&lt;td&gt;71.047s&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;定长数组是Array, 变长数组是ArrayBuffer。&lt;/p&gt;
 
-&lt;p&gt;每条消息处理耗时2ms的情况 ， 1消费线程：&lt;/p&gt;
+&lt;p&gt;用 &lt;code&gt;for(e &amp;lt;- arr)&lt;/code&gt; 遍历元素。&lt;/p&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;方式&lt;/th&gt;
-&lt;th&gt;1K&lt;/th&gt;
-&lt;th&gt;1W&lt;/th&gt;
-&lt;th&gt;10W&lt;/th&gt;
-&lt;th&gt;100W&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;p&gt;用 &lt;code&gt;for(e &amp;lt;- arr if ...) yield ...&lt;/code&gt; 转换数组。&lt;/p&gt;
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;ABQ&lt;/td&gt;
-&lt;td&gt;3.156s&lt;/td&gt;
-&lt;td&gt;28.803s&lt;/td&gt;
-&lt;td&gt;284.221s&lt;/td&gt;
-&lt;td&gt;2846 s&lt;/td&gt;
-&lt;/tr&gt;
+&lt;p&gt;Scala数组和Java数组互操作。&lt;/p&gt;
 
-&lt;tr&gt;
-&lt;td&gt;Disruptor&lt;/td&gt;
-&lt;td&gt;3.063s&lt;/td&gt;
-&lt;td&gt;28.436s&lt;/td&gt;
-&lt;td&gt;284.158s&lt;/td&gt;
-&lt;td&gt;2812 s&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;h2 id=&#34;4-映射和元组&#34;&gt;4.映射和元组&lt;/h2&gt;
 
-&lt;p&gt;当消息处理很快时（&amp;lt; 1ms）。&lt;/p&gt;
+&lt;p&gt;Scala中没有可变的树形映射，可以选择Java的TreeMap。&lt;/p&gt;
 
-&lt;p&gt;1消费线程：&lt;/p&gt;
+&lt;p&gt;元组可以用于函数需要返回不止一个值的情况。&lt;/p&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;方式&lt;/th&gt;
-&lt;th&gt;1K&lt;/th&gt;
-&lt;th&gt;1W&lt;/th&gt;
-&lt;th&gt;10W&lt;/th&gt;
-&lt;th&gt;100W&lt;/th&gt;
-&lt;th&gt;1000W&lt;/th&gt;
-&lt;th&gt;1W * 1W&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;h2 id=&#34;5-类&#34;&gt;5.类&lt;/h2&gt;
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;ABQ&lt;/td&gt;
-&lt;td&gt;37ms&lt;/td&gt;
-&lt;td&gt;151ms&lt;/td&gt;
-&lt;td&gt;1059ms&lt;/td&gt;
-&lt;td&gt;8.59s&lt;/td&gt;
-&lt;td&gt;87 s&lt;/td&gt;
-&lt;td&gt;813 s&lt;/td&gt;
-&lt;/tr&gt;
+&lt;p&gt;Scala为每个字段生成&lt;code&gt;getter，setter&lt;/code&gt;方法，不过可以通过&lt;code&gt;private,val,var,private[this]&lt;/code&gt;控制这个过程。&lt;/p&gt;
 
-&lt;tr&gt;
-&lt;td&gt;Disruptor&lt;/td&gt;
-&lt;td&gt;94ms&lt;/td&gt;
-&lt;td&gt;215ms&lt;/td&gt;
-&lt;td&gt;7.6s&lt;/td&gt;
-&lt;td&gt;7.6s&lt;/td&gt;
-&lt;td&gt;69.87 s&lt;/td&gt;
-&lt;td&gt;684 s&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;如果需要JavaBeans版的&lt;code&gt;getter，setter&lt;/code&gt;方法，可以使用BeanProperty注解。&lt;/p&gt;
 
-&lt;p&gt;4消费线程：&lt;/p&gt;
+&lt;p&gt;Scala中类有一个主构造器（primary constructor），任意多个辅助构造器（auxiliary constructor），名称是this。每个辅助构造器都必须开始于调用其他辅助构造器或者主构造器。&lt;/p&gt;
 
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;方式&lt;/th&gt;
-&lt;th&gt;1K&lt;/th&gt;
-&lt;th&gt;1W&lt;/th&gt;
-&lt;th&gt;10W&lt;/th&gt;
-&lt;th&gt;100W&lt;/th&gt;
-&lt;th&gt;1000W&lt;/th&gt;
-&lt;th&gt;1W * 1W&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;p&gt;练习5.注意BeanProperty包路径变了，&lt;code&gt;scala.beans.BeanProperty&lt;/code&gt;。&lt;/p&gt;
 
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;ABQ&lt;/td&gt;
-&lt;td&gt;38ms&lt;/td&gt;
-&lt;td&gt;181ms&lt;/td&gt;
-&lt;td&gt;1243ms&lt;/td&gt;
-&lt;td&gt;9.74s&lt;/td&gt;
-&lt;td&gt;100s&lt;/td&gt;
-&lt;td&gt;1024 s&lt;/td&gt;
-&lt;/tr&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;➜  ch05 git:(master) scalac Student.scala  
+➜  ch05 git:(master) javap -private Student
+Compiled from &amp;quot;Student.scala&amp;quot;
+public class Student {
+  private java.lang.String name;
+  private long id;
+  public java.lang.String name();
+  public void name_$eq(java.lang.String);
+  public void setName(java.lang.String);
+  public long id();
+  public void id_$eq(long);
+  public void setId(long);
+  public java.lang.String getName();
+  public long getId();
+  public Student(java.lang.String, long);
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;tr&gt;
-&lt;td&gt;Disruptor&lt;/td&gt;
-&lt;td&gt;63ms&lt;/td&gt;
-&lt;td&gt;162ms&lt;/td&gt;
-&lt;td&gt;1167ms&lt;/td&gt;
-&lt;td&gt;9.88s&lt;/td&gt;
-&lt;td&gt;97.8s&lt;/td&gt;
-&lt;td&gt;1002 s&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;h2 id=&#34;6-对象&#34;&gt;6.对象&lt;/h2&gt;
 
-&lt;h2 id=&#34;总结&#34;&gt;总结&lt;/h2&gt;
+&lt;p&gt;在Java中会使用单例对象的地方，Scala中用对象，单例模式。&lt;/p&gt;
 
-&lt;p&gt;从上面的测试情况下，处理在消息处理很快，且使用单消费者的时候Disruptor表现较好，其他情况并没有任何优势。&lt;/p&gt;
+&lt;p&gt;搞清类和伴生对象（companion object）的关系。&lt;/p&gt;
 
-&lt;p&gt;在Disruptor官方文档中给出的性能测试结果并没有涵盖本文中的场景，官方文档中的1P-3C多播方式要用多个ArrayBlockingQueue来实现Disruptor中的Multicast方式（内部是一个RingBuffer，但是多个Sequnce）。&lt;/p&gt;
+&lt;p&gt;定义枚举的方法。&lt;/p&gt;
 
-&lt;p&gt;所以在选用Disruptor的时候一定要具体的测试，搞清自己的场景，像本文中的一个生产者，多个消费者共同处理消息的场景使用普通的线程池+ABQ就足够了，并不比Disruptor表现差。&lt;/p&gt;
+&lt;h2 id=&#34;7-包和引入&#34;&gt;7.包和引入&lt;/h2&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://github.com/vonzhou/learning-java/tree/master/src/framework/disruptor/threadpoolvsdisruptor&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;本文代码&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;包对象（package object）。&lt;/p&gt;
+
+&lt;p&gt;可以在任何地方声明包引入。&lt;/p&gt;
+
+&lt;h2 id=&#34;8-继承&#34;&gt;8.继承&lt;/h2&gt;
+
+&lt;p&gt;要知道Scala的继承层级。&lt;/p&gt;
+
+&lt;p&gt;能看懂，但是自己怕是写不出来，需要练习。&lt;/p&gt;
+
+&lt;h2 id=&#34;9-文件和正则表达式&#34;&gt;9.文件和正则表达式&lt;/h2&gt;
+
+&lt;p&gt;用完Source对象，要记得close。&lt;/p&gt;
+
+&lt;p&gt;如果要查看某个字符，但是不处理掉它，使用source.buffered方法（类似C++中的&lt;code&gt;istream::peek&lt;/code&gt;，或java中的&lt;code&gt;PushbackInputStream&lt;/code&gt;）。&lt;/p&gt;
+
+&lt;p&gt;Scala没有提供读取二进制文件的方法，要使用java类库。写文件也要使用java库&lt;code&gt;java.io.PrintWriter&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;可以编写shell脚本。&lt;/p&gt;
+
+&lt;h2 id=&#34;10-特质&#34;&gt;10.特质&lt;/h2&gt;
+
+&lt;p&gt;Scala和Java不能多重继承（菱形继承问题）。&lt;/p&gt;
+
+&lt;p&gt;特质可以同时拥有抽象方法和具体方法，类可以实现多个特质。&lt;/p&gt;
+
+&lt;p&gt;实现特质用的extends，而不是implements，实现多个特质用with（奇怪么? &lt;code&gt;extends A with B&lt;/code&gt;，&lt;code&gt;A with B&lt;/code&gt;先是一个整体，然后由类扩展）。所有Java接口都可作为Scala的trait使用。&lt;/p&gt;
+
+&lt;p&gt;注意引入特质后，类的构造器执行顺序。&lt;/p&gt;
+
+&lt;p&gt;特质不能有构造器参数。&lt;/p&gt;
+
+&lt;p&gt;自身类型（self type）可以解决特质间的循环依赖。&lt;/p&gt;
+
+&lt;h2 id=&#34;11-操作符&#34;&gt;11.操作符&lt;/h2&gt;
+
+&lt;p&gt;操作符的优先级。&lt;/p&gt;
+
+&lt;p&gt;apply, update可以简化方法的调用。&lt;/p&gt;
+
+&lt;p&gt;unapply，unapplySeq和模式匹配的关系。&lt;/p&gt;
+
+&lt;h2 id=&#34;12-高阶函数&#34;&gt;12.高阶函数&lt;/h2&gt;
+
+&lt;p&gt;函数是一等公民。&lt;/p&gt;
+
+&lt;h2 id=&#34;13-集合&#34;&gt;13.集合&lt;/h2&gt;
+
+&lt;p&gt;所有集合都扩展自Iterable trait。&lt;/p&gt;
+
+&lt;p&gt;Java中ArrayList和LinkedList实现了共同的List接口，使得编写要考虑随机访问效率的代码比较困难，后来加入的RandomAccess（1.4）就是应对这个的。&lt;/p&gt;
+
+&lt;p&gt;Scala优先采用不可变集合。&lt;/p&gt;
+
+&lt;h2 id=&#34;14-模式匹配和样例类&#34;&gt;14.模式匹配和样例类&lt;/h2&gt;
+
+&lt;p&gt;Scala中模式匹配match无需在每个分支后面break。&lt;/p&gt;
+
+&lt;p&gt;支持守卫，而无需把每种情况的case都列出来。&lt;/p&gt;
+
+&lt;p&gt;倾向于使用类型模式匹配，而不是isInstanceOf操作符。匹配发生在运行时，所以泛型会擦除。&lt;/p&gt;
+
+&lt;p&gt;模式匹配用于数组，列表，元组背后是提取器机制，对应的伴生对象实现unapply，unapplySeq方法。比如Array的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;/** Called in a pattern match like `{ case Array(x,y,z) =&amp;gt; println(&#39;3 elements&#39;)}`.
+   *
+   *  @param x the selector value
+   *  @return  sequence wrapped in a [[scala.Some]], if `x` is a Seq, otherwise `None`
+   */
+  def unapplySeq[T](x: Array[T]): Option[IndexedSeq[T]] =
+    if (x == null) None else Some(x.toIndexedSeq)
+    // !!! the null check should to be necessary, but without it 2241 fails. Seems to be a bug
+    // in pattern matcher.  @PP: I noted in #4364 I think the behavior is correct.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;样例类（&lt;code&gt;Case Class&lt;/code&gt;）的使用场景和作用。List就是用样例类实现的。&lt;/p&gt;
+
+&lt;p&gt;推荐使用Option表示可有可无的东西。&lt;/p&gt;
+
+&lt;h2 id=&#34;15-注解&#34;&gt;15.注解&lt;/h2&gt;
+
+&lt;p&gt;Annotation，StaticAnnotation, ClassfileAnnotation。&lt;/p&gt;
+
+&lt;h2 id=&#34;17-类型参数&#34;&gt;17.类型参数&lt;/h2&gt;
+
+&lt;p&gt;类型变量界定，上界&lt;code&gt;&amp;lt;:&lt;/code&gt;，下界&lt;code&gt;&amp;gt;:&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;视图界定&lt;code&gt;&amp;lt;%&lt;/code&gt;，表示可以隐式转换的情况。&lt;/p&gt;
+
+&lt;p&gt;要实例化一个&lt;code&gt;Array[T]&lt;/code&gt;,需要一个&lt;code&gt;Manifest[T]&lt;/code&gt;对象，这么复杂？因为JVM中泛型擦除。&lt;/p&gt;
+
+&lt;h2 id=&#34;课后习题编程&#34;&gt;课后习题编程&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/vonzhou/ScalaImpatient&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;github&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;读于 2018.12.29 杭州&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>《非暴力沟通》读书笔记</title>
+      <link>http://vonzhou.com/2018/nonviolent-communication/</link>
+      <pubDate>Fri, 21 Dec 2018 12:55:16 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/nonviolent-communication/</guid>
+      <description>&lt;p&gt;关于《非暴力沟通》的读书笔记。&lt;/p&gt;
+
+&lt;p&gt;读完这本书，我对非暴力沟通的理解是：&lt;strong&gt;不论是工作，生活，家庭的沟通中，平心静气，不要冲动。不论表达自己，还是倾听别人，都把重点放在彼此的需求上。表达时可以和对方确认有没有明白自己的需求，倾听别人时可以确认自己有没有把握对方的需求。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;书中讲的道理很简单，列举了很多实例。下面是从书中摘的干句。&lt;/p&gt;
+
+&lt;p&gt;第一章 让爱融入生活&lt;/p&gt;
+
+&lt;p&gt;非暴力沟通提醒我们专注于彼此的观察、感受、需要和请求。它鼓励倾听，培育尊重与爱，使我们情意相通，乐于互助。&lt;/p&gt;
+
+&lt;p&gt;第二章 是什么蒙蔽了爱？&lt;/p&gt;
+
+&lt;p&gt;暴力的根源在于人们忽视彼此的感受与需要，而将冲突归咎于对方——至少大部分暴力的根源都是如此，不论是语言、精神或身体的暴力，还是家庭、部落以及国家的暴力。冷战期间，我们看到了这种思维的危险性。美国领导人把前苏联看作是致力于摧毁美国生活方式的“邪恶帝国”；前苏联领导人将美国人看作是试图征服他们的“帝国主义压迫者”。双方都没有承认内心的恐惧。&lt;/p&gt;
+
+&lt;p&gt;我们所看到的悲剧和马上就要看到的更大悲剧，并非是世界上反抗的人、不服从的人增多了，而是唯命是从的人、听话的人越来越多。&lt;/p&gt;
+
+&lt;p&gt;一旦意识不到我们是自己的主人，我们就成了危险人物。&lt;/p&gt;
+
+&lt;p&gt;“不应该”、“应该”和“不得不”这些表达方式特别适合这个目的：人们越是习惯于评定是非，他们也就越倾向于追随权威，来获得正确和错误的标准。一旦专注于自身的感受和需要，我们就不再是好奴隶和好属下。&lt;/p&gt;
+
+&lt;p&gt;第三章 区分观察和评论&lt;/p&gt;
+
+&lt;p&gt;静态的语言与动态的世界并不匹配，这是我们面临的挑战之一。&lt;/p&gt;
+
+&lt;p&gt;印度哲学家克里希那穆提（ J. Krishnamurti）曾经说，“不带评论的观察是人类智力的最高形式。”&lt;/p&gt;
+
+&lt;p&gt;非暴力沟通的第一个要素是观察。将观察和评论混为一谈，别人就会倾向于听到批评，并反驳我们。非暴力沟通是动态的语言，不主张绝对化的结论。它提倡在特定的时间和情境中进行观察，并清楚地描述观察结果。&lt;/p&gt;
+
+&lt;p&gt;第四章 体会和表达感受&lt;/p&gt;
+
+&lt;p&gt;非暴力沟通的第二个要素是感受。通过建立表达感受的词汇表，我们可以更清楚地表达感受，从而使沟通更为顺畅。在表达感受时，示弱有助于解决冲突。此外，非暴力沟通还对表达具体感受的词语与陈述想法、评论以及观点的词语作了区分。&lt;/p&gt;
+
+&lt;p&gt;第五章 感受的根源&lt;/p&gt;
+
+&lt;p&gt;如果我们通过批评来提出主张，人们的反应常常是申辩或反击。反之，如果我们直接说出需要，其他人就较有可能作出积极的回应。&lt;/p&gt;
+
+&lt;p&gt;“36年来，我一直在生你父亲的气，我认为他不在乎我的感受。我终于意识到，我从没有和他说我想要什么。”&lt;/p&gt;
+
+&lt;p&gt;真诚待人比委曲求全更为可贵。如果别人感到不安，我们可以认真地倾听，但无须责备自己。&lt;/p&gt;
+
+&lt;p&gt;第六章 请求帮助&lt;/p&gt;
+
+&lt;p&gt;我们感到沮丧是因为我们未能实现自己的愿望。可是，我们努力去实现梦想了吗？社会总是期待我们成为好男孩或好女孩、好父亲或好母亲。如果我们依照社会的期待去做，我们感到沮丧也就不是什么令人吃惊的事情了。沮丧是我们为了迎合社会而付出的代价。如果你要过得快乐些，我想请你想想，为了改善你的生活，你希望他人做些什么？”&lt;/p&gt;
+
+&lt;p&gt;非暴力沟通的第四个要素是请求。我们告诉人们，为了改善生活，我们希望他们做什么。我们避免使用抽象的语言，而借助具体的描述，来提出请求。在发言时，我们将自己想要的回应讲得越清楚，就越有可能得到理想的回应。由于我们所要表达的意思与别人的理解有可能不一致，有时，我们需要请求他人的反馈。特别是在集体讨论中发言时，我们需要清楚地表明自己的期待。否则，讨论可能只是在浪费大家的时间。&lt;/p&gt;
+
+&lt;p&gt;非暴力沟通的目的不是为了改变他人来迎合我们。相反，非暴力沟通重视每个人的需要，它的目的是帮助我们在诚实和倾听的基础上与人联系。&lt;/p&gt;
+
+&lt;p&gt;第七章 用全身心倾听&lt;/p&gt;
+
+&lt;p&gt;以色列哲学家马丁·布伯（ Martin Buber）对此作出了描述：“尽管有种种相似之处，生活的每时每刻就像一个刚出生的婴儿，一张新的面孔，我们从未见过，也不可能再次见到。我们无法停留在过去，也无法预见我们的反应。我们需要不带成见地感受变化。我们需要用全身心去倾听。”&lt;/p&gt;
+
+&lt;p&gt;不论别人说什么，我们只听到他们此时此刻的（ a）观察，（ b）感受，（ c）需要，和（ d）请求。&lt;/p&gt;
+
+&lt;p&gt;有时，我们认为自己受到了指责，实际上，那些话是他人表达需要和请求的方式。&lt;/p&gt;
+
+&lt;p&gt;关于劳资谈判的研究显示，如果双方同意在作出答复前先准确地重述对方的观点，那么，达成协议的时间将可以比平时缩短一半。&lt;/p&gt;
+
+&lt;p&gt;第八章 倾听的力量&lt;/p&gt;
+
+&lt;p&gt;我们越是倾听他人语言背后的感受和需要，就越不怕与他们坦诚地沟通。我们最不愿意示弱的时候往往是因为担心失去控制想显得强硬的时候。&lt;/p&gt;
+
+&lt;p&gt;第九章 爱自己&lt;/p&gt;
+
+&lt;p&gt;在日常生活中，我们主动根据需要和价值观来选择生活。我们的行为不再是为了履行职责、获得回报、逃避惩罚或避免感到内疚和羞愧。通过深入理解我们行为的动机，并用“选择做”来取代“不得不”，我们的生活将变得和谐并充满欢乐。&lt;/p&gt;
+
+&lt;p&gt;第十章 充分表达愤怒&lt;/p&gt;
+
+&lt;p&gt;问自己：“我不喜欢他们……，是因为我什么样的需要没有得到满足？”通过这样的方式，我们就把注意力放在了尚未得到满足的需要，而不是考虑他人有什么过错。&lt;/p&gt;
+
+&lt;p&gt;在生气时，批评和指责他人都无法真正传达我们的心声。如果想充分表达愤怒，我们就不能归咎于他人，而把注意力放在自己的感受和需要上。与批评和指责他人相比，直接说出我们的需要更有可能使我们的愿望得到满足。&lt;/p&gt;
+
+&lt;p&gt;表达愤怒的四个步骤是：（ 1）停下来，除了呼吸，什么都别做；（ 2）想一想是什么想法使我们生气了；（ 3）体会自己的需要；（ 4）表达感受和尚未满足的需要。&lt;/p&gt;
+
+&lt;p&gt;第十二章 重获生活的热情&lt;/p&gt;
+
+&lt;p&gt;一旦我不把人当作诊断的对象，而专注于彼此作为人的感受和需要，人们通常都会有积极的反应。&lt;/p&gt;
+
+&lt;p&gt;在情绪低落的时候，我们也许会怨天尤人。然而，如果我们以苛刻的态度对人对己，我们的心情也好不到哪里去。通过运用非暴力沟通，我们不再试图分析自己或他人有什么毛病，而是用心去了解我们的需要，这样，我们的内心将逐渐变得平和。一旦我们发现自己心底深处的愿望，并采取积极的行动，我们将会重获生活的热情。&lt;/p&gt;
+
+&lt;p&gt;第十三章 表达感激&lt;/p&gt;
+
+&lt;p&gt;非暴力沟通表达感激的方式包含三个部分： 1.对方做了什么事情使我们的生活得到了改善； 2.我们有哪些需要得到了满足； 3.我们的心情怎么样？&lt;/p&gt;
+
+&lt;p&gt;约翰·鲍威尔（ John Powell）在他的《爱的秘密》一书中讲到，对于没有在父亲活着的时候表达自己的感激，他十分伤心。这激起了我的强烈共鸣。如果无法向那些对我们的一生有极为重要影响的人表达感激，我们会感到多么悲哀啊！&lt;/p&gt;
+
+&lt;p&gt;相信：“一件值得做的事情即使做得不怎么样也是值得的！”&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;读于 2018.12.21 杭州&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>《HBase权威指南》读书笔记</title>
+      <link>http://vonzhou.com/2018/hbase-definitive/</link>
+      <pubDate>Thu, 20 Dec 2018 13:54:14 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/hbase-definitive/</guid>
+      <description>
+
+&lt;p&gt;我是在阅读《HBase不睡觉书》之后阅读的该书，所以没有通读。&lt;/p&gt;
+
+&lt;h2 id=&#34;思维导图&#34;&gt;思维导图&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/hbase-definitive-xmind.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;笔记&#34;&gt;笔记&lt;/h2&gt;
+
+&lt;p&gt;在一个上规模的系统中，单一的DB已经无法满足需求，一般会引入多种数据系统，应对不同的场景。&lt;/p&gt;
+
+&lt;p&gt;阅读时可以先通过简介，架构章节认识HBase，理解了其底层原理才能更好的使用，遇到问题不会盲目。接下来需要自己把HBase平台搭建起来，也需要一番折腾，也能体会各种组件的关系（HBase，ZK，Hadoop），最后就可以使用hbase shell或者Java API使用HBase。&lt;/p&gt;
+
+&lt;h3 id=&#34;架构&#34;&gt;架构&lt;/h3&gt;
+
+&lt;p&gt;BigTable底层的存储架构是 LSM， 和B+ tree对比， 区别是如何利用磁盘。&lt;/p&gt;
+
+&lt;p&gt;读写流程：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/hbase-read-write-flow.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;合并：在Region server中随着数据的写入，Memstore会刷到磁盘上，生成很多文件，如果这些文件的数目达到阈值，就会执行minor合并，生成更大的文件。还有一种执行不会那么频繁的major合并，会把所有文件合并成一个大文件，当然如果这个大文件超过阈值则会触发一次Region split。&lt;/p&gt;
+
+&lt;p&gt;Region拆分：当一个Region里的存储文件达到配置的阈值（&lt;code&gt;hbase.hregion.max.filesize&lt;/code&gt;）时会一分为二，在父region的&lt;code&gt;splits&lt;/code&gt;目录下进行，然后会更新&lt;code&gt;.META.&lt;/code&gt;表的状态和索引信息。&lt;/p&gt;
+
+&lt;p&gt;WAL：预写日志，类似于MySQL中的binlog，是为了保障RegionServer crash后数据不丢失的（前提是Hadoop是可靠的）。&lt;/p&gt;
+
+&lt;h3 id=&#34;使用&#34;&gt;使用&lt;/h3&gt;
+
+&lt;p&gt;基本的API使用起来。&lt;/p&gt;
+
+&lt;p&gt;根据业务场景设计rowkey，长度不要太长，尽量分散。&lt;/p&gt;
+
+&lt;h2 id=&#34;相关阅读&#34;&gt;相关阅读&lt;/h2&gt;
+
+&lt;p&gt;《Design Data-Intensive Applications》关于LSM，列式存储的章节。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;读于2018.12.20 杭州&lt;/p&gt;
+&lt;/blockquote&gt;
 </description>
     </item>
     

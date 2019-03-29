@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/nonviolent-communication/" />
+  <link rel="next" href="http://vonzhou.com/2019/nginx-temp-file/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/scala-impatient/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           《快学Scala》读书笔记 | 编程之路
+       
+  </title>
+  <meta name="title" content="《快学Scala》读书笔记 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "《快学Scala》读书笔记",
+    "headline" : "《快学Scala》读书笔记",
+    "description" : "这本书我是2013年买的，当时看了一部分，然后又忘了，现在重新阅读。
+Scala将OOP和函数式编程有机结合，动静兼备。前面的基本招式通读后，基本上可以理解。但是后面的类型系统，协变型变，定界延续目前还搞不懂，暂时略过。
+1.基础 Scala解释器的使用。
+val,var声明值和变量。
+有7中数值类型：Byte,Char,Short,Int,Long,Float,Double,Boolean，和Java不同的是这些都是类。
+Scala中使用方法进行数值类型的转换，而不是强制类型转换。
+和Java，C++不同的是，Scala中没有++,&ndash;操作符，要使用+=1。
+()操作符背后的实现原理是apply方法。
+2.控制结构和函数 if表达式有值。
+{}块也有值，值是最后一个表达式的值。这个特性对于要分多步来初始化val的情况很有用。
+Unit等同于Java，C++中的void。
+赋值语句本身没有值，是Unit。
+定义函数的时候，最好不使用return。
+Scala中没有Checked Exception。
+3.数组相关操作 定长数组是Array, 变长数组是ArrayBuffer。
+用 for(e &lt;- arr) 遍历元素。
+用 for(e &lt;- arr if ...) yield ... 转换数组。
+Scala数组和Java数组互操作。
+4.映射和元组 Scala中没有可变的树形映射，可以选择Java的TreeMap。
+元组可以用于函数需要返回不止一个值的情况。
+5.类 Scala为每个字段生成getter，setter方法，不过可以通过private,val,var,private[this]控制这个过程。
+如果需要JavaBeans版的getter，setter方法，可以使用BeanProperty注解。
+Scala中类有一个主构造器（primary constructor），任意多个辅助构造器（auxiliary constructor），名称是this。每个辅助构造器都必须开始于调用其他辅助构造器或者主构造器。
+练习5.注意BeanProperty包路径变了，scala.beans.BeanProperty。
+➜ ch05 git:(master) scalac Student.scala ➜ ch05 git:(master) javap -private Student Compiled from &quot;Student.scala&quot; public class Student { private java.lang.String name; private long id; public java.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-12-31 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2018-12-31 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/scala-impatient/",
+    "wordCount" : "241",
+    "keywords" : [ "Scala","读书", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">《快学Scala》读书笔记</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-12-31 itemprop="datePublished">December 31, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/scala/"> Scala </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>这本书我是2013年买的，当时看了一部分，然后又忘了，现在重新阅读。</p>
+
+<p>Scala将OOP和函数式编程有机结合，动静兼备。前面的基本招式通读后，基本上可以理解。但是后面的类型系统，协变型变，定界延续目前还搞不懂，暂时略过。</p>
+
+<h2 id="1-基础">1.基础</h2>
+
+<p>Scala解释器的使用。</p>
+
+<p>val,var声明值和变量。</p>
+
+<p>有7中数值类型：Byte,Char,Short,Int,Long,Float,Double,Boolean，和Java不同的是这些都是类。</p>
+
+<p>Scala中使用方法进行数值类型的转换，而不是强制类型转换。</p>
+
+<p>和<code>Java，C++</code>不同的是，Scala中没有++,&ndash;操作符，要使用+=1。</p>
+
+<p><code>()</code>操作符背后的实现原理是<code>apply</code>方法。</p>
+
+<h2 id="2-控制结构和函数">2.控制结构和函数</h2>
+
+<p>if表达式有值。</p>
+
+<p>{}块也有值，值是最后一个表达式的值。这个特性对于要分多步来初始化val的情况很有用。</p>
+
+<p>Unit等同于Java，C++中的void。</p>
+
+<p>赋值语句本身没有值，是Unit。</p>
+
+<p>定义函数的时候，最好不使用return。</p>
+
+<p>Scala中没有Checked Exception。</p>
+
+<h2 id="3-数组相关操作">3.数组相关操作</h2>
+
+<p>定长数组是Array, 变长数组是ArrayBuffer。</p>
+
+<p>用 <code>for(e &lt;- arr)</code> 遍历元素。</p>
+
+<p>用 <code>for(e &lt;- arr if ...) yield ...</code> 转换数组。</p>
+
+<p>Scala数组和Java数组互操作。</p>
+
+<h2 id="4-映射和元组">4.映射和元组</h2>
+
+<p>Scala中没有可变的树形映射，可以选择Java的TreeMap。</p>
+
+<p>元组可以用于函数需要返回不止一个值的情况。</p>
+
+<h2 id="5-类">5.类</h2>
+
+<p>Scala为每个字段生成<code>getter，setter</code>方法，不过可以通过<code>private,val,var,private[this]</code>控制这个过程。</p>
+
+<p>如果需要JavaBeans版的<code>getter，setter</code>方法，可以使用BeanProperty注解。</p>
+
+<p>Scala中类有一个主构造器（primary constructor），任意多个辅助构造器（auxiliary constructor），名称是this。每个辅助构造器都必须开始于调用其他辅助构造器或者主构造器。</p>
+
+<p>练习5.注意BeanProperty包路径变了，<code>scala.beans.BeanProperty</code>。</p>
+
+<pre><code class="language-java">➜  ch05 git:(master) scalac Student.scala  
+➜  ch05 git:(master) javap -private Student
+Compiled from &quot;Student.scala&quot;
+public class Student {
+  private java.lang.String name;
+  private long id;
+  public java.lang.String name();
+  public void name_$eq(java.lang.String);
+  public void setName(java.lang.String);
+  public long id();
+  public void id_$eq(long);
+  public void setId(long);
+  public java.lang.String getName();
+  public long getId();
+  public Student(java.lang.String, long);
+}
+</code></pre>
+
+<h2 id="6-对象">6.对象</h2>
+
+<p>在Java中会使用单例对象的地方，Scala中用对象，单例模式。</p>
+
+<p>搞清类和伴生对象（companion object）的关系。</p>
+
+<p>定义枚举的方法。</p>
+
+<h2 id="7-包和引入">7.包和引入</h2>
+
+<p>包对象（package object）。</p>
+
+<p>可以在任何地方声明包引入。</p>
+
+<h2 id="8-继承">8.继承</h2>
+
+<p>要知道Scala的继承层级。</p>
+
+<p>能看懂，但是自己怕是写不出来，需要练习。</p>
+
+<h2 id="9-文件和正则表达式">9.文件和正则表达式</h2>
+
+<p>用完Source对象，要记得close。</p>
+
+<p>如果要查看某个字符，但是不处理掉它，使用source.buffered方法（类似C++中的<code>istream::peek</code>，或java中的<code>PushbackInputStream</code>）。</p>
+
+<p>Scala没有提供读取二进制文件的方法，要使用java类库。写文件也要使用java库<code>java.io.PrintWriter</code>。</p>
+
+<p>可以编写shell脚本。</p>
+
+<h2 id="10-特质">10.特质</h2>
+
+<p>Scala和Java不能多重继承（菱形继承问题）。</p>
+
+<p>特质可以同时拥有抽象方法和具体方法，类可以实现多个特质。</p>
+
+<p>实现特质用的extends，而不是implements，实现多个特质用with（奇怪么? <code>extends A with B</code>，<code>A with B</code>先是一个整体，然后由类扩展）。所有Java接口都可作为Scala的trait使用。</p>
+
+<p>注意引入特质后，类的构造器执行顺序。</p>
+
+<p>特质不能有构造器参数。</p>
+
+<p>自身类型（self type）可以解决特质间的循环依赖。</p>
+
+<h2 id="11-操作符">11.操作符</h2>
+
+<p>操作符的优先级。</p>
+
+<p>apply, update可以简化方法的调用。</p>
+
+<p>unapply，unapplySeq和模式匹配的关系。</p>
+
+<h2 id="12-高阶函数">12.高阶函数</h2>
+
+<p>函数是一等公民。</p>
+
+<h2 id="13-集合">13.集合</h2>
+
+<p>所有集合都扩展自Iterable trait。</p>
+
+<p>Java中ArrayList和LinkedList实现了共同的List接口，使得编写要考虑随机访问效率的代码比较困难，后来加入的RandomAccess（1.4）就是应对这个的。</p>
+
+<p>Scala优先采用不可变集合。</p>
+
+<h2 id="14-模式匹配和样例类">14.模式匹配和样例类</h2>
+
+<p>Scala中模式匹配match无需在每个分支后面break。</p>
+
+<p>支持守卫，而无需把每种情况的case都列出来。</p>
+
+<p>倾向于使用类型模式匹配，而不是isInstanceOf操作符。匹配发生在运行时，所以泛型会擦除。</p>
+
+<p>模式匹配用于数组，列表，元组背后是提取器机制，对应的伴生对象实现unapply，unapplySeq方法。比如Array的：</p>
+
+<pre><code class="language-scala">/** Called in a pattern match like `{ case Array(x,y,z) =&gt; println('3 elements')}`.
+   *
+   *  @param x the selector value
+   *  @return  sequence wrapped in a [[scala.Some]], if `x` is a Seq, otherwise `None`
+   */
+  def unapplySeq[T](x: Array[T]): Option[IndexedSeq[T]] =
+    if (x == null) None else Some(x.toIndexedSeq)
+    // !!! the null check should to be necessary, but without it 2241 fails. Seems to be a bug
+    // in pattern matcher.  @PP: I noted in #4364 I think the behavior is correct.
+</code></pre>
+
+<p>样例类（<code>Case Class</code>）的使用场景和作用。List就是用样例类实现的。</p>
+
+<p>推荐使用Option表示可有可无的东西。</p>
+
+<h2 id="15-注解">15.注解</h2>
+
+<p>Annotation，StaticAnnotation, ClassfileAnnotation。</p>
+
+<h2 id="17-类型参数">17.类型参数</h2>
+
+<p>类型变量界定，上界<code>&lt;:</code>，下界<code>&gt;:</code>。</p>
+
+<p>视图界定<code>&lt;%</code>，表示可以隐式转换的情况。</p>
+
+<p>要实例化一个<code>Array[T]</code>,需要一个<code>Manifest[T]</code>对象，这么复杂？因为JVM中泛型擦除。</p>
+
+<h2 id="课后习题编程">课后习题编程</h2>
+
+<p><a href="https://github.com/vonzhou/ScalaImpatient" rel="nofollow noreferrer" target="_blank">github</a></p>
+
+<blockquote>
+<p>读于 2018.12.29 杭州</p>
+</blockquote>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/scala-impatient/>http://vonzhou.com/2018/scala-impatient/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/scala/">
+                    #Scala</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E8%AF%BB%E4%B9%A6/">
+                    #读书</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/nonviolent-communication/" class="prev" rel="prev" title="《非暴力沟通》读书笔记"><i class="iconfont icon-left"></i>&nbsp;《非暴力沟通》读书笔记</a>
+         
+        
+        <a href="http://vonzhou.com/2019/nginx-temp-file/" class="next" rel="next" title="Nginx后端响应不完整问题分析">Nginx后端响应不完整问题分析&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

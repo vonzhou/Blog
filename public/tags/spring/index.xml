@@ -76,6 +76,19 @@ protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod 
     </item>
     
     <item>
+      <title>jetty/tomcat容器在使用RequestParam注解处理PUT方法时的差异</title>
+      <link>http://vonzhou.com/2017/tomcat-vs-jetty-put/</link>
+      <pubDate>Thu, 06 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2017/tomcat-vs-jetty-put/</guid>
+      <description>场景 Spring boot项目使用内嵌的server，有如下的一个Controller方法。
+@RestController @RequestMapping(&amp;quot;/hello&amp;quot;) public class HelloController { @PutMapping(&amp;quot;/bind&amp;quot;) public String test(@RequestParam String param) { return param; } }  但是在使用jetty或tomcat时对于form-data，x-www-form-urlencoded格式的请求时表现的行为出现了差异：
+ 内嵌jetty表现出来的兼容性最好，不论PUT，POST方法，不论请求体的格式form-data，x-www-form-urlencoded，注解RequestParam都能成功解析到参数param的值 内嵌tomcat有点问题，POST方法对于两种格式都支持，PUT方法对于form-data会抛出&amp;rdquo;the request param xx is not present&amp;rdquo;，对于x-www-form-urlencoded是OK的  无意间遇到的一个问题，折腾了几个小时，通过debug源码可以了解到，在spring层面上逻辑是比较清晰的，Spring中Multipart只支持POST方法，通过下面的方法可以看出(org.springframework.web.multipart.support.StandardServletMultipartResolver#isMultipart) 。
+public boolean isMultipart(HttpServletRequest request) { // Same check as in Commons FileUpload... if (!&amp;quot;post&amp;quot;.equals(request.getMethod().toLowerCase())) { return false; } String contentType = request.getContentType(); return (contentType != null &amp;amp;&amp;amp; contentType.toLowerCase().startsWith(&amp;quot;multipart/&amp;quot;)); }  在调用我们的handler之前都会从具体request中解析参数（org.springframework.web.method.annotation.RequestParamMethodArgumentResolver#resolveName）。
+protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception { HttpServletRequest servletRequest = request.</description>
+    </item>
+    
+    <item>
       <title>Servlet Filter与HandlerInterceptor的对比</title>
       <link>http://vonzhou.com/2016/servlet-filter-vs-handler-interceptor/</link>
       <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>

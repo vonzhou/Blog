@@ -11,6 +11,15 @@
     
     
     <item>
+      <title>HBase</title>
+      <link>http://vonzhou.com/categories/hbase/</link>
+      <pubDate>Thu, 20 Dec 2018 13:54:14 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/categories/hbase/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Java</title>
       <link>http://vonzhou.com/categories/java/</link>
       <pubDate>Wed, 20 Mar 2019 00:00:00 +0000</pubDate>
@@ -31,7 +40,7 @@
     <item>
       <title>Linux</title>
       <link>http://vonzhou.com/categories/linux/</link>
-      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 07 Dec 2018 14:22:38 +0000</pubDate>
       
       <guid>http://vonzhou.com/categories/linux/</guid>
       <description></description>
@@ -61,6 +70,15 @@
       <pubDate>Sun, 09 Sep 2018 00:00:00 +0000</pubDate>
       
       <guid>http://vonzhou.com/categories/redis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Scala</title>
+      <link>http://vonzhou.com/categories/scala/</link>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/categories/scala/</guid>
       <description></description>
     </item>
     
@@ -121,7 +139,7 @@
     <item>
       <title>读书</title>
       <link>http://vonzhou.com/categories/%E8%AF%BB%E4%B9%A6/</link>
-      <pubDate>Sun, 16 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 21 Dec 2018 12:55:16 +0000</pubDate>
       
       <guid>http://vonzhou.com/categories/%E8%AF%BB%E4%B9%A6/</guid>
       <description></description>

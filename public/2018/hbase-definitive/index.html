@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/integercache/" />
+  <link rel="next" href="http://vonzhou.com/2018/nonviolent-communication/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/hbase-definitive/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           《HBase权威指南》读书笔记 | 编程之路
+       
+  </title>
+  <meta name="title" content="《HBase权威指南》读书笔记 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "《HBase权威指南》读书笔记",
+    "headline" : "《HBase权威指南》读书笔记",
+    "description" : " 我是在阅读《HBase不睡觉书》之后阅读的该书，所以没有通读。
+思维导图 笔记 在一个上规模的系统中，单一的DB已经无法满足需求，一般会引入多种数据系统，应对不同的场景。
+阅读时可以先通过简介，架构章节认识HBase，理解了其底层原理才能更好的使用，遇到问题不会盲目。接下来需要自己把HBase平台搭建起来，也需要一番折腾，也能体会各种组件的关系（HBase，ZK，Hadoop），最后就可以使用hbase shell或者Java API使用HBase。
+架构 BigTable底层的存储架构是 LSM， 和B+ tree对比， 区别是如何利用磁盘。
+读写流程：
+合并：在Region server中随着数据的写入，Memstore会刷到磁盘上，生成很多文件，如果这些文件的数目达到阈值，就会执行minor合并，生成更大的文件。还有一种执行不会那么频繁的major合并，会把所有文件合并成一个大文件，当然如果这个大文件超过阈值则会触发一次Region split。
+Region拆分：当一个Region里的存储文件达到配置的阈值（hbase.hregion.max.filesize）时会一分为二，在父region的splits目录下进行，然后会更新.META.表的状态和索引信息。
+WAL：预写日志，类似于MySQL中的binlog，是为了保障RegionServer crash后数据不丢失的（前提是Hadoop是可靠的）。
+使用 基本的API使用起来。
+根据业务场景设计rowkey，长度不要太长，尽量分散。
+相关阅读 《Design Data-Intensive Applications》关于LSM，列式存储的章节。
+ 读于2018.12.20 杭州
+ ",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-12-20 13:54:14 &#43;0000 UTC",
+    "dateModified" : "2018-12-20 13:54:14 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/hbase-definitive/",
+    "wordCount" : "29",
+    "keywords" : [ "Java","HBase","HDFS","读书", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">《HBase权威指南》读书笔记</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-12-20 itemprop="datePublished">December 20, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/hbase/"> HBase </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>我是在阅读《HBase不睡觉书》之后阅读的该书，所以没有通读。</p>
+
+<h2 id="思维导图">思维导图</h2>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/hbase-definitive-xmind.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<h2 id="笔记">笔记</h2>
+
+<p>在一个上规模的系统中，单一的DB已经无法满足需求，一般会引入多种数据系统，应对不同的场景。</p>
+
+<p>阅读时可以先通过简介，架构章节认识HBase，理解了其底层原理才能更好的使用，遇到问题不会盲目。接下来需要自己把HBase平台搭建起来，也需要一番折腾，也能体会各种组件的关系（HBase，ZK，Hadoop），最后就可以使用hbase shell或者Java API使用HBase。</p>
+
+<h3 id="架构">架构</h3>
+
+<p>BigTable底层的存储架构是 LSM， 和B+ tree对比， 区别是如何利用磁盘。</p>
+
+<p>读写流程：</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/hbase-read-write-flow.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>合并：在Region server中随着数据的写入，Memstore会刷到磁盘上，生成很多文件，如果这些文件的数目达到阈值，就会执行minor合并，生成更大的文件。还有一种执行不会那么频繁的major合并，会把所有文件合并成一个大文件，当然如果这个大文件超过阈值则会触发一次Region split。</p>
+
+<p>Region拆分：当一个Region里的存储文件达到配置的阈值（<code>hbase.hregion.max.filesize</code>）时会一分为二，在父region的<code>splits</code>目录下进行，然后会更新<code>.META.</code>表的状态和索引信息。</p>
+
+<p>WAL：预写日志，类似于MySQL中的binlog，是为了保障RegionServer crash后数据不丢失的（前提是Hadoop是可靠的）。</p>
+
+<h3 id="使用">使用</h3>
+
+<p>基本的API使用起来。</p>
+
+<p>根据业务场景设计rowkey，长度不要太长，尽量分散。</p>
+
+<h2 id="相关阅读">相关阅读</h2>
+
+<p>《Design Data-Intensive Applications》关于LSM，列式存储的章节。</p>
+
+<blockquote>
+<p>读于2018.12.20 杭州</p>
+</blockquote>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/hbase-definitive/>http://vonzhou.com/2018/hbase-definitive/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/java/">
+                    #Java</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/hbase/">
+                    #HBase</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/hdfs/">
+                    #HDFS</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/%E8%AF%BB%E4%B9%A6/">
+                    #读书</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/integercache/" class="prev" rel="prev" title="IntegerCache源码阅读"><i class="iconfont icon-left"></i>&nbsp;IntegerCache源码阅读</a>
+         
+        
+        <a href="http://vonzhou.com/2018/nonviolent-communication/" class="next" rel="next" title="《非暴力沟通》读书笔记">《非暴力沟通》读书笔记&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

@@ -6,10 +6,19 @@
     <description>Recent content in Tags on 编程之路</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 01 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 07 Dec 2018 14:22:38 +0000</lastBuildDate>
     
 	<atom:link href="http://vonzhou.com/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Bash</title>
+      <link>http://vonzhou.com/tags/bash/</link>
+      <pubDate>Fri, 07 Dec 2018 14:22:38 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/tags/bash/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>CAS</title>
@@ -53,6 +62,24 @@
       <pubDate>Thu, 14 Mar 2019 00:00:00 +0000</pubDate>
       
       <guid>http://vonzhou.com/tags/hbase/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>HDFS</title>
+      <link>http://vonzhou.com/tags/hdfs/</link>
+      <pubDate>Thu, 20 Dec 2018 13:54:14 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/tags/hdfs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>HTTP</title>
+      <link>http://vonzhou.com/tags/http/</link>
+      <pubDate>Thu, 06 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/tags/http/</guid>
       <description></description>
     </item>
     
@@ -102,6 +129,15 @@
     </item>
     
     <item>
+      <title>Jetty</title>
+      <link>http://vonzhou.com/tags/jetty/</link>
+      <pubDate>Thu, 06 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/tags/jetty/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Kafka</title>
       <link>http://vonzhou.com/tags/kafka/</link>
       <pubDate>Fri, 01 Mar 2019 00:00:00 +0000</pubDate>
@@ -113,7 +149,7 @@
     <item>
       <title>Linux</title>
       <link>http://vonzhou.com/tags/linux/</link>
-      <pubDate>Fri, 31 Aug 2018 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 18 Dec 2018 20:33:59 +0000</pubDate>
       
       <guid>http://vonzhou.com/tags/linux/</guid>
       <description></description>
@@ -147,6 +183,15 @@
     </item>
     
     <item>
+      <title>PUT</title>
+      <link>http://vonzhou.com/tags/put/</link>
+      <pubDate>Thu, 06 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/tags/put/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Redis</title>
       <link>http://vonzhou.com/tags/redis/</link>
       <pubDate>Fri, 14 Dec 2018 00:00:00 +0000</pubDate>
@@ -167,7 +212,7 @@
     <item>
       <title>Scala</title>
       <link>http://vonzhou.com/tags/scala/</link>
-      <pubDate>Wed, 07 Nov 2018 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>http://vonzhou.com/tags/scala/</guid>
       <description></description>
@@ -219,11 +264,29 @@
     </item>
     
     <item>
+      <title>Tomcat</title>
+      <link>http://vonzhou.com/tags/tomcat/</link>
+      <pubDate>Thu, 06 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/tags/tomcat/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Zuul</title>
       <link>http://vonzhou.com/tags/zuul/</link>
       <pubDate>Wed, 10 Oct 2018 00:00:00 +0000</pubDate>
       
       <guid>http://vonzhou.com/tags/zuul/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cURL</title>
+      <link>http://vonzhou.com/tags/curl/</link>
+      <pubDate>Fri, 07 Dec 2018 14:22:38 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/tags/curl/</guid>
       <description></description>
     </item>
     
@@ -329,7 +392,7 @@
     <item>
       <title>读书</title>
       <link>http://vonzhou.com/tags/%E8%AF%BB%E4%B9%A6/</link>
-      <pubDate>Sun, 16 Dec 2018 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>http://vonzhou.com/tags/%E8%AF%BB%E4%B9%A6/</guid>
       <description></description>

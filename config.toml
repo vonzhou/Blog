@@ -26,7 +26,7 @@ preserveTaxonomyNames = true
   
   [[menu.main]]
     name = "读书"
-    url = "https://github.com/vonzhou/readings"
+    url = "/readings/"
     weight = 2
 
   [[menu.main]]

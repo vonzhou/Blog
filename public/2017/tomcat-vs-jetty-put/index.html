@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2017/arraylist-toarray/" />
+  <link rel="next" href="http://vonzhou.com/2017/spring-exception-handler/" />
+  <link rel="canonical" href="http://vonzhou.com/2017/tomcat-vs-jetty-put/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           jetty/tomcat容器在使用RequestParam注解处理PUT方法时的差异 | 编程之路
+       
+  </title>
+  <meta name="title" content="jetty/tomcat容器在使用RequestParam注解处理PUT方法时的差异 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "jetty/tomcat容器在使用RequestParam注解处理PUT方法时的差异",
+    "headline" : "jetty/tomcat容器在使用RequestParam注解处理PUT方法时的差异",
+    "description" : "场景 Spring boot项目使用内嵌的server，有如下的一个Controller方法。
+@RestController @RequestMapping(&quot;/hello&quot;) public class HelloController { @PutMapping(&quot;/bind&quot;) public String test(@RequestParam String param) { return param; } }  但是在使用jetty或tomcat时对于form-data，x-www-form-urlencoded格式的请求时表现的行为出现了差异：
+ 内嵌jetty表现出来的兼容性最好，不论PUT，POST方法，不论请求体的格式form-data，x-www-form-urlencoded，注解RequestParam都能成功解析到参数param的值 内嵌tomcat有点问题，POST方法对于两种格式都支持，PUT方法对于form-data会抛出&rdquo;the request param xx is not present&rdquo;，对于x-www-form-urlencoded是OK的  无意间遇到的一个问题，折腾了几个小时，通过debug源码可以了解到，在spring层面上逻辑是比较清晰的，Spring中Multipart只支持POST方法，通过下面的方法可以看出(org.springframework.web.multipart.support.StandardServletMultipartResolver#isMultipart) 。
+public boolean isMultipart(HttpServletRequest request) { // Same check as in Commons FileUpload... if (!&quot;post&quot;.equals(request.getMethod().toLowerCase())) { return false; } String contentType = request.getContentType(); return (contentType != null &amp;&amp; contentType.toLowerCase().startsWith(&quot;multipart/&quot;)); }  在调用我们的handler之前都会从具体request中解析参数（org.springframework.web.method.annotation.RequestParamMethodArgumentResolver#resolveName）。
+protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception { HttpServletRequest servletRequest = request.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2017",
+    "datePublished": "2017-07-06 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2017-07-06 00:00:00 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2017/tomcat-vs-jetty-put/",
+    "wordCount" : "774",
+    "keywords" : [ "Spring","Spring MVC","Tomcat","Jetty","HTTP","PUT", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">jetty/tomcat容器在使用RequestParam注解处理PUT方法时的差异</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2017-07-06 itemprop="datePublished">July 6, 2017</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/spring/"> Spring </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/tomcat-vs-jetty-put.jpg" alt="执行流程" class="lazyload"><figcaption class="image-caption">执行流程</figcaption></figure></p>
+
+<h2 id="场景">场景</h2>
+
+<p>Spring boot项目使用内嵌的server，有如下的一个Controller方法。</p>
+
+<pre><code class="language-java">@RestController
+@RequestMapping(&quot;/hello&quot;)
+public class HelloController {
+
+    @PutMapping(&quot;/bind&quot;)
+    public String test(@RequestParam String param) {
+        return param;
+    }
+
+}
+</code></pre>
+
+<p>但是在使用jetty或tomcat时对于form-data，x-www-form-urlencoded格式的请求时表现的行为出现了差异：</p>
+
+<ul>
+<li>内嵌jetty表现出来的兼容性最好，不论PUT，POST方法，不论请求体的格式form-data，x-www-form-urlencoded，注解RequestParam都能成功解析到参数param的值</li>
+<li>内嵌tomcat有点问题，POST方法对于两种格式都支持，PUT方法对于form-data会抛出&rdquo;the request param xx is not present&rdquo;，对于x-www-form-urlencoded是OK的</li>
+</ul>
+
+<p>无意间遇到的一个问题，折腾了几个小时，通过debug源码可以了解到，在spring层面上逻辑是比较清晰的，Spring中Multipart只支持POST方法，通过下面的方法可以看出(org.springframework.web.multipart.support.StandardServletMultipartResolver#isMultipart)
+。</p>
+
+<pre><code class="language-java">public boolean isMultipart(HttpServletRequest request) {
+    // Same check as in Commons FileUpload...
+    if (!&quot;post&quot;.equals(request.getMethod().toLowerCase())) {
+        return false;
+    }
+    String contentType = request.getContentType();
+    return (contentType != null &amp;&amp; contentType.toLowerCase().startsWith(&quot;multipart/&quot;));
+}
+</code></pre>
+
+<p>在调用我们的handler之前都会从具体request中解析参数（org.springframework.web.method.annotation.RequestParamMethodArgumentResolver#resolveName）。</p>
+
+<pre><code class="language-java">protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
+    HttpServletRequest servletRequest = request.getNativeRequest(HttpServletRequest.class);
+    // PUT方法都无法解析为 MultipartRequest，这里为null
+    MultipartHttpServletRequest multipartRequest =
+            WebUtils.getNativeRequest(servletRequest, MultipartHttpServletRequest.class);
+
+    Object mpArg = MultipartResolutionDelegate.resolveMultipartArgument(name, parameter, servletRequest);
+    if (mpArg != MultipartResolutionDelegate.UNRESOLVABLE) {
+        return mpArg;
+    }
+
+    Object arg = null;
+    if (multipartRequest != null) {
+        List&lt;MultipartFile&gt; files = multipartRequest.getFiles(name);
+        if (!files.isEmpty()) {
+            arg = (files.size() == 1 ? files.get(0) : files);
+        }
+    }
+    // 所以参数从这里解析
+    if (arg == null) {
+        String[] paramValues = request.getParameterValues(name);
+        if (paramValues != null) {
+            arg = (paramValues.length == 1 ? paramValues[0] : paramValues);
+        }
+    }
+    return arg;
+}
+</code></pre>
+
+<p>至于具体的Request是什么，取决于server容器，虽然都实现了类似的规范。</p>
+
+<h2 id="tomcat请求参数解析过程">tomcat请求参数解析过程</h2>
+
+<p>解析参数过程：
+org.apache.catalina.connector.Request#parseParameters</p>
+
+<pre><code class="language-java">protected void parseParameters() {
+
+    parametersParsed = true;
+
+    // 这里得到的参数为空
+    Parameters parameters = coyoteRequest.getParameters();
+    boolean success = false;
+    try {
+        // Set this every time in case limit has been changed via JMX
+        parameters.setLimit(getConnector().getMaxParameterCount());
+
+        // getCharacterEncoding() may have been overridden to search for
+        // hidden form field containing request encoding
+        String enc = getCharacterEncoding();
+
+        boolean useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
+        if (enc != null) {
+            parameters.setEncoding(enc);
+            if (useBodyEncodingForURI) {
+                parameters.setQueryStringEncoding(enc);
+            }
+        } else {
+            parameters.setEncoding
+                (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+            if (useBodyEncodingForURI) {
+                parameters.setQueryStringEncoding
+                    (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+            }
+        }
+
+        parameters.handleQueryParameters();
+
+        if (usingInputStream || usingReader) {
+            success = true;
+            return;
+        }
+        
+        if( !getConnector().isParseBodyMethod(getMethod()) ) {
+            success = true;// PUT方法，不会解析body，直接返回
+            return;
+        }
+
+        // 如果是POST方法，会执行这里，获取contentType：multipart/form-data或者applicatoin/x-www-form-urlencoded
+        String contentType = getContentType();
+        if (contentType == null) {
+            contentType = &quot;&quot;;
+        }
+        int semicolon = contentType.indexOf(';');
+        if (semicolon &gt;= 0) {
+            contentType = contentType.substring(0, semicolon).trim();
+        } else {
+            contentType = contentType.trim();
+        }
+
+        if (&quot;multipart/form-data&quot;.equals(contentType)) {
+            parseParts(false); // 解析body part
+            success = true;
+            return;
+        }
+
+        if (!(&quot;application/x-www-form-urlencoded&quot;.equals(contentType))) {
+            success = true;
+            return;
+        }
+
+        // applicatoin/x-www-form-urlencoded格式会到这里
+        int len = getContentLength();
+
+        if (len &gt; 0) {
+            int maxPostSize = connector.getMaxPostSize();
+            if ((maxPostSize &gt;= 0) &amp;&amp; (len &gt; maxPostSize)) {
+                Context context = getContext();
+                if (context != null &amp;&amp; context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(
+                            sm.getString(&quot;coyoteRequest.postTooLarge&quot;));
+                }
+                checkSwallowInput();
+                parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
+                return;
+            }
+            byte[] formData = null;
+            if (len &lt; CACHED_POST_LEN) {
+                if (postData == null) {
+                    postData = new byte[CACHED_POST_LEN];
+                }
+                formData = postData;
+            } else {
+                formData = new byte[len];
+            }
+            try {
+                if (readPostBody(formData, len) != len) {
+                    parameters.setParseFailedReason(FailReason.REQUEST_BODY_INCOMPLETE);
+                    return;
+                }
+            } catch (IOException e) {
+                // Client disconnect
+                Context context = getContext();
+                if (context != null &amp;&amp; context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(
+                            sm.getString(&quot;coyoteRequest.parseParameters&quot;),
+                            e);
+                }
+                parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
+                return;
+            }
+            // 解析参数
+            parameters.processParameters(formData, 0, len);
+        } else if (&quot;chunked&quot;.equalsIgnoreCase(
+                coyoteRequest.getHeader(&quot;transfer-encoding&quot;))) {
+            byte[] formData = null;
+            try {
+                formData = readChunkedPostBody();
+            } catch (IllegalStateException ise) {
+                // chunkedPostTooLarge error
+                parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
+                Context context = getContext();
+                if (context != null &amp;&amp; context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(
+                            sm.getString(&quot;coyoteRequest.parseParameters&quot;),
+                            ise);
+                }
+                return;
+            } catch (IOException e) {
+                // Client disconnect
+                parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
+                Context context = getContext();
+                if (context != null &amp;&amp; context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(
+                            sm.getString(&quot;coyoteRequest.parseParameters&quot;),
+                            e);
+                }
+                return;
+            }
+            if (formData != null) {
+                parameters.processParameters(formData, 0, formData.length);
+            }
+        }
+        success = true;
+    } finally {
+        if (!success) {
+            parameters.setParseFailedReason(FailReason.UNKNOWN);
+        }
+    }
+
+}
+</code></pre>
+
+<h2 id="jetty请求参数解析过程">jetty请求参数解析过程</h2>
+
+<p>org.eclipse.jetty.server.Request#getParameterValues</p>
+
+<pre><code class="language-java">public String[] getParameterValues(String name)
+{
+    List&lt;String&gt; vals = getParameters().getValues(name);
+    if (vals == null)
+        return null;
+    return vals.toArray(new String[vals.size()]);
+}
+
+private MultiMap&lt;String&gt; getParameters()
+{
+    if (!_contentParamsExtracted) 
+    {
+        // content parameters need boolean protection as they can only be read
+        // once, but may be reset to null by a reset
+        _contentParamsExtracted = true;
+
+        // Extract content parameters; these cannot be replaced by a forward()
+        // once extracted and may have already been extracted by getParts() or
+        // by a processing happening after a form-based authentication.
+        if (_contentParameters == null)
+            extractContentParameters();
+    }
+    
+    // Extract query string parameters; these may be replaced by a forward()
+    // and may have already been extracted by mergeQueryParameters().
+    if (_queryParameters == null)
+        extractQueryParameters();
+
+    // Do parameters need to be combined?
+    if (_queryParameters==NO_PARAMS || _queryParameters.size()==0)
+        _parameters=_contentParameters; // 这里
+    else if (_contentParameters==NO_PARAMS || _contentParameters.size()==0)
+        _parameters=_queryParameters;
+    else
+    {
+        _parameters = new MultiMap&lt;&gt;();
+        _parameters.addAllValues(_queryParameters);
+        _parameters.addAllValues(_contentParameters);
+    }
+    
+    // protect against calls to recycled requests (which is illegal, but
+    // this gives better failures 
+    MultiMap&lt;String&gt; parameters=_parameters;
+    return parameters==null?NO_PARAMS:parameters;
+}
+
+
+private void extractContentParameters()
+{
+    String contentType = getContentType(); // 得到的ContentType是multipart/formdata
+    if (contentType == null || contentType.isEmpty())
+        _contentParameters=NO_PARAMS;
+    else
+    {
+        _contentParameters=new MultiMap&lt;&gt;();
+        contentType = HttpFields.valueParameters(contentType, null);
+        int contentLength = getContentLength();
+        if (contentLength != 0)
+        {
+            if (MimeTypes.Type.FORM_ENCODED.is(contentType) &amp;&amp; _inputState == __NONE &amp;&amp;
+                _channel.getHttpConfiguration().isFormEncodedMethod(getMethod()))
+            {
+                extractFormParameters(_contentParameters);
+            }
+            else if (contentType.startsWith(&quot;multipart/form-data&quot;) &amp;&amp;
+                    getAttribute(__MULTIPART_CONFIG_ELEMENT) != null &amp;&amp;
+                    _multiPartInputStream == null)
+            {
+                extractMultipartParameters(_contentParameters);  // 这里
+            }
+        }
+    }
+
+}
+
+ private void extractMultipartParameters(MultiMap&lt;String&gt; result)
+{
+    try
+    {
+        getParts(result);
+    }
+    catch (IOException | ServletException e)
+    {
+        LOG.warn(e);
+        throw new RuntimeException(e);
+    }
+}
+</code></pre>
+
+<h2 id="总结">总结</h2>
+
+<ul>
+<li>PUT用于Multipart是不规范的</li>
+<li>用起来简单，但是出问题能不能解决，是否知道原因才是最重要的</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2017/tomcat-vs-jetty-put/>http://vonzhou.com/2017/tomcat-vs-jetty-put/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring/">
+                    #Spring</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/spring-mvc/">
+                    #Spring MVC</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/tomcat/">
+                    #Tomcat</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/jetty/">
+                    #Jetty</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/http/">
+                    #HTTP</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/put/">
+                    #PUT</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2017/arraylist-toarray/" class="prev" rel="prev" title="关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法"><i class="iconfont icon-left"></i>&nbsp;关于 ArrayList.toArray() 和 Arrays.asList().toArray()方法</a>
+         
+        
+        <a href="http://vonzhou.com/2017/spring-exception-handler/" class="next" rel="next" title="ExceptionHandler 异常处理过程分析">ExceptionHandler 异常处理过程分析&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

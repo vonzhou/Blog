@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Scala on 编程之路</title>
+    <link>http://vonzhou.com/categories/scala/</link>
+    <description>Recent content in Scala on 编程之路</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 31 Dec 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://vonzhou.com/categories/scala/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>《快学Scala》读书笔记</title>
+      <link>http://vonzhou.com/2018/scala-impatient/</link>
+      <pubDate>Mon, 31 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/scala-impatient/</guid>
+      <description>这本书我是2013年买的，当时看了一部分，然后又忘了，现在重新阅读。
+Scala将OOP和函数式编程有机结合，动静兼备。前面的基本招式通读后，基本上可以理解。但是后面的类型系统，协变型变，定界延续目前还搞不懂，暂时略过。
+1.基础 Scala解释器的使用。
+val,var声明值和变量。
+有7中数值类型：Byte,Char,Short,Int,Long,Float,Double,Boolean，和Java不同的是这些都是类。
+Scala中使用方法进行数值类型的转换，而不是强制类型转换。
+和Java，C++不同的是，Scala中没有++,&amp;ndash;操作符，要使用+=1。
+()操作符背后的实现原理是apply方法。
+2.控制结构和函数 if表达式有值。
+{}块也有值，值是最后一个表达式的值。这个特性对于要分多步来初始化val的情况很有用。
+Unit等同于Java，C++中的void。
+赋值语句本身没有值，是Unit。
+定义函数的时候，最好不使用return。
+Scala中没有Checked Exception。
+3.数组相关操作 定长数组是Array, 变长数组是ArrayBuffer。
+用 for(e &amp;lt;- arr) 遍历元素。
+用 for(e &amp;lt;- arr if ...) yield ... 转换数组。
+Scala数组和Java数组互操作。
+4.映射和元组 Scala中没有可变的树形映射，可以选择Java的TreeMap。
+元组可以用于函数需要返回不止一个值的情况。
+5.类 Scala为每个字段生成getter，setter方法，不过可以通过private,val,var,private[this]控制这个过程。
+如果需要JavaBeans版的getter，setter方法，可以使用BeanProperty注解。
+Scala中类有一个主构造器（primary constructor），任意多个辅助构造器（auxiliary constructor），名称是this。每个辅助构造器都必须开始于调用其他辅助构造器或者主构造器。
+练习5.注意BeanProperty包路径变了，scala.beans.BeanProperty。
+➜ ch05 git:(master) scalac Student.scala ➜ ch05 git:(master) javap -private Student Compiled from &amp;quot;Student.scala&amp;quot; public class Student { private java.lang.String name; private long id; public java.</description>
+    </item>
+    
+  </channel>
+</rss>

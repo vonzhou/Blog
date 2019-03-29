@@ -6,10 +6,42 @@
     <description>Recent content in Linux on 编程之路</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 31 Aug 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 18 Dec 2018 20:33:59 +0000</lastBuildDate>
     
 	<atom:link href="http://vonzhou.com/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>运行《HBase权威指南》书中代码</title>
+      <link>http://vonzhou.com/2018/hbase-book-code/</link>
+      <pubDate>Tue, 18 Dec 2018 20:33:59 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/hbase-book-code/</guid>
+      <description>结合代码阅读《HBase权威指南》，没有实践就没有发言权。
+运行《HBase权威指南》书中代码
+前提 搭建好HBase运行环境。
+设置环境变量 设置MAVEN_HOME, HBASE_CONF_DIR环境变量：
+export MAVEN_HOME=/usr/share/maven export HBASE_CONF_DIR=$HBASE_HOME/conf  编译代码 编译安装父工程。
+在hbase-book下面运行：mvn clean compile install
+[INFO] HBase Book ......................................... SUCCESS [ 0.384 s] [INFO] HBase Book Common Code ............................. SUCCESS [ 16.906 s] [INFO] HBase Book Chapter 3 ............................... SUCCESS [ 0.994 s] [INFO] HBase Book Chapter 4 ............................... SUCCESS [ 1.469 s] [INFO] HBase Book Chapter 5 ............................... SUCCESS [ 0.628 s] [INFO] HBase Book Chapter 6 .</description>
+    </item>
+    
+    <item>
+      <title>curl URL是否加单引号引发的问题</title>
+      <link>http://vonzhou.com/2018/curl-single-quote/</link>
+      <pubDate>Fri, 07 Dec 2018 14:22:38 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/curl-single-quote/</guid>
+      <description>curl命令使用时，URL是否加单引号没想到搞出了问题。
+问题背景 后端实现了一个普通接口，浏览器中访问时OK的。
+但是bash中使用curl命令访问一直是400。
+$ curl -v http://localhost:8181/app/test.do?k=x&amp;amp;b=yyy  折腾了很久一直怀疑是自己服务的问题，殊不知是使用curl姿势的问题，URL中加上单引号就正常访问接口。
+$ curl -v &#39;http://localhost:8181/app/test.do?k=x&amp;amp;b=yyy&#39;  其实遇到问题应该早早的debug，而不是盲目的猜测原因，如果debug就会发现传到后端的参数其实是被截取了的，所以参数不完整，出现400。
+其实curl URL中加入的单引号并非是curl内部实现的问题，而是bash的实现决定的。
+➜ ~ echo k=x&amp;amp;b=yyy [1] 15207 k=x [1] + 15207 done echo k=x ➜ ~ echo &#39;k=x&amp;amp;b=yyy&#39; k=x&amp;amp;b=yyy  那么bash中的单引号到底有什么作用呢？
+Bash 单引号 引用bash文档
+ 3.1.2.2 Single Quotes Enclosing characters in single quotes (‘&amp;rsquo;’) preserves the literal value of each character within the quotes. A single quote may not occur between single quotes, even when preceded by a backslash.</description>
+    </item>
     
     <item>
       <title>Linux常用命令总结</title>

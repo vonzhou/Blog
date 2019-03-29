@@ -64,6 +64,42 @@ public class Singleton3 { private static Singleton3 INSTANCE = null; private Sin
     </item>
     
     <item>
+      <title>《HBase权威指南》读书笔记</title>
+      <link>http://vonzhou.com/2018/hbase-definitive/</link>
+      <pubDate>Thu, 20 Dec 2018 13:54:14 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/hbase-definitive/</guid>
+      <description> 我是在阅读《HBase不睡觉书》之后阅读的该书，所以没有通读。
+思维导图 笔记 在一个上规模的系统中，单一的DB已经无法满足需求，一般会引入多种数据系统，应对不同的场景。
+阅读时可以先通过简介，架构章节认识HBase，理解了其底层原理才能更好的使用，遇到问题不会盲目。接下来需要自己把HBase平台搭建起来，也需要一番折腾，也能体会各种组件的关系（HBase，ZK，Hadoop），最后就可以使用hbase shell或者Java API使用HBase。
+架构 BigTable底层的存储架构是 LSM， 和B+ tree对比， 区别是如何利用磁盘。
+读写流程：
+合并：在Region server中随着数据的写入，Memstore会刷到磁盘上，生成很多文件，如果这些文件的数目达到阈值，就会执行minor合并，生成更大的文件。还有一种执行不会那么频繁的major合并，会把所有文件合并成一个大文件，当然如果这个大文件超过阈值则会触发一次Region split。
+Region拆分：当一个Region里的存储文件达到配置的阈值（hbase.hregion.max.filesize）时会一分为二，在父region的splits目录下进行，然后会更新.META.表的状态和索引信息。
+WAL：预写日志，类似于MySQL中的binlog，是为了保障RegionServer crash后数据不丢失的（前提是Hadoop是可靠的）。
+使用 基本的API使用起来。
+根据业务场景设计rowkey，长度不要太长，尽量分散。
+相关阅读 《Design Data-Intensive Applications》关于LSM，列式存储的章节。
+ 读于2018.12.20 杭州
+ </description>
+    </item>
+    
+    <item>
+      <title>运行《HBase权威指南》书中代码</title>
+      <link>http://vonzhou.com/2018/hbase-book-code/</link>
+      <pubDate>Tue, 18 Dec 2018 20:33:59 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2018/hbase-book-code/</guid>
+      <description>结合代码阅读《HBase权威指南》，没有实践就没有发言权。
+运行《HBase权威指南》书中代码
+前提 搭建好HBase运行环境。
+设置环境变量 设置MAVEN_HOME, HBASE_CONF_DIR环境变量：
+export MAVEN_HOME=/usr/share/maven export HBASE_CONF_DIR=$HBASE_HOME/conf  编译代码 编译安装父工程。
+在hbase-book下面运行：mvn clean compile install
+[INFO] HBase Book ......................................... SUCCESS [ 0.384 s] [INFO] HBase Book Common Code ............................. SUCCESS [ 16.906 s] [INFO] HBase Book Chapter 3 ............................... SUCCESS [ 0.994 s] [INFO] HBase Book Chapter 4 ............................... SUCCESS [ 1.469 s] [INFO] HBase Book Chapter 5 ............................... SUCCESS [ 0.628 s] [INFO] HBase Book Chapter 6 .</description>
+    </item>
+    
+    <item>
       <title>从连接池(JedisPool)获取Redis连接源码分析</title>
       <link>http://vonzhou.com/2018/jedis-pool-get/</link>
       <pubDate>Fri, 14 Dec 2018 00:00:00 +0000</pubDate>

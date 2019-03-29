@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="vonzhou">
+  
+  
+  
+  <link rel="prev" href="http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/" />
+  <link rel="next" href="http://vonzhou.com/2018/jedis-pool-get/" />
+  <link rel="canonical" href="http://vonzhou.com/2018/curl-single-quote/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           curl URL是否加单引号引发的问题 | 编程之路
+       
+  </title>
+  <meta name="title" content="curl URL是否加单引号引发的问题 | 编程之路">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://vonzhou.com"
+    },
+    "articleSection" : "posts",
+    "name" : "curl URL是否加单引号引发的问题",
+    "headline" : "curl URL是否加单引号引发的问题",
+    "description" : "curl命令使用时，URL是否加单引号没想到搞出了问题。
+问题背景 后端实现了一个普通接口，浏览器中访问时OK的。
+但是bash中使用curl命令访问一直是400。
+$ curl -v http://localhost:8181/app/test.do?k=x&amp;b=yyy  折腾了很久一直怀疑是自己服务的问题，殊不知是使用curl姿势的问题，URL中加上单引号就正常访问接口。
+$ curl -v 'http://localhost:8181/app/test.do?k=x&amp;b=yyy'  其实遇到问题应该早早的debug，而不是盲目的猜测原因，如果debug就会发现传到后端的参数其实是被截取了的，所以参数不完整，出现400。
+其实curl URL中加入的单引号并非是curl内部实现的问题，而是bash的实现决定的。
+➜ ~ echo k=x&amp;b=yyy [1] 15207 k=x [1] + 15207 done echo k=x ➜ ~ echo 'k=x&amp;b=yyy' k=x&amp;b=yyy  那么bash中的单引号到底有什么作用呢？
+Bash 单引号 引用bash文档
+ 3.1.2.2 Single Quotes Enclosing characters in single quotes (‘&rsquo;’) preserves the literal value of each character within the quotes. A single quote may not occur between single quotes, even when preceded by a backslash.",
+    "inLanguage" : "en-us",
+    "author" : "vonzhou",
+    "creator" : "vonzhou",
+    "publisher": "vonzhou",
+    "accountablePerson" : "vonzhou",
+    "copyrightHolder" : "vonzhou",
+    "copyrightYear" : "2018",
+    "datePublished": "2018-12-07 14:22:38 &#43;0000 UTC",
+    "dateModified" : "2018-12-07 14:22:38 &#43;0000 UTC",
+    "url" : "http://vonzhou.com/2018/curl-single-quote/",
+    "wordCount" : "247",
+    "keywords" : [ "Linux","cURL","Bash", "编程之路"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://vonzhou.com">编程之路</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">博客</a>
+                
+                <a class="menu-item" href="/readings/" title="">读书</a>
+                
+                <a class="menu-item" href="/categories/" title="">分类</a>
+                
+                <a class="menu-item" href="/tags/" title="">标签</a>
+                
+                <a class="menu-item" href="/about/" title="">关于</a>
+                
+                <a class="menu-item" href="https://github.com/vonzhou/hugo-blog/issues" title="">留言</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">curl URL是否加单引号引发的问题</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://vonzhou.com" rel="author">vonzhou</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2018-12-07 itemprop="datePublished">December 7, 2018</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://vonzhou.com/categories/linux/"> Linux </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+            
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          
+
+<p>curl命令使用时，URL是否加单引号没想到搞出了问题。</p>
+
+<h2 id="问题背景">问题背景</h2>
+
+<p>后端实现了一个普通接口，浏览器中访问时OK的。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/curl-single-quote-1.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>但是bash中使用curl命令访问一直是400。</p>
+
+<pre><code class="language-bash">$ curl -v http://localhost:8181/app/test.do?k=x&amp;b=yyy
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/curl-single-quote-2.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>折腾了很久一直怀疑是自己服务的问题，殊不知是使用curl姿势的问题，URL中加上单引号就正常访问接口。</p>
+
+<pre><code class="language-bash">$ curl -v 'http://localhost:8181/app/test.do?k=x&amp;b=yyy'
+</code></pre>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/curl-single-quote-3.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>其实遇到问题应该早早的debug，而不是盲目的猜测原因，如果debug就会发现传到后端的参数其实是被截取了的，所以参数不完整，出现400。</p>
+
+<p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/curl-single-quote-4.png" alt="" class="lazyload"><figcaption class="image-caption"></figcaption></figure></p>
+
+<p>其实curl URL中加入的单引号并非是curl内部实现的问题，而是bash的实现决定的。</p>
+
+<pre><code class="language-bash">➜  ~ echo k=x&amp;b=yyy
+[1] 15207
+k=x                                                                                                                                                                                          
+[1]  + 15207 done       echo k=x
+➜  ~ echo 'k=x&amp;b=yyy'
+k=x&amp;b=yyy
+</code></pre>
+
+<p>那么bash中的单引号到底有什么作用呢？</p>
+
+<h2 id="bash-单引号">Bash 单引号</h2>
+
+<p><a href="http://www.gnu.org/software/bash/manual/html_node/Single-Quotes.html" rel="nofollow noreferrer" target="_blank">引用bash文档</a></p>
+
+<blockquote>
+<p>3.1.2.2 Single Quotes
+Enclosing characters in single quotes (‘&rsquo;’) preserves the literal value of each character within the quotes. A single quote may not occur between single quotes, even when preceded by a backslash.</p>
+
+<p>3.1.2.3 Double Quotes
+Enclosing characters in double quotes (‘&rdquo;’) preserves the literal value of all characters within the quotes, with the exception of ‘$’, ‘<code>’, ‘\’, and, when history expansion is enabled, ‘!’. When the shell is in POSIX mode (see Bash POSIX Mode), the ‘!’ has no special meaning within double quotes, even when history expansion is enabled. The characters ‘$’ and ‘</code>’ retain their special meaning within double quotes (see Shell Expansions). The backslash retains its special meaning only when followed by one of the following characters: ‘$’, ‘`’, ‘&rdquo;’, ‘\’, or newline. Within double quotes, backslashes that are followed by one of these characters are removed. Backslashes preceding characters without a special meaning are left unmodified. A double quote may be quoted within double quotes by preceding it with a backslash. If enabled, history expansion will be performed unless an ‘!’ appearing in double quotes is escaped using a backslash. The backslash preceding the ‘!’ is not removed.</p>
+</blockquote>
+
+<p>简言之，单引号中的内容会保持不变，而双引号中的内容可能会被执行替换。</p>
+
+<pre><code class="language-bash">➜  ~ echo '$(echo hello)'
+$(echo hello)
+➜  ~ echo &quot;$(echo hello)&quot;
+hello
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>vonzhou </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://vonzhou.com/2018/curl-single-quote/>http://vonzhou.com/2018/curl-single-quote/</span>
+            </p>
+            
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/linux/">
+                    #Linux</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/curl/">
+                    #cURL</a></span>
+            
+            <span class="tag"><a href="http://vonzhou.com/tags/bash/">
+                    #Bash</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://vonzhou.com">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+        
+        <a href="http://vonzhou.com/2018/disruptor-vs-arrayblockingqueue/" class="prev" rel="prev" title="ArrayBlockingQueue与Disruptor的性能对比"><i class="iconfont icon-left"></i>&nbsp;ArrayBlockingQueue与Disruptor的性能对比</a>
+         
+        
+        <a href="http://vonzhou.com/2018/jedis-pool-get/" class="next" rel="next" title="从连接池(JedisPool)获取Redis连接源码分析">从连接池(JedisPool)获取Redis连接源码分析&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2011 - 2019</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://vonzhou.com">vonzhou</a>  </span> 
+         
+
+         
+		   
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+     <link href="//lib.baomitu.com/lightgallery/1.6.11/css/lightgallery.min.css" rel="stylesheet">  
+      
+     <script src="/js/vendor_gallery.min.js" async="" ></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>
