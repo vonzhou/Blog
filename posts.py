@@ -21,6 +21,7 @@ TITLE = "title: "
 DATE = "date: "
 # 最终生成的posts列表
 res = os.linesep
+total = 0
 
 for f in onlyfiles:
     tmp = postsDir + "/" + f
@@ -38,10 +39,12 @@ for f in onlyfiles:
                 date = line[line.index(DATE) + len(DATE):]
                 entry = entry + "  " + date
                 break
+        total = total + 1
         res = res + entry + os.linesep
 
 
 # print(res)
+res = "**截止目前输出了 " + str(total) + " 篇文章， 海到尽头天作岸，山登绝顶我为峰！**" + os.linesep + res
 
 readmeFile = "README.md"
 originContent=""

@@ -1,5 +1,5 @@
 ---
-title: 运行《HBase权威指南》书中代码
+title: "运行《HBase权威指南》书中代码"
 date: 2018-12-18 20:33:59
 categories: ["HBase"]
 tags: ["Java", "HBase", "Linux"]
