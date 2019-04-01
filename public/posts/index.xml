@@ -6,10 +6,25 @@
     <description>Recent content in Posts on 编程之路</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 01 Apr 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://vonzhou.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>《Youth》</title>
+      <link>http://vonzhou.com/2019/youth/</link>
+      <pubDate>Mon, 01 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/youth/</guid>
+      <description>无意间看到《Youth》这首诗，瞬间想到六，七年前有段时间那个在黄家湖畔每天学习英文的少年，其中就有背诵这首诗。
+原文 Youth is not a time of life—it is a state of mind.
+It is not a matter of red cheeks, red lips and supple knees.
+It is a temper of the will; a quality of the imagination; a vigor(精力) of the emotions.
+it is a freshness of the deep springs of life.
+Youth means a temperamental predominance of courage over timidity,
+of the appetite for adventure over a life of ease.</description>
+    </item>
     
     <item>
       <title>JDK 12新特性：Switch表达式</title>

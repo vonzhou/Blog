@@ -2,8 +2,8 @@
 title: "波兰来客"
 date: 2019-03-15T11:03:31+08:00
 draft: false
-categories: ["其他"]
-tags: ["文学", 诗"]
+categories: ["生活"]
+tags: ["文学", "诗"]
 ---
 
 很喜欢这首诗。

@@ -110,15 +110,6 @@
     </item>
     
     <item>
-      <title>其他</title>
-      <link>http://vonzhou.com/categories/%E5%85%B6%E4%BB%96/</link>
-      <pubDate>Fri, 15 Mar 2019 11:03:31 +0800</pubDate>
-      
-      <guid>http://vonzhou.com/categories/%E5%85%B6%E4%BB%96/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>大数据</title>
       <link>http://vonzhou.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/</link>
       <pubDate>Thu, 14 Mar 2019 00:00:00 +0000</pubDate>
@@ -133,6 +124,15 @@
       <pubDate>Tue, 30 Aug 2016 00:00:00 +0000</pubDate>
       
       <guid>http://vonzhou.com/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>生活</title>
+      <link>http://vonzhou.com/categories/%E7%94%9F%E6%B4%BB/</link>
+      <pubDate>Mon, 01 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/categories/%E7%94%9F%E6%B4%BB/</guid>
       <description></description>
     </item>
     

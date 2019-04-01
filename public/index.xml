@@ -6,8 +6,103 @@
     <description>Recent content in 编程之路 on 编程之路</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 01 Apr 2019 00:00:00 +0000</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>《Youth》</title>
+      <link>http://vonzhou.com/2019/youth/</link>
+      <pubDate>Mon, 01 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/youth/</guid>
+      <description>
+
+&lt;p&gt;无意间看到《Youth》这首诗，瞬间想到六，七年前有段时间那个在黄家湖畔每天学习英文的少年，其中就有背诵这首诗。&lt;/p&gt;
+
+&lt;h2 id=&#34;原文&#34;&gt;原文&lt;/h2&gt;
+
+&lt;p&gt;Youth is not a time of life—it is a state of mind.&lt;/p&gt;
+
+&lt;p&gt;It is not a matter of red cheeks, red lips and supple knees.&lt;/p&gt;
+
+&lt;p&gt;It is a temper of the will; a quality of the imagination; a vigor(精力) of the emotions.&lt;/p&gt;
+
+&lt;p&gt;it is a freshness of the deep springs of life.&lt;/p&gt;
+
+&lt;p&gt;Youth means a temperamental predominance of courage over timidity,&lt;/p&gt;
+
+&lt;p&gt;of the appetite for adventure over a life of ease.&lt;/p&gt;
+
+&lt;p&gt;This often exists in a man of fifty, more than in a boy of twenty.&lt;/p&gt;
+
+&lt;p&gt;Nobody grows old by merely living a number of years;&lt;/p&gt;
+
+&lt;p&gt;people grow old by deserting their ideals.&lt;/p&gt;
+
+&lt;p&gt;Years may wrinkle the skin, but to give up enthusiasm wrinkles the soul.&lt;/p&gt;
+
+&lt;p&gt;Worry, doubt, self-distrust, fear and despair—&lt;/p&gt;
+
+&lt;p&gt;these are the long, long years that bow the head  and turn the growing spirit back to dust.&lt;/p&gt;
+
+&lt;p&gt;Whether seventy or sixteen, there is in every being’s heart a love of wonder;&lt;/p&gt;
+
+&lt;p&gt;the sweet amazement at the stars and starlike things and thoughts;&lt;/p&gt;
+
+&lt;p&gt;the undaunted challenge of events,&lt;/p&gt;
+
+&lt;p&gt;the unfailing childlike appetite for what comes next,&lt;/p&gt;
+
+&lt;p&gt;and the joy in the game of life.&lt;/p&gt;
+
+&lt;p&gt;You are as young as your faith, as old as your doubt;&lt;/p&gt;
+
+&lt;p&gt;as young as your self-confidence, as old as your fear,&lt;/p&gt;
+
+&lt;p&gt;as young as your hope, as old as your despair.&lt;/p&gt;
+
+&lt;p&gt;In the central place of your heart there is a wireless station.&lt;/p&gt;
+
+&lt;p&gt;So long as it receives messages of beauty, hope, cheer, grandeur, courage,&lt;/p&gt;
+
+&lt;p&gt;and power from the earth, from men and from the Infinite—so long are you young.&lt;/p&gt;
+
+&lt;p&gt;When the wires are all down and the central places of your heart are covered with the&lt;/p&gt;
+
+&lt;p&gt;snows of pessimism and the ice of cynicism,&lt;/p&gt;
+
+&lt;p&gt;then are you grown old, indeed!
+                                                                               –Samuel  Ullman&lt;/p&gt;
+
+&lt;h2 id=&#34;中文&#34;&gt;中文&lt;/h2&gt;
+
+&lt;p&gt;青春不是年华，而是心境；&lt;/p&gt;
+
+&lt;p&gt;青春不是桃面、丹唇、柔膝，&lt;/p&gt;
+
+&lt;p&gt;而是深沉的意志，恢宏的想象，炙热的感情；&lt;/p&gt;
+
+&lt;p&gt;青春是生命的深泉在涌流。&lt;/p&gt;
+
+&lt;p&gt;青春气贯长虹，勇锐盖过怯弱，进取压倒苟安。&lt;/p&gt;
+
+&lt;p&gt;如此锐气，二十后生而有之，六旬男子则更多见。&lt;/p&gt;
+
+&lt;p&gt;年岁有加，并非垂老，理想丢弃，方堕暮年。&lt;/p&gt;
+
+&lt;p&gt;岁月悠悠，衰微只及肌肤；热忱抛却，颓废必致灵魂。&lt;/p&gt;
+
+&lt;p&gt;忧烦，惶恐，丧失自信，定使心灵扭曲，意气如灰。&lt;/p&gt;
+
+&lt;p&gt;无论年届花甲，抑或二八芳龄，心中皆有生命之欢乐，奇迹之诱惑，孩童般天真久盛不衰。&lt;/p&gt;
+
+&lt;p&gt;人人心中皆有一台天线，只要你从天上人间接受美好、希望、欢乐、勇气和力量的信号，你就青春永驻，风华常存。&lt;/p&gt;
+
+&lt;p&gt;一旦天线下降，锐气便被冰雪覆盖，玩世不恭、自暴自弃油然而生，即使年方二十，实已垂垂老矣；&lt;/p&gt;
+
+&lt;p&gt;然则只要树起天线，捕捉乐观信号，你就有望在八十高龄告别尘寰时仍觉年轻。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>JDK 12新特性：Switch表达式</title>
@@ -1869,56 +1964,6 @@ public class Student {
 
 &lt;blockquote&gt;
 &lt;p&gt;读于 2018.12.21 杭州&lt;/p&gt;
-&lt;/blockquote&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>《HBase权威指南》读书笔记</title>
-      <link>http://vonzhou.com/2018/hbase-definitive/</link>
-      <pubDate>Thu, 20 Dec 2018 13:54:14 +0000</pubDate>
-      
-      <guid>http://vonzhou.com/2018/hbase-definitive/</guid>
-      <description>
-
-&lt;p&gt;我是在阅读《HBase不睡觉书》之后阅读的该书，所以没有通读。&lt;/p&gt;
-
-&lt;h2 id=&#34;思维导图&#34;&gt;思维导图&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/hbase-definitive-xmind.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;笔记&#34;&gt;笔记&lt;/h2&gt;
-
-&lt;p&gt;在一个上规模的系统中，单一的DB已经无法满足需求，一般会引入多种数据系统，应对不同的场景。&lt;/p&gt;
-
-&lt;p&gt;阅读时可以先通过简介，架构章节认识HBase，理解了其底层原理才能更好的使用，遇到问题不会盲目。接下来需要自己把HBase平台搭建起来，也需要一番折腾，也能体会各种组件的关系（HBase，ZK，Hadoop），最后就可以使用hbase shell或者Java API使用HBase。&lt;/p&gt;
-
-&lt;h3 id=&#34;架构&#34;&gt;架构&lt;/h3&gt;
-
-&lt;p&gt;BigTable底层的存储架构是 LSM， 和B+ tree对比， 区别是如何利用磁盘。&lt;/p&gt;
-
-&lt;p&gt;读写流程：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://vonzhou.com/images/hbase-read-write-flow.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;合并：在Region server中随着数据的写入，Memstore会刷到磁盘上，生成很多文件，如果这些文件的数目达到阈值，就会执行minor合并，生成更大的文件。还有一种执行不会那么频繁的major合并，会把所有文件合并成一个大文件，当然如果这个大文件超过阈值则会触发一次Region split。&lt;/p&gt;
-
-&lt;p&gt;Region拆分：当一个Region里的存储文件达到配置的阈值（&lt;code&gt;hbase.hregion.max.filesize&lt;/code&gt;）时会一分为二，在父region的&lt;code&gt;splits&lt;/code&gt;目录下进行，然后会更新&lt;code&gt;.META.&lt;/code&gt;表的状态和索引信息。&lt;/p&gt;
-
-&lt;p&gt;WAL：预写日志，类似于MySQL中的binlog，是为了保障RegionServer crash后数据不丢失的（前提是Hadoop是可靠的）。&lt;/p&gt;
-
-&lt;h3 id=&#34;使用&#34;&gt;使用&lt;/h3&gt;
-
-&lt;p&gt;基本的API使用起来。&lt;/p&gt;
-
-&lt;p&gt;根据业务场景设计rowkey，长度不要太长，尽量分散。&lt;/p&gt;
-
-&lt;h2 id=&#34;相关阅读&#34;&gt;相关阅读&lt;/h2&gt;
-
-&lt;p&gt;《Design Data-Intensive Applications》关于LSM，列式存储的章节。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;读于2018.12.20 杭州&lt;/p&gt;
 &lt;/blockquote&gt;
 </description>
     </item>
