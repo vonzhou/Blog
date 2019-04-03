@@ -4,10 +4,12 @@
 
 
 
+
+
 
 ## 源文件
 
-**截止目前输出了 49 篇文章， 海到尽头天作岸，山登绝顶我为峰！**
+**截止目前输出了 51 篇文章， 海到尽头天作岸，山登绝顶我为峰！**
 
 [2015阅读的书单](content/posts/2015-read-book.md)  2016-04-06
 
@@ -39,11 +41,13 @@
 
 [为什么枚举是实现单例最好的方式？](content/posts/enum-singleton.md)  2019-02-14
 
-[行《HBase权威指南》书中代](content/posts/hbase-book-code.md)  2018-12-18 20:33:59
+[运行《HBase权威指南》书中代码](content/posts/hbase-book-code.md)  2018-12-18 20:33:59
 
 [《HBase权威指南》读书笔记](content/posts/hbase-definitive.md)  2018-12-20 13:54:14
 
 [HBase 实现分页查询](content/posts/hbase-page.md)  2019-03-14
+
+[HBase 查询优化](content/posts/hbase-query-optimize.md)  2019-04-03
 
 [InnoDB 行锁的实现](content/posts/innodb-row-lock.md)  2019-02-16
 
@@ -75,7 +79,7 @@
 
 [Nginx后端响应不完整问题分析](content/posts/nginx-temp-file.md)  2019-01-04
 
-[非暴力沟通》读书笔](content/posts/nonviolent-communication.md)  2018-12-21 12:55:16
+[《非暴力沟通》读书笔记](content/posts/nonviolent-communication.md)  2018-12-21 12:55:16
 
 [Redis中键的过期删除策略](content/posts/redis-expire.md)  2018-09-09
 
@@ -105,6 +109,8 @@
 
 [jetty/tomcat容器在使用RequestParam注解处理PUT方法时的差异](content/posts/tomcat-vs-jetty-put.md)  2017-07-06
 
+[《Youth》](content/posts/youth.md)  2019-04-01
+
 [解决Zuul无法同时转发Multipart和JSON请求的问题](content/posts/zuul-forward-multipart-and-json.md)  2018-10-10
 
 ## 约定
@@ -121,13 +127,9 @@
 ## 其他
 
 * [Spark 快速入门](https://github.com/vonzhou/learning-spark/tree/master/blogs/hello)  2019.3.7
-* [《HBase权威指南》读书笔记](https://github.com/vonzhou/Blog/blob/master/Contents/BigData/hbase-definitive.md) 2018.12.20
-* [运行《HBase权威指南》书中代码](https://github.com/vonzhou/hbase-book#%E8%BF%90%E8%A1%8Chbase%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97%E4%B9%A6%E4%B8%AD%E4%BB%A3%E7%A0%81) 2018.12.18
-* [curl URL是否加单引号引发的问题](https://github.com/vonzhou/Blog/blob/master/Contents/Linux/curl/singlequote/curl-single-quote.md) 2018.12.7
 * [netstat 命令](https://github.com/vonzhou/Blog/tree/master/Contents/Linux/netstat)  2017.5.16
 * [tcpdump 命令](https://github.com/vonzhou/Blog/tree/master/Contents/Linux/tcpdump)  2017.5.16
 * [《深入理解计算机系统结构》实战](https://github.com/vonzhou/CSAPP)   2015.3.24
 * [《快学Scala》读书笔记](https://github.com/vonzhou/ScalaImpatient#%E5%BF%AB%E5%AD%A6scala%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0)  2018.12.31
 * [SQL优化方法总结](https://github.com/vonzhou/Blog/blob/master/Contents/Database/sql-optimization) 2019.2.23
 * [何为整洁架构？](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/cleanarch/clean-arch.md) 2019.1.8
-* [《非暴力沟通》读书笔记](https://github.com/vonzhou/Blog/blob/master/Contents/Reading/nonviolent-communication.md)

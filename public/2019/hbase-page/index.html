@@ -139,7 +139,7 @@ public Table getTable() throws Exception { Table table = tableThreadLocal.get();
                 in
                 <i class="iconfont icon-folder"></i>
                 <span class="post-category">
-                        <a href="http://vonzhou.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"> 大数据 </a>
+                        <a href="http://vonzhou.com/categories/hbase/"> HBase </a>
                         
                 </span>
         </div>
@@ -172,7 +172,7 @@ public Table getTable() throws Exception { Table table = tableThreadLocal.get();
 
 <p>比如要把用户关联的数据存入HBase，后续根据时间查询，可以这样设计rowkey：</p>
 
-<pre><code>userId + (Long.MAX - timestamp) + uid 
+<pre><code class="language-bash">userId + (Long.MAX - timestamp) + uid 
 </code></pre>
 
 <p>这样能满足：</p>

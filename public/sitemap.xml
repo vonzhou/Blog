@@ -3,6 +3,16 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
     <url>
+      <loc>http://vonzhou.com/2019/hbase-query-optimize/</loc>
+      
+      <lastmod>2019-04-03T00:00:00+00:00</lastmod>
+      
+      
+      
+      
+    </url>
+  
+    <url>
       <loc>http://vonzhou.com/2019/youth/</loc>
       
       <lastmod>2019-04-01T00:00:00+00:00</lastmod>
@@ -595,7 +605,7 @@
     <url>
       <loc>http://vonzhou.com/tags/hbase/</loc>
       
-      <lastmod>2019-03-14T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-03T00:00:00+00:00</lastmod>
       
       
       
@@ -607,7 +617,7 @@
     <url>
       <loc>http://vonzhou.com/categories/hbase/</loc>
       
-      <lastmod>2018-12-20T13:54:14+00:00</lastmod>
+      <lastmod>2019-04-03T00:00:00+00:00</lastmod>
       
       
       
@@ -691,7 +701,7 @@
     <url>
       <loc>http://vonzhou.com/tags/java/</loc>
       
-      <lastmod>2019-03-20T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-03T00:00:00+00:00</lastmod>
       
       
       
@@ -847,7 +857,7 @@
     <url>
       <loc>http://vonzhou.com/posts/</loc>
       
-      <lastmod>2019-04-01T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-03T00:00:00+00:00</lastmod>
       
       
       
@@ -1085,18 +1095,6 @@
     </url>
   
     <url>
-      <loc>http://vonzhou.com/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
-      
-      <lastmod>2019-03-14T00:00:00+00:00</lastmod>
-      
-      
-      
-      <priority>0</priority>
-      
-      
-    </url>
-  
-    <url>
       <loc>http://vonzhou.com/tags/%E5%AD%97%E8%8A%82%E7%A0%81/</loc>
       
       <lastmod>2018-11-27T00:00:00+00:00</lastmod>
@@ -1219,7 +1217,7 @@
     <url>
       <loc>http://vonzhou.com/</loc>
       
-      <lastmod>2019-04-01T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-03T00:00:00+00:00</lastmod>
       
       
       

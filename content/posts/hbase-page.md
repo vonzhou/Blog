@@ -2,7 +2,7 @@
 title: "HBase 实现分页查询"
 date: 2019-03-14
 draft: false
-categories: ["大数据"]
+categories: ["HBase"]
 tags: ["HBase", "Java"]
 ---
 
@@ -16,7 +16,7 @@ tags: ["HBase", "Java"]
 
 比如要把用户关联的数据存入HBase，后续根据时间查询，可以这样设计rowkey：
 
-```
+```bash
 userId + (Long.MAX - timestamp) + uid 
 ```
 

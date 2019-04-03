@@ -6,10 +6,31 @@
     <description>Recent content in Java on 编程之路</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 03 Apr 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://vonzhou.com/tags/java/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>HBase 查询优化</title>
+      <link>http://vonzhou.com/2019/hbase-query-optimize/</link>
+      <pubDate>Wed, 03 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://vonzhou.com/2019/hbase-query-optimize/</guid>
+      <description>场景 在《HBase 实现分页查询》中描述了一个按用户维度和时间区间查询HBase的场景，业务不断复杂后衍生出了另一个场景：需要查询一段时间段内，一个列符合特定条件的数据。
+假设我们要查询的数据领域模型如下：
+class BigMsg { private Long id; private Long insertTime; private List&amp;lt;Long&amp;gt; a; private Long b; private String c; }  问题抽象为：从HBase查询列b=b0的数据，其中b很稀疏。
+Long b0 = 123; getDetailMsgs(b0);  行键设计与查询性能 HBase使用时最重要的莫过于Rowkey的设计，直接影响数据的存储和查询性能。
+在我们的场景中，为了实现按照时间区间查询，rowkey包括用户ID和时间戳，可以使用过滤器，Scan的时候取我们需要的数据，在数据量很大的情况下，大量的KeyValue会送到过滤器筛选，必然很低效。
+经验法则  rowkey不宜过长 尽量将查询的维度或信息存储在rowkey中，因为rowkey筛选数据的效率最高  下面这张图来源于《HBase权威指南》，展示了KeyValue的各个方面对筛选数据性能的影响。
+优化方案 回到我们的问题上来。
+要查询一段时间内，列b=b0的数据，能想到有3种方法。
+使用Filter 最直接的想法是Scan的时候设置列值过滤器，但是列b稀疏，所以在这样的效率很低。
+rowkey中包含 可以在设计rowkey的时候纳入列b的信息，这样方法存在以下缺陷：
+ 会增加rowkey的存储开销 一开始设计rowkey的时候，并不能考虑到所有类似情况，所以灵活性不好  映射表 本人在实际中采用的是引入一个映射表的方法，映射表中存储了对应的列b和Msg HTable的rowkey之间的关联信息。
+实现 映射信息存储 BigMsg信息的存储见《HBase 实现分页查询》，之后需要同时更新映射信息。
+public void saveMapInfo(BigMsg msg, String msgRowkey) { Long b = msg.getB(); Long insertTime = msg.</description>
+    </item>
     
     <item>
       <title>JDK 12新特性：Switch表达式</title>
