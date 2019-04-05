@@ -247,18 +247,18 @@ init by CommandLineRunner ...
 <p><figure><img src="/images/ring.svg" data-sizes="auto" data-src="/images/spring-boot-init-methods-1.jpg" alt="Runner调用流程" class="lazyload"><figcaption class="image-caption">Runner调用流程</figcaption></figure></p>
 
 <pre><code class="language-java">private void callRunners(ApplicationContext context, ApplicationArguments args) {
-    List&lt;Object&gt; runners = new ArrayList&lt;Object&gt;();
-    runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
-    runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
-    AnnotationAwareOrderComparator.sort(runners);
-    for (Object runner : new LinkedHashSet&lt;Object&gt;(runners)) {
-        if (runner instanceof ApplicationRunner) {
-            callRunner((ApplicationRunner) runner, args);
-        }
-        if (runner instanceof CommandLineRunner) {
-            callRunner((CommandLineRunner) runner, args);
-        }
-    }
+	List&lt;Object&gt; runners = new ArrayList&lt;Object&gt;();
+	runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
+	runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
+	AnnotationAwareOrderComparator.sort(runners);
+	for (Object runner : new LinkedHashSet&lt;Object&gt;(runners)) {
+		if (runner instanceof ApplicationRunner) {
+			callRunner((ApplicationRunner) runner, args);
+		}
+		if (runner instanceof CommandLineRunner) {
+			callRunner((CommandLineRunner) runner, args);
+		}
+	}
 }
 </code></pre>
 
@@ -269,78 +269,78 @@ init by CommandLineRunner ...
 <p>bean在实例化之后会进行初始化操作，即 initializeBean ，从<code>invokeInitMethods</code>方法中我们可以看到 InitializingBean 接口方法先执行，然后是配置的 init-method 方法。</p>
 
 <pre><code class="language-java">protected Object initializeBean(final String beanName, final Object bean, RootBeanDefinition mbd) {
-    if (System.getSecurityManager() != null) {
-        AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() {
-            @Override
-            public Object run() {
-                invokeAwareMethods(beanName, bean);
-                return null;
-            }
-        }, getAccessControlContext());
-    }
-    else {
-        // 如果这个bean实现了一些Aware接口，则将对应的对象设置给他
-        invokeAwareMethods(beanName, bean);
-    }
+	if (System.getSecurityManager() != null) {
+		AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() {
+			@Override
+			public Object run() {
+				invokeAwareMethods(beanName, bean);
+				return null;
+			}
+		}, getAccessControlContext());
+	}
+	else {
+	    // 如果这个bean实现了一些Aware接口，则将对应的对象设置给他
+		invokeAwareMethods(beanName, bean);
+	}
 
-    Object wrappedBean = bean;
-    if (mbd == null || !mbd.isSynthetic()) {
-        wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
-    }
+	Object wrappedBean = bean;
+	if (mbd == null || !mbd.isSynthetic()) {
+		wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+	}
 
-    try {
-        // 这里
-        invokeInitMethods(beanName, wrappedBean, mbd);
-    }
-    catch (Throwable ex) {
-        throw new BeanCreationException(
-                (mbd != null ? mbd.getResourceDescription() : null),
-                beanName, &quot;Invocation of init method failed&quot;, ex);
-    }
+	try {
+	    // 这里
+		invokeInitMethods(beanName, wrappedBean, mbd);
+	}
+	catch (Throwable ex) {
+		throw new BeanCreationException(
+				(mbd != null ? mbd.getResourceDescription() : null),
+				beanName, &quot;Invocation of init method failed&quot;, ex);
+	}
 
-    if (mbd == null || !mbd.isSynthetic()) {
-        wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
-    }
-    return wrappedBean;
+	if (mbd == null || !mbd.isSynthetic()) {
+		wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+	}
+	return wrappedBean;
 }
 </code></pre>
 
 <pre><code class="language-java">protected void invokeInitMethods(String beanName, final Object bean, RootBeanDefinition mbd)
-        throws Throwable {
+		throws Throwable {
 
-    boolean isInitializingBean = (bean instanceof InitializingBean);
-    if (isInitializingBean &amp;&amp; (mbd == null || !mbd.isExternallyManagedInitMethod(&quot;afterPropertiesSet&quot;))) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(&quot;Invoking afterPropertiesSet() on bean with name '&quot; + beanName + &quot;'&quot;);
-        }
-        if (System.getSecurityManager() != null) {
-            try {
-                AccessController.doPrivileged(new PrivilegedExceptionAction&lt;Object&gt;() {
-                    @Override
-                    public Object run() throws Exception {
-                        ((InitializingBean) bean).afterPropertiesSet();
-                        return null;
-                    }
-                }, getAccessControlContext());
-            }
-            catch (PrivilegedActionException pae) {
-                throw pae.getException();
-            }
-        }
-        else {
-            // 如果实现了 InitializingBean 接口
-            ((InitializingBean) bean).afterPropertiesSet();
-        }
-    }
+	boolean isInitializingBean = (bean instanceof InitializingBean);
+	if (isInitializingBean &amp;&amp; (mbd == null || !mbd.isExternallyManagedInitMethod(&quot;afterPropertiesSet&quot;))) {
+		if (logger.isDebugEnabled()) {
+			logger.debug(&quot;Invoking afterPropertiesSet() on bean with name '&quot; + beanName + &quot;'&quot;);
+		}
+		if (System.getSecurityManager() != null) {
+			try {
+				AccessController.doPrivileged(new PrivilegedExceptionAction&lt;Object&gt;() {
+					@Override
+					public Object run() throws Exception {
+						((InitializingBean) bean).afterPropertiesSet();
+						return null;
+					}
+				}, getAccessControlContext());
+			}
+			catch (PrivilegedActionException pae) {
+				throw pae.getException();
+			}
+		}
+		else {
+		    // 如果实现了 InitializingBean 接口
+			((InitializingBean) bean).afterPropertiesSet();
+		}
+	}
 
-    if (mbd != null) {
-        // 如果配置了 init-method
-        String initMethodName = mbd.getInitMethodName();
-        if (initMethodName != null &amp;&amp; !(isInitializingBean &amp;&amp; &quot;afterPropertiesSet&quot;.equals(initMethodName)) &amp;&amp;
-                !mbd.isExternallyManagedInitMethod(initMethodName)) {
-            invokeCustomInitMethod(beanName, bean, mbd);
-        }
-    }
+	if (mbd != null) {
+	    // 如果配置了 init-method
+		String initMethodName = mbd.getInitMethodName();
+		if (initMethodName != null &amp;&amp; !(isInitializingBean &amp;&amp; &quot;afterPropertiesSet&quot;.equals(initMethodName)) &amp;&amp;
+				!mbd.isExternallyManagedInitMethod(initMethodName)) {
+			invokeCustomInitMethod(beanName, bean, mbd);
+		}
+	}
 }
 </code></pre>
 
@@ -348,97 +348,97 @@ init by CommandLineRunner ...
 
 <pre><code class="language-java">@Override
 public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-    LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
-    try {
-        metadata.invokeInitMethods(bean, beanName);
-    }
-    catch (InvocationTargetException ex) {
-        throw new BeanCreationException(beanName, &quot;Invocation of init method failed&quot;, ex.getTargetException());
-    }
-    catch (Throwable ex) {
-        throw new BeanCreationException(beanName, &quot;Failed to invoke init method&quot;, ex);
-    }
-    return bean;
+	LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
+	try {
+		metadata.invokeInitMethods(bean, beanName);
+	}
+	catch (InvocationTargetException ex) {
+		throw new BeanCreationException(beanName, &quot;Invocation of init method failed&quot;, ex.getTargetException());
+	}
+	catch (Throwable ex) {
+		throw new BeanCreationException(beanName, &quot;Failed to invoke init method&quot;, ex);
+	}
+	return bean;
 }
 
 public void invokeInitMethods(Object target, String beanName) throws Throwable {
-    Collection&lt;LifecycleElement&gt; initMethodsToIterate =
-            (this.checkedInitMethods != null ? this.checkedInitMethods : this.initMethods);
-    if (!initMethodsToIterate.isEmpty()) {
-        boolean debug = logger.isDebugEnabled();
-        for (LifecycleElement element : initMethodsToIterate) {
-            if (debug) {
-                logger.debug(&quot;Invoking init method on bean '&quot; + beanName + &quot;': &quot; + element.getMethod());
-            }
-            element.invoke(target);
-        }
-    }
+	Collection&lt;LifecycleElement&gt; initMethodsToIterate =
+			(this.checkedInitMethods != null ? this.checkedInitMethods : this.initMethods);
+	if (!initMethodsToIterate.isEmpty()) {
+		boolean debug = logger.isDebugEnabled();
+		for (LifecycleElement element : initMethodsToIterate) {
+			if (debug) {
+				logger.debug(&quot;Invoking init method on bean '&quot; + beanName + &quot;': &quot; + element.getMethod());
+			}
+			element.invoke(target);
+		}
+	}
 }
 </code></pre>
 
 <p>这个 <code>BeanPostProcessor</code> 首次执行的时候利用反射去寻找这个bean中定义的生命周期元数据，即 <code>PostConstruct，PreDestroy</code> 注解标注的方法。</p>
 
 <pre><code class="language-java">private LifecycleMetadata findLifecycleMetadata(Class&lt;?&gt; clazz) {
-    if (this.lifecycleMetadataCache == null) {
-        // Happens after deserialization, during destruction...
-        return buildLifecycleMetadata(clazz);
-    }
-    // Quick check on the concurrent map first, with minimal locking.
-    LifecycleMetadata metadata = this.lifecycleMetadataCache.get(clazz);
-    if (metadata == null) {
-        synchronized (this.lifecycleMetadataCache) {
-            metadata = this.lifecycleMetadataCache.get(clazz);
-            if (metadata == null) {
-                // 双重检查
-                metadata = buildLifecycleMetadata(clazz);
-                this.lifecycleMetadataCache.put(clazz, metadata);
-            }
-            return metadata;
-        }
-    }
-    return metadata;
+	if (this.lifecycleMetadataCache == null) {
+		// Happens after deserialization, during destruction...
+		return buildLifecycleMetadata(clazz);
+	}
+	// Quick check on the concurrent map first, with minimal locking.
+	LifecycleMetadata metadata = this.lifecycleMetadataCache.get(clazz);
+	if (metadata == null) {
+		synchronized (this.lifecycleMetadataCache) {
+			metadata = this.lifecycleMetadataCache.get(clazz);
+			if (metadata == null) {
+			    // 双重检查
+				metadata = buildLifecycleMetadata(clazz);
+				this.lifecycleMetadataCache.put(clazz, metadata);
+			}
+			return metadata;
+		}
+	}
+	return metadata;
 }
 
 private LifecycleMetadata buildLifecycleMetadata(final Class&lt;?&gt; clazz) {
-    final boolean debug = logger.isDebugEnabled();
-    LinkedList&lt;LifecycleElement&gt; initMethods = new LinkedList&lt;LifecycleElement&gt;();
-    LinkedList&lt;LifecycleElement&gt; destroyMethods = new LinkedList&lt;LifecycleElement&gt;();
-    Class&lt;?&gt; targetClass = clazz;
+	final boolean debug = logger.isDebugEnabled();
+	LinkedList&lt;LifecycleElement&gt; initMethods = new LinkedList&lt;LifecycleElement&gt;();
+	LinkedList&lt;LifecycleElement&gt; destroyMethods = new LinkedList&lt;LifecycleElement&gt;();
+	Class&lt;?&gt; targetClass = clazz;
 
-    do {
-        final LinkedList&lt;LifecycleElement&gt; currInitMethods = new LinkedList&lt;LifecycleElement&gt;();
-        final LinkedList&lt;LifecycleElement&gt; currDestroyMethods = new LinkedList&lt;LifecycleElement&gt;();
+	do {
+		final LinkedList&lt;LifecycleElement&gt; currInitMethods = new LinkedList&lt;LifecycleElement&gt;();
+		final LinkedList&lt;LifecycleElement&gt; currDestroyMethods = new LinkedList&lt;LifecycleElement&gt;();
 
-        ReflectionUtils.doWithLocalMethods(targetClass, new ReflectionUtils.MethodCallback() {
-            @Override
-            public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-                if (initAnnotationType != null) {
-                    if (method.getAnnotation(initAnnotationType) != null) {
-                        LifecycleElement element = new LifecycleElement(method);
-                        currInitMethods.add(element);
-                        if (debug) {
-                            logger.debug(&quot;Found init method on class [&quot; + clazz.getName() + &quot;]: &quot; + method);
-                        }
-                    }
-                }
-                if (destroyAnnotationType != null) {
-                    if (method.getAnnotation(destroyAnnotationType) != null) {
-                        currDestroyMethods.add(new LifecycleElement(method));
-                        if (debug) {
-                            logger.debug(&quot;Found destroy method on class [&quot; + clazz.getName() + &quot;]: &quot; + method);
-                        }
-                    }
-                }
-            }
-        });
+		ReflectionUtils.doWithLocalMethods(targetClass, new ReflectionUtils.MethodCallback() {
+			@Override
+			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+				if (initAnnotationType != null) {
+					if (method.getAnnotation(initAnnotationType) != null) {
+						LifecycleElement element = new LifecycleElement(method);
+						currInitMethods.add(element);
+						if (debug) {
+							logger.debug(&quot;Found init method on class [&quot; + clazz.getName() + &quot;]: &quot; + method);
+						}
+					}
+				}
+				if (destroyAnnotationType != null) {
+					if (method.getAnnotation(destroyAnnotationType) != null) {
+						currDestroyMethods.add(new LifecycleElement(method));
+						if (debug) {
+							logger.debug(&quot;Found destroy method on class [&quot; + clazz.getName() + &quot;]: &quot; + method);
+						}
+					}
+				}
+			}
+		});
 
-        initMethods.addAll(0, currInitMethods);
-        destroyMethods.addAll(currDestroyMethods);
-        targetClass = targetClass.getSuperclass();
-    }
-    while (targetClass != null &amp;&amp; targetClass != Object.class);
+		initMethods.addAll(0, currInitMethods);
+		destroyMethods.addAll(currDestroyMethods);
+		targetClass = targetClass.getSuperclass();
+	}
+	while (targetClass != null &amp;&amp; targetClass != Object.class);
 
-    return new LifecycleMetadata(clazz, initMethods, destroyMethods);
+	return new LifecycleMetadata(clazz, initMethods, destroyMethods);
 }
 </code></pre>
 
@@ -446,10 +446,10 @@ private LifecycleMetadata buildLifecycleMetadata(final Class&lt;?&gt; clazz) {
 <code>CommonAnnotationBeanPostProcessor</code>（继承了     <code>InitDestroyAnnotationBeanPostProcessor</code>）的构造器中看到，可以看到这个代码的可扩展性很好。</p>
 
 <pre><code class="language-java">public CommonAnnotationBeanPostProcessor() {
-    setOrder(Ordered.LOWEST_PRECEDENCE - 3);
-    setInitAnnotationType(PostConstruct.class);
-    setDestroyAnnotationType(PreDestroy.class);
-    ignoreResourceType(&quot;javax.xml.ws.WebServiceContext&quot;);
+	setOrder(Ordered.LOWEST_PRECEDENCE - 3);
+	setInitAnnotationType(PostConstruct.class);
+	setDestroyAnnotationType(PreDestroy.class);
+	ignoreResourceType(&quot;javax.xml.ws.WebServiceContext&quot;);
 }
 </code></pre>
 

@@ -191,43 +191,43 @@ public class HelloController {
 。</p>
 
 <pre><code class="language-java">public boolean isMultipart(HttpServletRequest request) {
-    // Same check as in Commons FileUpload...
-    if (!&quot;post&quot;.equals(request.getMethod().toLowerCase())) {
-        return false;
-    }
-    String contentType = request.getContentType();
-    return (contentType != null &amp;&amp; contentType.toLowerCase().startsWith(&quot;multipart/&quot;));
+	// Same check as in Commons FileUpload...
+	if (!&quot;post&quot;.equals(request.getMethod().toLowerCase())) {
+		return false;
+	}
+	String contentType = request.getContentType();
+	return (contentType != null &amp;&amp; contentType.toLowerCase().startsWith(&quot;multipart/&quot;));
 }
 </code></pre>
 
 <p>在调用我们的handler之前都会从具体request中解析参数（org.springframework.web.method.annotation.RequestParamMethodArgumentResolver#resolveName）。</p>
 
 <pre><code class="language-java">protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
-    HttpServletRequest servletRequest = request.getNativeRequest(HttpServletRequest.class);
-    // PUT方法都无法解析为 MultipartRequest，这里为null
-    MultipartHttpServletRequest multipartRequest =
-            WebUtils.getNativeRequest(servletRequest, MultipartHttpServletRequest.class);
+	HttpServletRequest servletRequest = request.getNativeRequest(HttpServletRequest.class);
+	// PUT方法都无法解析为 MultipartRequest，这里为null
+	MultipartHttpServletRequest multipartRequest =
+			WebUtils.getNativeRequest(servletRequest, MultipartHttpServletRequest.class);
 
-    Object mpArg = MultipartResolutionDelegate.resolveMultipartArgument(name, parameter, servletRequest);
-    if (mpArg != MultipartResolutionDelegate.UNRESOLVABLE) {
-        return mpArg;
-    }
+	Object mpArg = MultipartResolutionDelegate.resolveMultipartArgument(name, parameter, servletRequest);
+	if (mpArg != MultipartResolutionDelegate.UNRESOLVABLE) {
+		return mpArg;
+	}
 
-    Object arg = null;
-    if (multipartRequest != null) {
-        List&lt;MultipartFile&gt; files = multipartRequest.getFiles(name);
-        if (!files.isEmpty()) {
-            arg = (files.size() == 1 ? files.get(0) : files);
-        }
-    }
-    // 所以参数从这里解析
-    if (arg == null) {
-        String[] paramValues = request.getParameterValues(name);
-        if (paramValues != null) {
-            arg = (paramValues.length == 1 ? paramValues[0] : paramValues);
-        }
-    }
-    return arg;
+	Object arg = null;
+	if (multipartRequest != null) {
+		List&lt;MultipartFile&gt; files = multipartRequest.getFiles(name);
+		if (!files.isEmpty()) {
+			arg = (files.size() == 1 ? files.get(0) : files);
+		}
+	}
+	// 所以参数从这里解析
+	if (arg == null) {
+		String[] paramValues = request.getParameterValues(name);
+		if (paramValues != null) {
+			arg = (paramValues.length == 1 ? paramValues[0] : paramValues);
+		}
+	}
+	return arg;
 }
 </code></pre>
 

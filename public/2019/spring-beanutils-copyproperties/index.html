@@ -220,43 +220,43 @@
 <p>copyProperties 的实现总体上很清晰：利用反射，调用source对象的get方法，然后set到target对象中。</p>
 
 <pre><code class="language-java">public static void copyProperties(Object source, Object target) throws BeansException {
-        copyProperties(source, target, null, (String[]) null);
-    }
+		copyProperties(source, target, null, (String[]) null);
+	}
 
 private static void copyProperties(Object source, Object target, Class&lt;?&gt; editable, String... ignoreProperties)
-            throws BeansException {
-        Class&lt;?&gt; actualEditable = target.getClass();
+			throws BeansException {
+		Class&lt;?&gt; actualEditable = target.getClass();
 
-        PropertyDescriptor[] targetPds = getPropertyDescriptors(actualEditable);
-        List&lt;String&gt; ignoreList = (ignoreProperties != null ? Arrays.asList(ignoreProperties) : null);
+		PropertyDescriptor[] targetPds = getPropertyDescriptors(actualEditable);
+		List&lt;String&gt; ignoreList = (ignoreProperties != null ? Arrays.asList(ignoreProperties) : null);
 
-        for (PropertyDescriptor targetPd : targetPds) {
-            Method writeMethod = targetPd.getWriteMethod();
-            if (writeMethod != null &amp;&amp; (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
-                PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
-                if (sourcePd != null) {
-                    Method readMethod = sourcePd.getReadMethod();
-                    if (readMethod != null &amp;&amp;
-                            ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType())) {
-                        try {
-                            if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
-                                readMethod.setAccessible(true);
-                            }
-                            Object value = readMethod.invoke(source);
-                            if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
-                                writeMethod.setAccessible(true);
-                            }
-                            writeMethod.invoke(target, value);
-                        }
-                        catch (Throwable ex) {
-                            throw new FatalBeanException(
-                                    &quot;Could not copy property '&quot; + targetPd.getName() + &quot;' from source to target&quot;, ex);
-                        }
-                    }
-                }
-            }
-        }
-    }
+		for (PropertyDescriptor targetPd : targetPds) {
+			Method writeMethod = targetPd.getWriteMethod();
+			if (writeMethod != null &amp;&amp; (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
+				PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
+				if (sourcePd != null) {
+					Method readMethod = sourcePd.getReadMethod();
+					if (readMethod != null &amp;&amp;
+							ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType())) {
+						try {
+							if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
+								readMethod.setAccessible(true);
+							}
+							Object value = readMethod.invoke(source);
+							if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
+								writeMethod.setAccessible(true);
+							}
+							writeMethod.invoke(target, value);
+						}
+						catch (Throwable ex) {
+							throw new FatalBeanException(
+									&quot;Could not copy property '&quot; + targetPd.getName() + &quot;' from source to target&quot;, ex);
+						}
+					}
+				}
+			}
+		}
+	}
 
 </code></pre>
 
@@ -265,83 +265,83 @@ private static void copyProperties(Object source, Object target, Class&lt;?&gt; 
 <p>PropertyDescriptor 描述的是Java Bean的一个属性，具有读写(getter/setter)方法，</p>
 
 <pre><code class="language-java">public static PropertyDescriptor[] getPropertyDescriptors(Class&lt;?&gt; clazz) throws BeansException {
-        CachedIntrospectionResults cr = CachedIntrospectionResults.forClass(clazz);
-        return cr.getPropertyDescriptors();
-    }
+		CachedIntrospectionResults cr = CachedIntrospectionResults.forClass(clazz);
+		return cr.getPropertyDescriptors();
+	}
 
 </code></pre>
 
 <p><code>CachedIntrospectionResults</code>缓存了Java Bean对应Class的<code>PropertyDescriptor</code>信息，存储数据结构是<code>ConcurrentHashMap</code>：</p>
 
 <pre><code class="language-java">static final ConcurrentMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt; strongClassCache =
-            new ConcurrentHashMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt;(64);
+			new ConcurrentHashMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt;(64);
 </code></pre>
 
 <p>先从缓存中查询，如果没有，则进行实际的解析，构造。</p>
 
 <pre><code class="language-java">static CachedIntrospectionResults forClass(Class&lt;?&gt; beanClass) throws BeansException {
-        CachedIntrospectionResults results = strongClassCache.get(beanClass);
-        if (results != null) {
-            return results;
-        }
-        results = softClassCache.get(beanClass);
-        if (results != null) {
-            return results;
-        }
+		CachedIntrospectionResults results = strongClassCache.get(beanClass);
+		if (results != null) {
+			return results;
+		}
+		results = softClassCache.get(beanClass);
+		if (results != null) {
+			return results;
+		}
 
         // TODO 具体的解析过程
-        results = new CachedIntrospectionResults(beanClass);
-        ConcurrentMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt; classCacheToUse;
+		results = new CachedIntrospectionResults(beanClass);
+		ConcurrentMap&lt;Class&lt;?&gt;, CachedIntrospectionResults&gt; classCacheToUse;
 
         // TODO cachesafe ？
-        if (ClassUtils.isCacheSafe(beanClass, CachedIntrospectionResults.class.getClassLoader()) ||
-                isClassLoaderAccepted(beanClass.getClassLoader())) {
-            classCacheToUse = strongClassCache;
-        }
-        else {
-            classCacheToUse = softClassCache;
-        }
+		if (ClassUtils.isCacheSafe(beanClass, CachedIntrospectionResults.class.getClassLoader()) ||
+				isClassLoaderAccepted(beanClass.getClassLoader())) {
+			classCacheToUse = strongClassCache;
+		}
+		else {
+			classCacheToUse = softClassCache;
+		}
 
-        CachedIntrospectionResults existing = classCacheToUse.putIfAbsent(beanClass, results);
-        return (existing != null ? existing : results);
-    }
+		CachedIntrospectionResults existing = classCacheToUse.putIfAbsent(beanClass, results);
+		return (existing != null ? existing : results);
+	}
 
 </code></pre>
 
 <p>接下来看<code>CachedIntrospectionResults</code>构造函数，先是利用<code>Introspector</code>解析class的<code>BeanInfo</code>（实现类是<code>GenericBeanInfo</code>），然后更新缓存。</p>
 
 <pre><code class="language-java">private CachedIntrospectionResults(Class&lt;?&gt; beanClass) throws BeansException {
-        try {
-            BeanInfo beanInfo = null;
-            if (beanInfo == null) {
-                // If none of the factories supported the class, fall back to the default
-                beanInfo = (shouldIntrospectorIgnoreBeaninfoClasses ?
-                        Introspector.getBeanInfo(beanClass, Introspector.IGNORE_ALL_BEANINFO) :
-                        Introspector.getBeanInfo(beanClass)); // 这里
-            }
-            this.beanInfo = beanInfo;
+		try {
+			BeanInfo beanInfo = null;
+			if (beanInfo == null) {
+				// If none of the factories supported the class, fall back to the default
+				beanInfo = (shouldIntrospectorIgnoreBeaninfoClasses ?
+						Introspector.getBeanInfo(beanClass, Introspector.IGNORE_ALL_BEANINFO) :
+						Introspector.getBeanInfo(beanClass)); // 这里
+			}
+			this.beanInfo = beanInfo;
 
 
-            this.propertyDescriptorCache = new LinkedHashMap&lt;String, PropertyDescriptor&gt;();
+			this.propertyDescriptorCache = new LinkedHashMap&lt;String, PropertyDescriptor&gt;();
 
-            // This call is slow so we do it once.
-            PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
-            for (PropertyDescriptor pd : pds) {
-                if (Class.class == beanClass &amp;&amp;
-                        (&quot;classLoader&quot;.equals(pd.getName()) ||  &quot;protectionDomain&quot;.equals(pd.getName()))) {
-                    // Ignore Class.getClassLoader() and getProtectionDomain() methods - nobody needs to bind to those
-                    continue;
-                }
-                pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
-                this.propertyDescriptorCache.put(pd.getName(), pd);
-            }
+			// This call is slow so we do it once.
+			PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
+			for (PropertyDescriptor pd : pds) {
+				if (Class.class == beanClass &amp;&amp;
+						(&quot;classLoader&quot;.equals(pd.getName()) ||  &quot;protectionDomain&quot;.equals(pd.getName()))) {
+					// Ignore Class.getClassLoader() and getProtectionDomain() methods - nobody needs to bind to those
+					continue;
+				}
+				pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
+				this.propertyDescriptorCache.put(pd.getName(), pd);
+			}
 
-            this.typeDescriptorCache = new ConcurrentReferenceHashMap&lt;PropertyDescriptor, TypeDescriptor&gt;();
-        }
-        catch (IntrospectionException ex) {
-            throw new FatalBeanException(&quot;Failed to obtain BeanInfo for class [&quot; + beanClass.getName() + &quot;]&quot;, ex);
-        }
-    }
+			this.typeDescriptorCache = new ConcurrentReferenceHashMap&lt;PropertyDescriptor, TypeDescriptor&gt;();
+		}
+		catch (IntrospectionException ex) {
+			throw new FatalBeanException(&quot;Failed to obtain BeanInfo for class [&quot; + beanClass.getName() + &quot;]&quot;, ex);
+		}
+	}
 
 </code></pre>
 
@@ -350,23 +350,23 @@ private static void copyProperties(Object source, Object target, Class&lt;?&gt; 
 <p>看工具类<code>ClassUtils</code>。</p>
 
 <pre><code class="language-java">public static boolean isAssignable(Class&lt;?&gt; lhsType, Class&lt;?&gt; rhsType) {
-        if (lhsType.isAssignableFrom(rhsType)) {
-            return true;
-        }
-        if (lhsType.isPrimitive()) {
-            Class&lt;?&gt; resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
-            if (lhsType == resolvedPrimitive) {
-                return true;
-            }
-        }
-        else {
-            Class&lt;?&gt; resolvedWrapper = primitiveTypeToWrapperMap.get(rhsType);
-            if (resolvedWrapper != null &amp;&amp; lhsType.isAssignableFrom(resolvedWrapper)) {
-                return true;
-            }
-        }
-        return false;
-    }
+		if (lhsType.isAssignableFrom(rhsType)) {
+			return true;
+		}
+		if (lhsType.isPrimitive()) {
+			Class&lt;?&gt; resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
+			if (lhsType == resolvedPrimitive) {
+				return true;
+			}
+		}
+		else {
+			Class&lt;?&gt; resolvedWrapper = primitiveTypeToWrapperMap.get(rhsType);
+			if (resolvedWrapper != null &amp;&amp; lhsType.isAssignableFrom(resolvedWrapper)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 </code></pre>
 

@@ -206,392 +206,392 @@ contextConfigLocation 上下文参数用于配置路径的指定，如果没有�
 <p>DispatcherServlet 的父类 HttpServletBean 覆盖了 HttpServlet 的 init 方法，实现该 servlet 的初始化。</p>
 
 <pre><code class="language-java">/**
-     * Map config parameters onto bean properties of this servlet, and
-     * invoke subclass initialization.
-     * @throws ServletException if bean properties are invalid (or required
-     * properties are missing), or if subclass initialization fails.
-     */
-    @Override
-    public final void init() throws ServletException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(&quot;Initializing servlet '&quot; + getServletName() + &quot;'&quot;);
-        }
+	 * Map config parameters onto bean properties of this servlet, and
+	 * invoke subclass initialization.
+	 * @throws ServletException if bean properties are invalid (or required
+	 * properties are missing), or if subclass initialization fails.
+	 */
+	@Override
+	public final void init() throws ServletException {
+		if (logger.isDebugEnabled()) {
+			logger.debug(&quot;Initializing servlet '&quot; + getServletName() + &quot;'&quot;);
+		}
 
-        // Set bean properties from init parameters.
-        try {
-            PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
-            BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
-            ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
-            bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
-            initBeanWrapper(bw);
-            bw.setPropertyValues(pvs, true);
-        }
-        catch (BeansException ex) {
-            logger.error(&quot;Failed to set bean properties on servlet '&quot; + getServletName() + &quot;'&quot;, ex);
-            throw ex;
-        }
+		// Set bean properties from init parameters.
+		try {
+			PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
+			BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
+			ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
+			bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
+			initBeanWrapper(bw);
+			bw.setPropertyValues(pvs, true);
+		}
+		catch (BeansException ex) {
+			logger.error(&quot;Failed to set bean properties on servlet '&quot; + getServletName() + &quot;'&quot;, ex);
+			throw ex;
+		}
 
-        // Let subclasses do whatever initialization they like. 这里
-        initServletBean();
+		// Let subclasses do whatever initialization they like. 这里
+		initServletBean();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(&quot;Servlet '&quot; + getServletName() + &quot;' configured successfully&quot;);
-        }
-    }
+		if (logger.isDebugEnabled()) {
+			logger.debug(&quot;Servlet '&quot; + getServletName() + &quot;' configured successfully&quot;);
+		}
+	}
 </code></pre>
 
 <p>正如注释所说 initServletBean() 留由子类实现，体现了模板方法模式，当上述bean属性设置完成后，进入这里 FrameworkServlet#init() 创建 Servlet 的上下文 WebApplicationContext，initWebApplicationContext 首先会获得该 Web 应用的 root WebApplicationContext （通常是由 org.springframework.web.context.ContextLoaderListener 加载的），然后根据这个根上下文得到我们这个 Servlet 的 WebApplicationContext。initFrameworkServlet 方法是空的，而且子类 DispatcherServlet 也没有覆盖。</p>
 
-<pre><code class="language-java">    /**
-     * Overridden method of {@link HttpServletBean}, invoked after any bean properties
-     * have been set. Creates this servlet's WebApplicationContext.
-     */
-    @Override
-    protected final void initServletBean() throws ServletException {
-        getServletContext().log(&quot;Initializing Spring FrameworkServlet '&quot; + getServletName() + &quot;'&quot;);
-        if (this.logger.isInfoEnabled()) {
-            this.logger.info(&quot;FrameworkServlet '&quot; + getServletName() + &quot;': initialization started&quot;);
-        }
-        long startTime = System.currentTimeMillis();
+<pre><code class="language-java">	/**
+	 * Overridden method of {@link HttpServletBean}, invoked after any bean properties
+	 * have been set. Creates this servlet's WebApplicationContext.
+	 */
+	@Override
+	protected final void initServletBean() throws ServletException {
+		getServletContext().log(&quot;Initializing Spring FrameworkServlet '&quot; + getServletName() + &quot;'&quot;);
+		if (this.logger.isInfoEnabled()) {
+			this.logger.info(&quot;FrameworkServlet '&quot; + getServletName() + &quot;': initialization started&quot;);
+		}
+		long startTime = System.currentTimeMillis();
 
-        try {
-            this.webApplicationContext = initWebApplicationContext();
-            initFrameworkServlet();
-        }
-        catch (ServletException ex) {
-            this.logger.error(&quot;Context initialization failed&quot;, ex);
-            throw ex;
-        }
-        catch (RuntimeException ex) {
-            this.logger.error(&quot;Context initialization failed&quot;, ex);
-            throw ex;
-        }
+		try {
+			this.webApplicationContext = initWebApplicationContext();
+			initFrameworkServlet();
+		}
+		catch (ServletException ex) {
+			this.logger.error(&quot;Context initialization failed&quot;, ex);
+			throw ex;
+		}
+		catch (RuntimeException ex) {
+			this.logger.error(&quot;Context initialization failed&quot;, ex);
+			throw ex;
+		}
 
-        if (this.logger.isInfoEnabled()) {
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            this.logger.info(&quot;FrameworkServlet '&quot; + getServletName() + &quot;': initialization completed in &quot; +
-                    elapsedTime + &quot; ms&quot;);
-        }
-    }
+		if (this.logger.isInfoEnabled()) {
+			long elapsedTime = System.currentTimeMillis() - startTime;
+			this.logger.info(&quot;FrameworkServlet '&quot; + getServletName() + &quot;': initialization completed in &quot; +
+					elapsedTime + &quot; ms&quot;);
+		}
+	}
 
-    /**
-     * Initialize and publish the WebApplicationContext for this servlet.
-     * &lt;p&gt;Delegates to {@link #createWebApplicationContext} for actual creation
-     * of the context. Can be overridden in subclasses.
-     * @return the WebApplicationContext instance
-     * @see #FrameworkServlet(WebApplicationContext)
-     * @see #setContextClass
-     * @see #setContextConfigLocation
-     */
-    protected WebApplicationContext initWebApplicationContext() {
-        WebApplicationContext rootContext =
-                WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        WebApplicationContext wac = null;
+	/**
+	 * Initialize and publish the WebApplicationContext for this servlet.
+	 * &lt;p&gt;Delegates to {@link #createWebApplicationContext} for actual creation
+	 * of the context. Can be overridden in subclasses.
+	 * @return the WebApplicationContext instance
+	 * @see #FrameworkServlet(WebApplicationContext)
+	 * @see #setContextClass
+	 * @see #setContextConfigLocation
+	 */
+	protected WebApplicationContext initWebApplicationContext() {
+		WebApplicationContext rootContext =
+				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+		WebApplicationContext wac = null;
 
-        if (this.webApplicationContext != null) {
-            // A context instance was injected at construction time -&gt; use it
-            wac = this.webApplicationContext;
-            if (wac instanceof ConfigurableWebApplicationContext) {
-                ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) wac;
-                if (!cwac.isActive()) {
-                    // The context has not yet been refreshed -&gt; provide services such as
-                    // setting the parent context, setting the application context id, etc
-                    if (cwac.getParent() == null) {
-                        // The context instance was injected without an explicit parent -&gt; set
-                        // the root application context (if any; may be null) as the parent
-                        cwac.setParent(rootContext);
-                    }
-                    configureAndRefreshWebApplicationContext(cwac);
-                }
-            }
-        }
-        if (wac == null) {
-            // No context instance was injected at construction time -&gt; see if one
-            // has been registered in the servlet context. If one exists, it is assumed
-            // that the parent context (if any) has already been set and that the
-            // user has performed any initialization such as setting the context id
-            wac = findWebApplicationContext();
-        }
-        if (wac == null) {
-            // No context instance is defined for this servlet -&gt; create a local one
-            wac = createWebApplicationContext(rootContext);
-        }
+		if (this.webApplicationContext != null) {
+			// A context instance was injected at construction time -&gt; use it
+			wac = this.webApplicationContext;
+			if (wac instanceof ConfigurableWebApplicationContext) {
+				ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) wac;
+				if (!cwac.isActive()) {
+					// The context has not yet been refreshed -&gt; provide services such as
+					// setting the parent context, setting the application context id, etc
+					if (cwac.getParent() == null) {
+						// The context instance was injected without an explicit parent -&gt; set
+						// the root application context (if any; may be null) as the parent
+						cwac.setParent(rootContext);
+					}
+					configureAndRefreshWebApplicationContext(cwac);
+				}
+			}
+		}
+		if (wac == null) {
+			// No context instance was injected at construction time -&gt; see if one
+			// has been registered in the servlet context. If one exists, it is assumed
+			// that the parent context (if any) has already been set and that the
+			// user has performed any initialization such as setting the context id
+			wac = findWebApplicationContext();
+		}
+		if (wac == null) {
+			// No context instance is defined for this servlet -&gt; create a local one
+			wac = createWebApplicationContext(rootContext);
+		}
 
-        if (!this.refreshEventReceived) {
-            // Either the context is not a ConfigurableApplicationContext with refresh
-            // support or the context injected at construction time had already been
-            // refreshed -&gt; trigger initial onRefresh manually here.
-            onRefresh(wac);
-        }
+		if (!this.refreshEventReceived) {
+			// Either the context is not a ConfigurableApplicationContext with refresh
+			// support or the context injected at construction time had already been
+			// refreshed -&gt; trigger initial onRefresh manually here.
+			onRefresh(wac);
+		}
 
-        if (this.publishContext) {
-            // Publish the context as a servlet context attribute.
-            String attrName = getServletContextAttributeName();
-            getServletContext().setAttribute(attrName, wac);
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug(&quot;Published WebApplicationContext of servlet '&quot; + getServletName() +
-                        &quot;' as ServletContext attribute with name [&quot; + attrName + &quot;]&quot;);
-            }
-        }
+		if (this.publishContext) {
+			// Publish the context as a servlet context attribute.
+			String attrName = getServletContextAttributeName();
+			getServletContext().setAttribute(attrName, wac);
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug(&quot;Published WebApplicationContext of servlet '&quot; + getServletName() +
+						&quot;' as ServletContext attribute with name [&quot; + attrName + &quot;]&quot;);
+			}
+		}
 
-        return wac;
-    }
+		return wac;
+	}
 </code></pre>
 
 <h2 id="dispatcherservlet-处理请求流程">DispatcherServlet 处理请求流程</h2>
 
 <p>FrameworkServlet 中覆盖了 HttpServlet 的 doGet(),doPost()等方法，而 doGet(),doPost()等又直接调用方法 processRequest 来处理请求，代码如下。</p>
 
-<pre><code class="language-java">    /**
-     * Delegate GET requests to processRequest/doService.
-     * &lt;p&gt;Will also be invoked by HttpServlet's default implementation of {@code doHead},
-     * with a {@code NoBodyResponse} that just captures the content length.
-     * @see #doService
-     * @see #doHead
-     */
-    @Override
-    protected final void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+<pre><code class="language-java">	/**
+	 * Delegate GET requests to processRequest/doService.
+	 * &lt;p&gt;Will also be invoked by HttpServlet's default implementation of {@code doHead},
+	 * with a {@code NoBodyResponse} that just captures the content length.
+	 * @see #doService
+	 * @see #doHead
+	 */
+	@Override
+	protected final void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        processRequest(request, response);
-    }
+		processRequest(request, response);
+	}
 
-    /**
-     * Delegate POST requests to {@link #processRequest}.
-     * @see #doService
-     */
-    @Override
-    protected final void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	/**
+	 * Delegate POST requests to {@link #processRequest}.
+	 * @see #doService
+	 */
+	@Override
+	protected final void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        processRequest(request, response);
-    }
+		processRequest(request, response);
+	}
 </code></pre>
 
 <p>然后我们进入 processRequest 方法，实际的请求处理是调用其抽象方法 doService。</p>
 
 <pre><code class="language-java">/**
-     * Process this request, publishing an event regardless of the outcome.
-     * &lt;p&gt;The actual event handling is performed by the abstract
-     * {@link #doService} template method.
-     */
-    protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	 * Process this request, publishing an event regardless of the outcome.
+	 * &lt;p&gt;The actual event handling is performed by the abstract
+	 * {@link #doService} template method.
+	 */
+	protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        long startTime = System.currentTimeMillis();
-        Throwable failureCause = null;
+		long startTime = System.currentTimeMillis();
+		Throwable failureCause = null;
 
-        LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
-        LocaleContext localeContext = buildLocaleContext(request);
+		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+		LocaleContext localeContext = buildLocaleContext(request);
 
-        RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
-        ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
+		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
+		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
-        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
-        asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
+		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
 
-        initContextHolders(request, localeContext, requestAttributes);
+		initContextHolders(request, localeContext, requestAttributes);
 
-        try {
-            doService(request, response);
-        }
-        catch (ServletException ex) {
-            failureCause = ex;
-            throw ex;
-        }
-        catch (IOException ex) {
-            failureCause = ex;
-            throw ex;
-        }
-        catch (Throwable ex) {
-            failureCause = ex;
-            throw new NestedServletException(&quot;Request processing failed&quot;, ex);
-        }
+		try {
+			doService(request, response);
+		}
+		catch (ServletException ex) {
+			failureCause = ex;
+			throw ex;
+		}
+		catch (IOException ex) {
+			failureCause = ex;
+			throw ex;
+		}
+		catch (Throwable ex) {
+			failureCause = ex;
+			throw new NestedServletException(&quot;Request processing failed&quot;, ex);
+		}
 
-        finally {
-            resetContextHolders(request, previousLocaleContext, previousAttributes);
-            if (requestAttributes != null) {
-                requestAttributes.requestCompleted();
-            }
+		finally {
+			resetContextHolders(request, previousLocaleContext, previousAttributes);
+			if (requestAttributes != null) {
+				requestAttributes.requestCompleted();
+			}
 
-            if (logger.isDebugEnabled()) {
-                if (failureCause != null) {
-                    this.logger.debug(&quot;Could not complete request&quot;, failureCause);
-                }
-                else {
-                    if (asyncManager.isConcurrentHandlingStarted()) {
-                        logger.debug(&quot;Leaving response open for concurrent processing&quot;);
-                    }
-                    else {
-                        this.logger.debug(&quot;Successfully completed request&quot;);
-                    }
-                }
-            }
+			if (logger.isDebugEnabled()) {
+				if (failureCause != null) {
+					this.logger.debug(&quot;Could not complete request&quot;, failureCause);
+				}
+				else {
+					if (asyncManager.isConcurrentHandlingStarted()) {
+						logger.debug(&quot;Leaving response open for concurrent processing&quot;);
+					}
+					else {
+						this.logger.debug(&quot;Successfully completed request&quot;);
+					}
+				}
+			}
 
-            publishRequestHandledEvent(request, response, startTime, failureCause);
-        }
-    }
+			publishRequestHandledEvent(request, response, startTime, failureCause);
+		}
+	}
 
-    /**
-     * Subclasses must implement this method to do the work of request handling,
-     * receiving a centralized callback for GET, POST, PUT and DELETE.
-     * &lt;p&gt;The contract is essentially the same as that for the commonly overridden
-     * {@code doGet} or {@code doPost} methods of HttpServlet.
-     * &lt;p&gt;This class intercepts calls to ensure that exception handling and
-     * event publication takes place.
-     * @param request current HTTP request
-     * @param response current HTTP response
-     * @throws Exception in case of any kind of processing failure
-     * @see javax.servlet.http.HttpServlet#doGet
-     * @see javax.servlet.http.HttpServlet#doPost
-     */
-    protected abstract void doService(HttpServletRequest request, HttpServletResponse response)
-            throws Exception;
+	/**
+	 * Subclasses must implement this method to do the work of request handling,
+	 * receiving a centralized callback for GET, POST, PUT and DELETE.
+	 * &lt;p&gt;The contract is essentially the same as that for the commonly overridden
+	 * {@code doGet} or {@code doPost} methods of HttpServlet.
+	 * &lt;p&gt;This class intercepts calls to ensure that exception handling and
+	 * event publication takes place.
+	 * @param request current HTTP request
+	 * @param response current HTTP response
+	 * @throws Exception in case of any kind of processing failure
+	 * @see javax.servlet.http.HttpServlet#doGet
+	 * @see javax.servlet.http.HttpServlet#doPost
+	 */
+	protected abstract void doService(HttpServletRequest request, HttpServletResponse response)
+			throws Exception;
 </code></pre>
 
 <p>然后在 DispatcherServlet 中具体实现请求的处理分发，先是把一些资源放到请求属性中，然后调用 doDispatch 实现请求分发到控制器的 handler。doDispatch 中首先会判断是否是文件传输流的请求（利用MultipartResolver），如果是的话就会转为 MultipartHttpServletRequest。接下来 getHandler(processedRequest) 根据请求获得对应的handler，最后调用 handle() 处理请求，会反射到在控制器中实现的方法。</p>
 
 <pre><code class="language-java">/**
-     * Exposes the DispatcherServlet-specific request attributes and delegates to {@link #doDispatch}
-     * for the actual dispatching.
-     */
-    @Override
-    protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (logger.isDebugEnabled()) {
-            String resumed = WebAsyncUtils.getAsyncManager(request).hasConcurrentResult() ? &quot; resumed&quot; : &quot;&quot;;
-            logger.debug(&quot;DispatcherServlet with name '&quot; + getServletName() + &quot;'&quot; + resumed +
-                    &quot; processing &quot; + request.getMethod() + &quot; request for [&quot; + getRequestUri(request) + &quot;]&quot;);
-        }
+	 * Exposes the DispatcherServlet-specific request attributes and delegates to {@link #doDispatch}
+	 * for the actual dispatching.
+	 */
+	@Override
+	protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if (logger.isDebugEnabled()) {
+			String resumed = WebAsyncUtils.getAsyncManager(request).hasConcurrentResult() ? &quot; resumed&quot; : &quot;&quot;;
+			logger.debug(&quot;DispatcherServlet with name '&quot; + getServletName() + &quot;'&quot; + resumed +
+					&quot; processing &quot; + request.getMethod() + &quot; request for [&quot; + getRequestUri(request) + &quot;]&quot;);
+		}
 
-        // Keep a snapshot of the request attributes in case of an include,
-        // to be able to restore the original attributes after the include.
-        Map&lt;String, Object&gt; attributesSnapshot = null;
-        if (WebUtils.isIncludeRequest(request)) {
-            attributesSnapshot = new HashMap&lt;String, Object&gt;();
-            Enumeration&lt;?&gt; attrNames = request.getAttributeNames();
-            while (attrNames.hasMoreElements()) {
-                String attrName = (String) attrNames.nextElement();
-                if (this.cleanupAfterInclude || attrName.startsWith(&quot;org.springframework.web.servlet&quot;)) {
-                    attributesSnapshot.put(attrName, request.getAttribute(attrName));
-                }
-            }
-        }
+		// Keep a snapshot of the request attributes in case of an include,
+		// to be able to restore the original attributes after the include.
+		Map&lt;String, Object&gt; attributesSnapshot = null;
+		if (WebUtils.isIncludeRequest(request)) {
+			attributesSnapshot = new HashMap&lt;String, Object&gt;();
+			Enumeration&lt;?&gt; attrNames = request.getAttributeNames();
+			while (attrNames.hasMoreElements()) {
+				String attrName = (String) attrNames.nextElement();
+				if (this.cleanupAfterInclude || attrName.startsWith(&quot;org.springframework.web.servlet&quot;)) {
+					attributesSnapshot.put(attrName, request.getAttribute(attrName));
+				}
+			}
+		}
 
-        // Make framework objects available to handlers and view objects.
-        request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());
-        request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
-        request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
-        request.setAttribute(THEME_SOURCE_ATTRIBUTE, getThemeSource());
+		// Make framework objects available to handlers and view objects.
+		request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());
+		request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
+		request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
+		request.setAttribute(THEME_SOURCE_ATTRIBUTE, getThemeSource());
 
-        FlashMap inputFlashMap = this.flashMapManager.retrieveAndUpdate(request, response);
-        if (inputFlashMap != null) {
-            request.setAttribute(INPUT_FLASH_MAP_ATTRIBUTE, Collections.unmodifiableMap(inputFlashMap));
-        }
-        request.setAttribute(OUTPUT_FLASH_MAP_ATTRIBUTE, new FlashMap());
-        request.setAttribute(FLASH_MAP_MANAGER_ATTRIBUTE, this.flashMapManager);
+		FlashMap inputFlashMap = this.flashMapManager.retrieveAndUpdate(request, response);
+		if (inputFlashMap != null) {
+			request.setAttribute(INPUT_FLASH_MAP_ATTRIBUTE, Collections.unmodifiableMap(inputFlashMap));
+		}
+		request.setAttribute(OUTPUT_FLASH_MAP_ATTRIBUTE, new FlashMap());
+		request.setAttribute(FLASH_MAP_MANAGER_ATTRIBUTE, this.flashMapManager);
 
-        try {
-            doDispatch(request, response);
-        }
-        finally {
-            if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
-                // Restore the original attribute snapshot, in case of an include.
-                if (attributesSnapshot != null) {
-                    restoreAttributesAfterInclude(request, attributesSnapshot);
-                }
-            }
-        }
-    }
+		try {
+			doDispatch(request, response);
+		}
+		finally {
+			if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
+				// Restore the original attribute snapshot, in case of an include.
+				if (attributesSnapshot != null) {
+					restoreAttributesAfterInclude(request, attributesSnapshot);
+				}
+			}
+		}
+	}
 
-    /**
-     * Process the actual dispatching to the handler.
-     * &lt;p&gt;The handler will be obtained by applying the servlet's HandlerMappings in order.
-     * The HandlerAdapter will be obtained by querying the servlet's installed HandlerAdapters
-     * to find the first that supports the handler class.
-     * &lt;p&gt;All HTTP methods are handled by this method. It's up to HandlerAdapters or handlers
-     * themselves to decide which methods are acceptable.
-     * @param request current HTTP request
-     * @param response current HTTP response
-     * @throws Exception in case of any kind of processing failure
-     */
-    protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        HttpServletRequest processedRequest = request;
-        HandlerExecutionChain mappedHandler = null;
-        boolean multipartRequestParsed = false;
+	/**
+	 * Process the actual dispatching to the handler.
+	 * &lt;p&gt;The handler will be obtained by applying the servlet's HandlerMappings in order.
+	 * The HandlerAdapter will be obtained by querying the servlet's installed HandlerAdapters
+	 * to find the first that supports the handler class.
+	 * &lt;p&gt;All HTTP methods are handled by this method. It's up to HandlerAdapters or handlers
+	 * themselves to decide which methods are acceptable.
+	 * @param request current HTTP request
+	 * @param response current HTTP response
+	 * @throws Exception in case of any kind of processing failure
+	 */
+	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		HttpServletRequest processedRequest = request;
+		HandlerExecutionChain mappedHandler = null;
+		boolean multipartRequestParsed = false;
 
-        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 
-        try {
-            ModelAndView mv = null;
-            Exception dispatchException = null;
+		try {
+			ModelAndView mv = null;
+			Exception dispatchException = null;
 
-            try {
-                processedRequest = checkMultipart(request);
-                multipartRequestParsed = (processedRequest != request);
+			try {
+				processedRequest = checkMultipart(request);
+				multipartRequestParsed = (processedRequest != request);
 
-                // Determine handler for the current request.
-                mappedHandler = getHandler(processedRequest);
-                if (mappedHandler == null || mappedHandler.getHandler() == null) {
-                    noHandlerFound(processedRequest, response);
-                    return;
-                }
+				// Determine handler for the current request.
+				mappedHandler = getHandler(processedRequest);
+				if (mappedHandler == null || mappedHandler.getHandler() == null) {
+					noHandlerFound(processedRequest, response);
+					return;
+				}
 
-                // Determine handler adapter for the current request.
-                HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
+				// Determine handler adapter for the current request.
+				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
-                // Process last-modified header, if supported by the handler.
-                String method = request.getMethod();
-                boolean isGet = &quot;GET&quot;.equals(method);
-                if (isGet || &quot;HEAD&quot;.equals(method)) {
-                    long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(&quot;Last-Modified value for [&quot; + getRequestUri(request) + &quot;] is: &quot; + lastModified);
-                    }
-                    if (new ServletWebRequest(request, response).checkNotModified(lastModified) &amp;&amp; isGet) {
-                        return;
-                    }
-                }
+				// Process last-modified header, if supported by the handler.
+				String method = request.getMethod();
+				boolean isGet = &quot;GET&quot;.equals(method);
+				if (isGet || &quot;HEAD&quot;.equals(method)) {
+					long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
+					if (logger.isDebugEnabled()) {
+						logger.debug(&quot;Last-Modified value for [&quot; + getRequestUri(request) + &quot;] is: &quot; + lastModified);
+					}
+					if (new ServletWebRequest(request, response).checkNotModified(lastModified) &amp;&amp; isGet) {
+						return;
+					}
+				}
 
-                if (!mappedHandler.applyPreHandle(processedRequest, response)) {
-                    return;
-                }
+				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+					return;
+				}
 
-                // Actually invoke the handler.
-                mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+				// Actually invoke the handler.
+				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
-                if (asyncManager.isConcurrentHandlingStarted()) {
-                    return;
-                }
+				if (asyncManager.isConcurrentHandlingStarted()) {
+					return;
+				}
 
-                applyDefaultViewName(processedRequest, mv);
-                mappedHandler.applyPostHandle(processedRequest, response, mv);
-            }
-            catch (Exception ex) {
-                dispatchException = ex;
-            }
-            processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
-        }
-        catch (Exception ex) {
-            triggerAfterCompletion(processedRequest, response, mappedHandler, ex);
-        }
-        catch (Error err) {
-            triggerAfterCompletionWithError(processedRequest, response, mappedHandler, err);
-        }
-        finally {
-            if (asyncManager.isConcurrentHandlingStarted()) {
-                // Instead of postHandle and afterCompletion
-                if (mappedHandler != null) {
-                    mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
-                }
-            }
-            else {
-                // Clean up any resources used by a multipart request.
-                if (multipartRequestParsed) {
-                    cleanupMultipart(processedRequest);
-                }
-            }
-        }
-    }
+				applyDefaultViewName(processedRequest, mv);
+				mappedHandler.applyPostHandle(processedRequest, response, mv);
+			}
+			catch (Exception ex) {
+				dispatchException = ex;
+			}
+			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
+		}
+		catch (Exception ex) {
+			triggerAfterCompletion(processedRequest, response, mappedHandler, ex);
+		}
+		catch (Error err) {
+			triggerAfterCompletionWithError(processedRequest, response, mappedHandler, err);
+		}
+		finally {
+			if (asyncManager.isConcurrentHandlingStarted()) {
+				// Instead of postHandle and afterCompletion
+				if (mappedHandler != null) {
+					mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
+				}
+			}
+			else {
+				// Clean up any resources used by a multipart request.
+				if (multipartRequestParsed) {
+					cleanupMultipart(processedRequest);
+				}
+			}
+		}
+	}
 </code></pre>
 
 <p>HandlerAdapter接口的handle方法抽象的是一个handler如何处理一个请求，该接口实现有下面几个。</p>
@@ -599,52 +599,52 @@ contextConfigLocation 上下文参数用于配置路径的指定，如果没有�
 <p>AnnotationMethodHandlerAdapter 基于HTTP请求的路径，方法，请求参数，使用 RequestMapping 注解来映handler，从 Spring 3.2建议使用RequestMappingHandlerAdapter。这里看看AnnotationMethodHandlerAdapter是如何实现handle方法的, 使用了反射，最后通过 invokeHandlerMethod 执行了对应的handler方法。</p>
 
 <pre><code class="language-java">@Override
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 
-        Class&lt;?&gt; clazz = ClassUtils.getUserClass(handler);
-        Boolean annotatedWithSessionAttributes = this.sessionAnnotatedClassesCache.get(clazz);
-        if (annotatedWithSessionAttributes == null) {
-            annotatedWithSessionAttributes = (AnnotationUtils.findAnnotation(clazz, SessionAttributes.class) != null);
-            this.sessionAnnotatedClassesCache.put(clazz, annotatedWithSessionAttributes);
-        }
+		Class&lt;?&gt; clazz = ClassUtils.getUserClass(handler);
+		Boolean annotatedWithSessionAttributes = this.sessionAnnotatedClassesCache.get(clazz);
+		if (annotatedWithSessionAttributes == null) {
+			annotatedWithSessionAttributes = (AnnotationUtils.findAnnotation(clazz, SessionAttributes.class) != null);
+			this.sessionAnnotatedClassesCache.put(clazz, annotatedWithSessionAttributes);
+		}
 
-        if (annotatedWithSessionAttributes) {
-            checkAndPrepare(request, response, this.cacheSecondsForSessionAttributeHandlers, true);
-        }
-        else {
-            checkAndPrepare(request, response, true);
-        }
+		if (annotatedWithSessionAttributes) {
+			checkAndPrepare(request, response, this.cacheSecondsForSessionAttributeHandlers, true);
+		}
+		else {
+			checkAndPrepare(request, response, true);
+		}
 
-        // Execute invokeHandlerMethod in synchronized block if required.
-        if (this.synchronizeOnSession) {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                Object mutex = WebUtils.getSessionMutex(session);
-                synchronized (mutex) {
-                    return invokeHandlerMethod(request, response, handler);
-                }
-            }
-        }
+		// Execute invokeHandlerMethod in synchronized block if required.
+		if (this.synchronizeOnSession) {
+			HttpSession session = request.getSession(false);
+			if (session != null) {
+				Object mutex = WebUtils.getSessionMutex(session);
+				synchronized (mutex) {
+					return invokeHandlerMethod(request, response, handler);
+				}
+			}
+		}
 
-        return invokeHandlerMethod(request, response, handler);
-    }
+		return invokeHandlerMethod(request, response, handler);
+	}
 
-    protected ModelAndView invokeHandlerMethod(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+	protected ModelAndView invokeHandlerMethod(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 
-        ServletHandlerMethodResolver methodResolver = getMethodResolver(handler);
-        Method handlerMethod = methodResolver.resolveHandlerMethod(request);
-        ServletHandlerMethodInvoker methodInvoker = new ServletHandlerMethodInvoker(methodResolver);
-        ServletWebRequest webRequest = new ServletWebRequest(request, response);
-        ExtendedModelMap implicitModel = new BindingAwareModelMap();
+		ServletHandlerMethodResolver methodResolver = getMethodResolver(handler);
+		Method handlerMethod = methodResolver.resolveHandlerMethod(request);
+		ServletHandlerMethodInvoker methodInvoker = new ServletHandlerMethodInvoker(methodResolver);
+		ServletWebRequest webRequest = new ServletWebRequest(request, response);
+		ExtendedModelMap implicitModel = new BindingAwareModelMap();
 
-        Object result = methodInvoker.invokeHandlerMethod(handlerMethod, handler, webRequest, implicitModel);
-        ModelAndView mav =
-                methodInvoker.getModelAndView(handlerMethod, handler.getClass(), result, implicitModel, webRequest);
-        methodInvoker.updateModelAttributes(handler, (mav != null ? mav.getModel() : null), implicitModel, webRequest);
-        return mav;
-    }
+		Object result = methodInvoker.invokeHandlerMethod(handlerMethod, handler, webRequest, implicitModel);
+		ModelAndView mav =
+				methodInvoker.getModelAndView(handlerMethod, handler.getClass(), result, implicitModel, webRequest);
+		methodInvoker.updateModelAttributes(handler, (mav != null ? mav.getModel() : null), implicitModel, webRequest);
+		return mav;
+	}
 </code></pre>
 
 <h2 id="小结">小结</h2>

@@ -170,13 +170,13 @@
 @Component
 public class AccessTokenFilter extends ZuulFilter {
 
-    // Filter 的类型，在路由之前
+	// Filter 的类型，在路由之前
     @Override
     public String filterType() {
         return &quot;pre&quot;;
     }
 
-    // 比系统的优先级要低些
+	// 比系统的优先级要低些
     @Override
     public int filterOrder() {
         return 7;
@@ -194,13 +194,13 @@ public class AccessTokenFilter extends ZuulFilter {
         log.info(&quot;token={}&quot;, token);
 
         token = URLDecoder.decode(token, &quot;UTF-8&quot;);
-        // 验证 token
-        boolean valid = validateToken(token);
+		// 验证 token
+		boolean valid = validateToken(token);
 
-        // 验证不通过则直接响应
-        if(!valid){
-             setFalseZuulResponse(requestContext);
-        }
+		// 验证不通过则直接响应
+		if(!valid){
+			 setFalseZuulResponse(requestContext);
+		}
 
         return null;
     }
@@ -245,12 +245,12 @@ public class AccessTokenFilter extends ZuulFilter {
 <p>有一天，新增了一个接口，URL中带有JSON串，发现访问该接口时请求无法到达后端。网关模块抛出了异常 URISyntaxException。</p>
 
 <pre><code class="language-java">Caused by: java.net.URISyntaxException: Illegal character in query at index 65: http://10.201.169.146:8091/api/.../?param=%7B&quot;a&quot;:&quot;&quot;,&quot;b&quot;:&quot;&quot;,&quot;c&quot;:&quot;&quot;%7D
-    at java.net.URI$Parser.fail(URI.java:2848)
-    at java.net.URI$Parser.checkChars(URI.java:3021)
-    at java.net.URI$Parser.parseHierarchical(URI.java:3111)
-    at java.net.URI$Parser.parse(URI.java:3053)
-    at java.net.URI.&lt;init&gt;(URI.java:588)
-    at com.sun.jersey.api.uri.UriBuilderImpl.createURI(UriBuilderImpl.java:721)
+	at java.net.URI$Parser.fail(URI.java:2848)
+	at java.net.URI$Parser.checkChars(URI.java:3021)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3111)
+	at java.net.URI$Parser.parse(URI.java:3053)
+	at java.net.URI.&lt;init&gt;(URI.java:588)
+	at com.sun.jersey.api.uri.UriBuilderImpl.createURI(UriBuilderImpl.java:721)
 </code></pre>
 
 <p>很慌，然后Goolge后发现这个问题<a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/918" rel="nofollow noreferrer" target="_blank">别人也遇到过</a>，说这个版本的Zuul默认使用的是 Ribbon Client，换成 http client 就可以了。</p>
@@ -267,74 +267,74 @@ public RibbonCommandFactory&lt;?&gt; ribbonCommandFactory(
 <pre><code class="language-java">2018-10-09 19:04:22.591  WARN 12137 --- [qtp289592183-19] o.e.jetty.server.handler.ErrorHandler    : EXCEPTION 
 
 org.springframework.web.util.NestedServletException: Request processing failed; nested exception is org.springframework.web.multipart.MultipartException: Could not parse multipart servlet request; nested exception is java.io.IOException: Incomplete parts
-    at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:982)
-    at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:872)
-    at javax.servlet.http.HttpServlet.service(HttpServlet.java:707)
-    at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:846)
-    at javax.servlet.http.HttpServlet.service(HttpServlet.java:790)
-    at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:845)
-    at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:584)
-    at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:143)
-    at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:566)
-    at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:226)
-    at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1180)
-    at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:512)
-    at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:185)
-    at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1112)
-    at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
-    at org.eclipse.jetty.server.Dispatcher.forward(Dispatcher.java:199)
-    at org.eclipse.jetty.server.Dispatcher.error(Dispatcher.java:79)
-    at org.eclipse.jetty.server.handler.ErrorHandler.handle(ErrorHandler.java:94)
-    at org.springframework.boot.context.embedded.jetty.JettyEmbeddedErrorHandler.handle(JettyEmbeddedErrorHandler.java:55)
-    at org.eclipse.jetty.server.Response.sendError(Response.java:558)
-    at org.eclipse.jetty.server.Response.sendError(Response.java:497)
-    at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:651)
-    at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:143)
-    at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
-    at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:226)
-    at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1180)
-    at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:512)
-    at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:185)
-    at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1112)
-    at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
-    at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:134)
-    at org.eclipse.jetty.server.Server.handle(Server.java:534)
-    at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:320)
-    at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:251)
-    at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:273)
-    at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:95)
-    at org.eclipse.jetty.io.SelectChannelEndPoint$2.run(SelectChannelEndPoint.java:93)
-    at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.executeProduceConsume(ExecuteProduceConsume.java:303)
-    at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.produceConsume(ExecuteProduceConsume.java:148)
-    at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.run(ExecuteProduceConsume.java:136)
-    at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:671)
-    at org.eclipse.jetty.util.thread.QueuedThreadPool$2.run(QueuedThreadPool.java:589)
-    at java.lang.Thread.run(Thread.java:745)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:982)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:872)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:707)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:846)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:790)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:845)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:584)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:143)
+	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:566)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:226)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1180)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:512)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:185)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1112)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+	at org.eclipse.jetty.server.Dispatcher.forward(Dispatcher.java:199)
+	at org.eclipse.jetty.server.Dispatcher.error(Dispatcher.java:79)
+	at org.eclipse.jetty.server.handler.ErrorHandler.handle(ErrorHandler.java:94)
+	at org.springframework.boot.context.embedded.jetty.JettyEmbeddedErrorHandler.handle(JettyEmbeddedErrorHandler.java:55)
+	at org.eclipse.jetty.server.Response.sendError(Response.java:558)
+	at org.eclipse.jetty.server.Response.sendError(Response.java:497)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:651)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:143)
+	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:226)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1180)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:512)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:185)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1112)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:134)
+	at org.eclipse.jetty.server.Server.handle(Server.java:534)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:320)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:251)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:273)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:95)
+	at org.eclipse.jetty.io.SelectChannelEndPoint$2.run(SelectChannelEndPoint.java:93)
+	at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.executeProduceConsume(ExecuteProduceConsume.java:303)
+	at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.produceConsume(ExecuteProduceConsume.java:148)
+	at org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume.run(ExecuteProduceConsume.java:136)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:671)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$2.run(QueuedThreadPool.java:589)
+	at java.lang.Thread.run(Thread.java:745)
 Caused by: org.springframework.web.multipart.MultipartException: Could not parse multipart servlet request; nested exception is java.io.IOException: Incomplete parts
-    at org.springframework.web.multipart.support.StandardMultipartHttpServletRequest.parseRequest(StandardMultipartHttpServletRequest.java:111)
-    at org.springframework.web.multipart.support.StandardMultipartHttpServletRequest.&lt;init&gt;(StandardMultipartHttpServletRequest.java:85)
-    at org.springframework.web.multipart.support.StandardServletMultipartResolver.resolveMultipart(StandardServletMultipartResolver.java:76)
-    at org.springframework.web.servlet.DispatcherServlet.checkMultipart(DispatcherServlet.java:1099)
-    at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:932)
-    at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:897)
-    at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:970)
-    ... 42 common frames omitted
+	at org.springframework.web.multipart.support.StandardMultipartHttpServletRequest.parseRequest(StandardMultipartHttpServletRequest.java:111)
+	at org.springframework.web.multipart.support.StandardMultipartHttpServletRequest.&lt;init&gt;(StandardMultipartHttpServletRequest.java:85)
+	at org.springframework.web.multipart.support.StandardServletMultipartResolver.resolveMultipart(StandardServletMultipartResolver.java:76)
+	at org.springframework.web.servlet.DispatcherServlet.checkMultipart(DispatcherServlet.java:1099)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:932)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:897)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:970)
+	... 42 common frames omitted
 Caused by: java.io.IOException: Incomplete parts
-    at org.eclipse.jetty.util.MultiPartInputStreamParser.parse(MultiPartInputStreamParser.java:781)
-    at org.eclipse.jetty.util.MultiPartInputStreamParser.getParts(MultiPartInputStreamParser.java:422)
-    at org.eclipse.jetty.server.Request.getParts(Request.java:2317)
-    at org.eclipse.jetty.server.Request.extractMultipartParameters(Request.java:519)
-    at org.eclipse.jetty.server.Request.extractContentParameters(Request.java:441)
-    at org.eclipse.jetty.server.Request.getParameters(Request.java:365)
-    at org.eclipse.jetty.server.Request.getParameter(Request.java:996)
-    at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:70)
-    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
-    at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1699)
-    at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:197)
-    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
-    at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1699)
-    at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:582)
-    ... 21 common frames omitted
+	at org.eclipse.jetty.util.MultiPartInputStreamParser.parse(MultiPartInputStreamParser.java:781)
+	at org.eclipse.jetty.util.MultiPartInputStreamParser.getParts(MultiPartInputStreamParser.java:422)
+	at org.eclipse.jetty.server.Request.getParts(Request.java:2317)
+	at org.eclipse.jetty.server.Request.extractMultipartParameters(Request.java:519)
+	at org.eclipse.jetty.server.Request.extractContentParameters(Request.java:441)
+	at org.eclipse.jetty.server.Request.getParameters(Request.java:365)
+	at org.eclipse.jetty.server.Request.getParameter(Request.java:996)
+	at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:70)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1699)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:197)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1699)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:582)
+	... 21 common frames omitted
 </code></pre>
 
 <p>异常抛的位置是 <code>org.eclipse.jetty.util.MultiPartInputStreamParser#parse</code>：</p>

@@ -91,8 +91,8 @@ getDetailMsgs(b0);
     Long id = msg.getId();
     try {
         Table table = getTable();
-        Put p = new Put(getRowKey(b, insertTime, id));
-        p.addColumn(Bytes.toBytes(COL_FAMILY),          Bytes.toBytes(MSG_ID_COL), Bytes.toBytes(msgRowkey));
+ 		Put p = new Put(getRowKey(b, insertTime, id));
+        p.addColumn(Bytes.toBytes(COL_FAMILY), 			Bytes.toBytes(MSG_ID_COL), Bytes.toBytes(msgRowkey));
         table.put(put);
     } catch (Exception e) {
     }
@@ -114,7 +114,7 @@ getDetailMsgs(b0);
     byte[] startRow = getRowKey(b, end, 0L);
     byte[] endRow = getRowKey(b, start, Long.MAX_VALUE);
 
-    // 映射表
+	// 映射表
     Table table = getTable();
     while (true) {
         Scan scan = new Scan();
@@ -822,43 +822,43 @@ props.put(&amp;quot;batch.size&amp;quot;, 2 * 10 * 1024 * 1024);
 &lt;p&gt;copyProperties 的实现总体上很清晰：利用反射，调用source对象的get方法，然后set到target对象中。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void copyProperties(Object source, Object target) throws BeansException {
-        copyProperties(source, target, null, (String[]) null);
-    }
+		copyProperties(source, target, null, (String[]) null);
+	}
 
 private static void copyProperties(Object source, Object target, Class&amp;lt;?&amp;gt; editable, String... ignoreProperties)
-            throws BeansException {
-        Class&amp;lt;?&amp;gt; actualEditable = target.getClass();
+			throws BeansException {
+		Class&amp;lt;?&amp;gt; actualEditable = target.getClass();
 
-        PropertyDescriptor[] targetPds = getPropertyDescriptors(actualEditable);
-        List&amp;lt;String&amp;gt; ignoreList = (ignoreProperties != null ? Arrays.asList(ignoreProperties) : null);
+		PropertyDescriptor[] targetPds = getPropertyDescriptors(actualEditable);
+		List&amp;lt;String&amp;gt; ignoreList = (ignoreProperties != null ? Arrays.asList(ignoreProperties) : null);
 
-        for (PropertyDescriptor targetPd : targetPds) {
-            Method writeMethod = targetPd.getWriteMethod();
-            if (writeMethod != null &amp;amp;&amp;amp; (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
-                PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
-                if (sourcePd != null) {
-                    Method readMethod = sourcePd.getReadMethod();
-                    if (readMethod != null &amp;amp;&amp;amp;
-                            ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType())) {
-                        try {
-                            if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
-                                readMethod.setAccessible(true);
-                            }
-                            Object value = readMethod.invoke(source);
-                            if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
-                                writeMethod.setAccessible(true);
-                            }
-                            writeMethod.invoke(target, value);
-                        }
-                        catch (Throwable ex) {
-                            throw new FatalBeanException(
-                                    &amp;quot;Could not copy property &#39;&amp;quot; + targetPd.getName() + &amp;quot;&#39; from source to target&amp;quot;, ex);
-                        }
-                    }
-                }
-            }
-        }
-    }
+		for (PropertyDescriptor targetPd : targetPds) {
+			Method writeMethod = targetPd.getWriteMethod();
+			if (writeMethod != null &amp;amp;&amp;amp; (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
+				PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
+				if (sourcePd != null) {
+					Method readMethod = sourcePd.getReadMethod();
+					if (readMethod != null &amp;amp;&amp;amp;
+							ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType())) {
+						try {
+							if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
+								readMethod.setAccessible(true);
+							}
+							Object value = readMethod.invoke(source);
+							if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
+								writeMethod.setAccessible(true);
+							}
+							writeMethod.invoke(target, value);
+						}
+						catch (Throwable ex) {
+							throw new FatalBeanException(
+									&amp;quot;Could not copy property &#39;&amp;quot; + targetPd.getName() + &amp;quot;&#39; from source to target&amp;quot;, ex);
+						}
+					}
+				}
+			}
+		}
+	}
 
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -867,83 +867,83 @@ private static void copyProperties(Object source, Object target, Class&amp;lt;?&
 &lt;p&gt;PropertyDescriptor 描述的是Java Bean的一个属性，具有读写(getter/setter)方法，&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static PropertyDescriptor[] getPropertyDescriptors(Class&amp;lt;?&amp;gt; clazz) throws BeansException {
-        CachedIntrospectionResults cr = CachedIntrospectionResults.forClass(clazz);
-        return cr.getPropertyDescriptors();
-    }
+		CachedIntrospectionResults cr = CachedIntrospectionResults.forClass(clazz);
+		return cr.getPropertyDescriptors();
+	}
 
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;code&gt;CachedIntrospectionResults&lt;/code&gt;缓存了Java Bean对应Class的&lt;code&gt;PropertyDescriptor&lt;/code&gt;信息，存储数据结构是&lt;code&gt;ConcurrentHashMap&lt;/code&gt;：&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;static final ConcurrentMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt; strongClassCache =
-            new ConcurrentHashMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt;(64);
+			new ConcurrentHashMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt;(64);
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;先从缓存中查询，如果没有，则进行实际的解析，构造。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;static CachedIntrospectionResults forClass(Class&amp;lt;?&amp;gt; beanClass) throws BeansException {
-        CachedIntrospectionResults results = strongClassCache.get(beanClass);
-        if (results != null) {
-            return results;
-        }
-        results = softClassCache.get(beanClass);
-        if (results != null) {
-            return results;
-        }
+		CachedIntrospectionResults results = strongClassCache.get(beanClass);
+		if (results != null) {
+			return results;
+		}
+		results = softClassCache.get(beanClass);
+		if (results != null) {
+			return results;
+		}
 
         // TODO 具体的解析过程
-        results = new CachedIntrospectionResults(beanClass);
-        ConcurrentMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt; classCacheToUse;
+		results = new CachedIntrospectionResults(beanClass);
+		ConcurrentMap&amp;lt;Class&amp;lt;?&amp;gt;, CachedIntrospectionResults&amp;gt; classCacheToUse;
 
         // TODO cachesafe ？
-        if (ClassUtils.isCacheSafe(beanClass, CachedIntrospectionResults.class.getClassLoader()) ||
-                isClassLoaderAccepted(beanClass.getClassLoader())) {
-            classCacheToUse = strongClassCache;
-        }
-        else {
-            classCacheToUse = softClassCache;
-        }
+		if (ClassUtils.isCacheSafe(beanClass, CachedIntrospectionResults.class.getClassLoader()) ||
+				isClassLoaderAccepted(beanClass.getClassLoader())) {
+			classCacheToUse = strongClassCache;
+		}
+		else {
+			classCacheToUse = softClassCache;
+		}
 
-        CachedIntrospectionResults existing = classCacheToUse.putIfAbsent(beanClass, results);
-        return (existing != null ? existing : results);
-    }
+		CachedIntrospectionResults existing = classCacheToUse.putIfAbsent(beanClass, results);
+		return (existing != null ? existing : results);
+	}
 
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;接下来看&lt;code&gt;CachedIntrospectionResults&lt;/code&gt;构造函数，先是利用&lt;code&gt;Introspector&lt;/code&gt;解析class的&lt;code&gt;BeanInfo&lt;/code&gt;（实现类是&lt;code&gt;GenericBeanInfo&lt;/code&gt;），然后更新缓存。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private CachedIntrospectionResults(Class&amp;lt;?&amp;gt; beanClass) throws BeansException {
-        try {
-            BeanInfo beanInfo = null;
-            if (beanInfo == null) {
-                // If none of the factories supported the class, fall back to the default
-                beanInfo = (shouldIntrospectorIgnoreBeaninfoClasses ?
-                        Introspector.getBeanInfo(beanClass, Introspector.IGNORE_ALL_BEANINFO) :
-                        Introspector.getBeanInfo(beanClass)); // 这里
-            }
-            this.beanInfo = beanInfo;
+		try {
+			BeanInfo beanInfo = null;
+			if (beanInfo == null) {
+				// If none of the factories supported the class, fall back to the default
+				beanInfo = (shouldIntrospectorIgnoreBeaninfoClasses ?
+						Introspector.getBeanInfo(beanClass, Introspector.IGNORE_ALL_BEANINFO) :
+						Introspector.getBeanInfo(beanClass)); // 这里
+			}
+			this.beanInfo = beanInfo;
 
 
-            this.propertyDescriptorCache = new LinkedHashMap&amp;lt;String, PropertyDescriptor&amp;gt;();
+			this.propertyDescriptorCache = new LinkedHashMap&amp;lt;String, PropertyDescriptor&amp;gt;();
 
-            // This call is slow so we do it once.
-            PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
-            for (PropertyDescriptor pd : pds) {
-                if (Class.class == beanClass &amp;amp;&amp;amp;
-                        (&amp;quot;classLoader&amp;quot;.equals(pd.getName()) ||  &amp;quot;protectionDomain&amp;quot;.equals(pd.getName()))) {
-                    // Ignore Class.getClassLoader() and getProtectionDomain() methods - nobody needs to bind to those
-                    continue;
-                }
-                pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
-                this.propertyDescriptorCache.put(pd.getName(), pd);
-            }
+			// This call is slow so we do it once.
+			PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
+			for (PropertyDescriptor pd : pds) {
+				if (Class.class == beanClass &amp;amp;&amp;amp;
+						(&amp;quot;classLoader&amp;quot;.equals(pd.getName()) ||  &amp;quot;protectionDomain&amp;quot;.equals(pd.getName()))) {
+					// Ignore Class.getClassLoader() and getProtectionDomain() methods - nobody needs to bind to those
+					continue;
+				}
+				pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
+				this.propertyDescriptorCache.put(pd.getName(), pd);
+			}
 
-            this.typeDescriptorCache = new ConcurrentReferenceHashMap&amp;lt;PropertyDescriptor, TypeDescriptor&amp;gt;();
-        }
-        catch (IntrospectionException ex) {
-            throw new FatalBeanException(&amp;quot;Failed to obtain BeanInfo for class [&amp;quot; + beanClass.getName() + &amp;quot;]&amp;quot;, ex);
-        }
-    }
+			this.typeDescriptorCache = new ConcurrentReferenceHashMap&amp;lt;PropertyDescriptor, TypeDescriptor&amp;gt;();
+		}
+		catch (IntrospectionException ex) {
+			throw new FatalBeanException(&amp;quot;Failed to obtain BeanInfo for class [&amp;quot; + beanClass.getName() + &amp;quot;]&amp;quot;, ex);
+		}
+	}
 
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -952,23 +952,23 @@ private static void copyProperties(Object source, Object target, Class&amp;lt;?&
 &lt;p&gt;看工具类&lt;code&gt;ClassUtils&lt;/code&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static boolean isAssignable(Class&amp;lt;?&amp;gt; lhsType, Class&amp;lt;?&amp;gt; rhsType) {
-        if (lhsType.isAssignableFrom(rhsType)) {
-            return true;
-        }
-        if (lhsType.isPrimitive()) {
-            Class&amp;lt;?&amp;gt; resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
-            if (lhsType == resolvedPrimitive) {
-                return true;
-            }
-        }
-        else {
-            Class&amp;lt;?&amp;gt; resolvedWrapper = primitiveTypeToWrapperMap.get(rhsType);
-            if (resolvedWrapper != null &amp;amp;&amp;amp; lhsType.isAssignableFrom(resolvedWrapper)) {
-                return true;
-            }
-        }
-        return false;
-    }
+		if (lhsType.isAssignableFrom(rhsType)) {
+			return true;
+		}
+		if (lhsType.isPrimitive()) {
+			Class&amp;lt;?&amp;gt; resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
+			if (lhsType == resolvedPrimitive) {
+				return true;
+			}
+		}
+		else {
+			Class&amp;lt;?&amp;gt; resolvedWrapper = primitiveTypeToWrapperMap.get(rhsType);
+			if (resolvedWrapper != null &amp;amp;&amp;amp; lhsType.isAssignableFrom(resolvedWrapper)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -1371,8 +1371,8 @@ Two objects are same
 &lt;p&gt;输出：&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Exception in thread &amp;quot;main&amp;quot; java.lang.IllegalArgumentException: Cannot reflectively create enum objects
-    at java.lang.reflect.Constructor.newInstance(Constructor.java:417)
-    at lang.enumsingleton.SingletonUsingEnumReflectionDemo.main(SingletonUsingEnumReflectionDemo.java:16)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:417)
+	at lang.enumsingleton.SingletonUsingEnumReflectionDemo.main(SingletonUsingEnumReflectionDemo.java:16)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;枚举是一个语法糖&#34;&gt;枚举是一个语法糖&lt;/h2&gt;
@@ -1690,37 +1690,37 @@ SourceFile: &amp;quot;ColorEnum.java&amp;quot;
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] ERROR o.a.k.c.c.i.ConsumerCoordinator.handle 550 - Error UNKNOWN_MEMBER_ID occurred while committing offsets for group xxxxx_group
 2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] ERROR o.a.k.c.c.i.ConsumerCoordinator.onJoinPrepare 254 - User provided listener org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer$1 failed on partition revocation:
 org.apache.kafka.clients.consumer.CommitFailedException: Commit cannot be completed due to group rebalance
-    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:552)
-    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:493)
-    at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:665)
-    at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:644)
-    at org.apache.kafka.clients.consumer.internals.RequestFuture$1.onSuccess(RequestFuture.java:167)
-    at org.apache.kafka.clients.consumer.internals.RequestFuture.fireSuccess(RequestFuture.java:133)
-    at org.apache.kafka.clients.consumer.internals.RequestFuture.complete(RequestFuture.java:107)
-    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient$RequestFutureCompletionHandler.onComplete(ConsumerNetworkClient.java:380)
-    at org.apache.kafka.clients.NetworkClient.poll(NetworkClient.java:274)
-    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.clientPoll(ConsumerNetworkClient.java:320)
-    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:213)
-    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:193)
-    at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:163)
-    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.commitOffsetsSync(ConsumerCoordinator.java:358)
-    at org.apache.kafka.clients.consumer.KafkaConsumer.commitSync(KafkaConsumer.java:968)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.ackImmediate(KafkaMessageListenerContainer.java:578)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.manualAck(KafkaMessageListenerContainer.java:559)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.handleManualAcks(KafkaMessageListenerContainer.java:550)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.processCommits(KafkaMessageListenerContainer.java:624)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.stopInvokerAndCommitManualAcks(KafkaMessageListenerContainer.java:504)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.access$900(KafkaMessageListenerContainer.java:221)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer$1.onPartitionsRevoked(KafkaMessageListenerContainer.java:297)
-    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.onJoinPrepare(ConsumerCoordinator.java:250)
-    at org.apache.kafka.clients.consumer.internals.AbstractCoordinator.ensureActiveGroup(AbstractCoordinator.java:207)
-    at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.ensurePartitionAssignment(ConsumerCoordinator.java:311)
-    at org.apache.kafka.clients.consumer.KafkaConsumer.pollOnce(KafkaConsumer.java:890)
-    at org.apache.kafka.clients.consumer.KafkaConsumer.poll(KafkaConsumer.java:853)
-    at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:408)
-    at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
-    at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-    at java.lang.Thread.run(Thread.java:745)
+	at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:552)
+	at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator$OffsetCommitResponseHandler.handle(ConsumerCoordinator.java:493)
+	at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:665)
+	at org.apache.kafka.clients.consumer.internals.AbstractCoordinator$CoordinatorResponseHandler.onSuccess(AbstractCoordinator.java:644)
+	at org.apache.kafka.clients.consumer.internals.RequestFuture$1.onSuccess(RequestFuture.java:167)
+	at org.apache.kafka.clients.consumer.internals.RequestFuture.fireSuccess(RequestFuture.java:133)
+	at org.apache.kafka.clients.consumer.internals.RequestFuture.complete(RequestFuture.java:107)
+	at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient$RequestFutureCompletionHandler.onComplete(ConsumerNetworkClient.java:380)
+	at org.apache.kafka.clients.NetworkClient.poll(NetworkClient.java:274)
+	at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.clientPoll(ConsumerNetworkClient.java:320)
+	at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:213)
+	at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:193)
+	at org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient.poll(ConsumerNetworkClient.java:163)
+	at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.commitOffsetsSync(ConsumerCoordinator.java:358)
+	at org.apache.kafka.clients.consumer.KafkaConsumer.commitSync(KafkaConsumer.java:968)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.ackImmediate(KafkaMessageListenerContainer.java:578)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.manualAck(KafkaMessageListenerContainer.java:559)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.handleManualAcks(KafkaMessageListenerContainer.java:550)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.processCommits(KafkaMessageListenerContainer.java:624)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.stopInvokerAndCommitManualAcks(KafkaMessageListenerContainer.java:504)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.access$900(KafkaMessageListenerContainer.java:221)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer$1.onPartitionsRevoked(KafkaMessageListenerContainer.java:297)
+	at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.onJoinPrepare(ConsumerCoordinator.java:250)
+	at org.apache.kafka.clients.consumer.internals.AbstractCoordinator.ensureActiveGroup(AbstractCoordinator.java:207)
+	at org.apache.kafka.clients.consumer.internals.ConsumerCoordinator.ensurePartitionAssignment(ConsumerCoordinator.java:311)
+	at org.apache.kafka.clients.consumer.KafkaConsumer.pollOnce(KafkaConsumer.java:890)
+	at org.apache.kafka.clients.consumer.KafkaConsumer.poll(KafkaConsumer.java:853)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:408)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.lang.Thread.run(Thread.java:745)
 2019-01-29 23:59:24 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-1] INFO  o.a.k.c.c.i.AbstractCoordinator.handle 354 - Attempt to join group xxxxx_group failed due to unknown member id, resetting and retrying.
 2019-01-29 23:59:48 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-4] INFO  o.a.k.c.c.i.AbstractCoordinator.handle 623 - Attempt to heart beat failed since the group is rebalancing, try to re-join group.
 2019-01-29 23:59:48 [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-kafka-consumer-4] INFO  o.s.k.l.KafkaMessageListenerContainer.onPartitionsRevoked 224 - partitions revoked:[]
@@ -1732,32 +1732,32 @@ org.apache.kafka.clients.consumer.CommitFailedException: Commit cannot be comple
 &lt;p&gt;offset提交失败，带来的问题就是大量的消息被重复消费，相互影响，不断恶化，导致消息堆积很严重，无法推进。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate record.
-    at sun.reflect.GeneratedConstructorAccessor45.newInstance(Unknown Source)
-    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
-    at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
-    at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
-    at com.mysql.jdbc.Util.getInstance(Util.java:386)
-    at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
-    at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
-    at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
-    at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
-    at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
-    at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
-    at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
-    at com.mysql.jdbc.PreparedStatement.execute$sentryProxy(PreparedStatement.java:1379)
-    at com.mysql.jdbc.PreparedStatement.execute(PreparedStatement.java)
-    at com.alibaba.druid.pool.DruidPooledPreparedStatement.execute(DruidPooledPreparedStatement.java:493)
-    at org.apache.ibatis.executor.statement.PreparedStatementHandler.update(PreparedStatementHandler.java:46)
-    at org.apache.ibatis.executor.statement.RoutingStatementHandler.update(RoutingStatementHandler.java:74)
-    at org.apache.ibatis.executor.SimpleExecutor.doUpdate(SimpleExecutor.java:50)
-    at org.apache.ibatis.executor.BaseExecutor.update(BaseExecutor.java:117)
-    at org.apache.ibatis.executor.CachingExecutor.update(CachingExecutor.java:76)
-    at org.apache.ibatis.session.defaults.DefaultSqlSession.update(DefaultSqlSession.java:198)
-    at org.apache.ibatis.session.defaults.DefaultSqlSession.insert(DefaultSqlSession.java:185)
-    at sun.reflect.GeneratedMethodAccessor84.invoke(Unknown Source)
-    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-    at java.lang.reflect.Method.invoke(Method.java:498)
-    at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:434)
+	at sun.reflect.GeneratedConstructorAccessor45.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+	at com.mysql.jdbc.PreparedStatement.execute$sentryProxy(PreparedStatement.java:1379)
+	at com.mysql.jdbc.PreparedStatement.execute(PreparedStatement.java)
+	at com.alibaba.druid.pool.DruidPooledPreparedStatement.execute(DruidPooledPreparedStatement.java:493)
+	at org.apache.ibatis.executor.statement.PreparedStatementHandler.update(PreparedStatementHandler.java:46)
+	at org.apache.ibatis.executor.statement.RoutingStatementHandler.update(RoutingStatementHandler.java:74)
+	at org.apache.ibatis.executor.SimpleExecutor.doUpdate(SimpleExecutor.java:50)
+	at org.apache.ibatis.executor.BaseExecutor.update(BaseExecutor.java:117)
+	at org.apache.ibatis.executor.CachingExecutor.update(CachingExecutor.java:76)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.update(DefaultSqlSession.java:198)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.insert(DefaultSqlSession.java:185)
+	at sun.reflect.GeneratedMethodAccessor84.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:434)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;解决&#34;&gt;解决&lt;/h2&gt;

@@ -301,7 +301,7 @@ typedef struct redisDb {
             latencyAddSampleIfNeeded(&quot;expire-cycle&quot;,elapsed/1000);
             if (elapsed &gt; timelimit) timelimit_exit = 1;
         }
-        // 超过时间限制则退出
+		// 超过时间限制则退出
         if (timelimit_exit) return;
         /* 在当前db中，如果少于25%的key过期，则停止继续删除过期key */
     } while (expired &gt; ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP/4);

@@ -244,8 +244,8 @@ getDetailMsgs(b0);
     Long id = msg.getId();
     try {
         Table table = getTable();
-        Put p = new Put(getRowKey(b, insertTime, id));
-        p.addColumn(Bytes.toBytes(COL_FAMILY),          Bytes.toBytes(MSG_ID_COL), Bytes.toBytes(msgRowkey));
+ 		Put p = new Put(getRowKey(b, insertTime, id));
+        p.addColumn(Bytes.toBytes(COL_FAMILY), 			Bytes.toBytes(MSG_ID_COL), Bytes.toBytes(msgRowkey));
         table.put(put);
     } catch (Exception e) {
     }
@@ -267,7 +267,7 @@ getDetailMsgs(b0);
     byte[] startRow = getRowKey(b, end, 0L);
     byte[] endRow = getRowKey(b, start, Long.MAX_VALUE);
 
-    // 映射表
+	// 映射表
     Table table = getTable();
     while (true) {
         Scan scan = new Scan();

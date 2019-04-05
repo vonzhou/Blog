@@ -385,38 +385,38 @@ Hello, JVM!
 <p>对应的JASM格式反汇编内容：</p>
 
 <pre><code>super public class Foo
-    version 52:0
+	version 52:0
 {
 
 static Field bv:Z;
 
 public Method &quot;&lt;init&gt;&quot;:&quot;()V&quot;
-    stack 1 locals 1
+	stack 1 locals 1
 {
-        aload_0;
-        invokespecial   Method java/lang/Object.&quot;&lt;init&gt;&quot;:&quot;()V&quot;;
-        return;
+		aload_0;
+		invokespecial	Method java/lang/Object.&quot;&lt;init&gt;&quot;:&quot;()V&quot;;
+		return;
 }
 
 public static Method main:&quot;([Ljava/lang/String;)V&quot;
-    stack 2 locals 1
+	stack 2 locals 1
 {
-        iconst_1;  # 入栈常量1
-        putstatic   Field bv:&quot;Z&quot;;
-        getstatic   Field bv:&quot;Z&quot;;
-        ifeq    L18; 
-        getstatic   Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
-        ldc String &quot;Hello, Java!&quot;;
-        invokevirtual   Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
-    L18:    stack_frame_type same;
-        getstatic   Field bv:&quot;Z&quot;;
-        iconst_1;
-        if_icmpne   L33;  # 比较
-        getstatic   Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
-        ldc String &quot;Hello, JVM!&quot;;
-        invokevirtual   Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
-    L33:    stack_frame_type same;
-        return;
+		iconst_1;  # 入栈常量1
+		putstatic	Field bv:&quot;Z&quot;;
+		getstatic	Field bv:&quot;Z&quot;;
+		ifeq	L18; 
+		getstatic	Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
+		ldc	String &quot;Hello, Java!&quot;;
+		invokevirtual	Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
+	L18:	stack_frame_type same;
+		getstatic	Field bv:&quot;Z&quot;;
+		iconst_1;
+		if_icmpne	L33;  # 比较
+		getstatic	Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
+		ldc	String &quot;Hello, JVM!&quot;;
+		invokevirtual	Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
+	L33:	stack_frame_type same;
+		return;
 }
 
 } // end Class Foo
@@ -427,38 +427,38 @@ public static Method main:&quot;([Ljava/lang/String;)V&quot;
 <p>如果修改下Foo.jasm。</p>
 
 <pre><code>super public class Foo
-    version 52:0
+	version 52:0
 {
 
 static Field bv:Z;
 
 public Method &quot;&lt;init&gt;&quot;:&quot;()V&quot;
-    stack 1 locals 1
+	stack 1 locals 1
 {
-        aload_0;
-        invokespecial   Method java/lang/Object.&quot;&lt;init&gt;&quot;:&quot;()V&quot;;
-        return;
+		aload_0;
+		invokespecial	Method java/lang/Object.&quot;&lt;init&gt;&quot;:&quot;()V&quot;;
+		return;
 }
 
 public static Method main:&quot;([Ljava/lang/String;)V&quot;
-    stack 2 locals 1
+	stack 2 locals 1
 {
-        iconst_1;
-        putstatic   Field bv:&quot;Z&quot;;
-        getstatic   Field bv:&quot;Z&quot;;
-        ifeq    L18;
-        getstatic   Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
-        ldc String &quot;Hello, Java!&quot;;
-        invokevirtual   Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
-    L18:    stack_frame_type same;
-        getstatic   Field bv:&quot;Z&quot;;
-        iconst_2;  # 修改了这里
-        if_icmpne   L33;
-        getstatic   Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
-        ldc String &quot;Hello, JVM!&quot;;
-        invokevirtual   Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
-    L33:    stack_frame_type same;
-        return;
+		iconst_1;
+		putstatic	Field bv:&quot;Z&quot;;
+		getstatic	Field bv:&quot;Z&quot;;
+		ifeq	L18;
+		getstatic	Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
+		ldc	String &quot;Hello, Java!&quot;;
+		invokevirtual	Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
+	L18:	stack_frame_type same;
+		getstatic	Field bv:&quot;Z&quot;;
+		iconst_2;  # 修改了这里
+		if_icmpne	L33;
+		getstatic	Field java/lang/System.out:&quot;Ljava/io/PrintStream;&quot;;
+		ldc	String &quot;Hello, JVM!&quot;;
+		invokevirtual	Method java/io/PrintStream.println:&quot;(Ljava/lang/String;)V&quot;;
+	L33:	stack_frame_type same;
+		return;
 }
 
 } // end Class Foo
