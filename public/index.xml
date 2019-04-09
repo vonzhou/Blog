@@ -508,6 +508,7 @@ expr match {
 &lt;h2 id=&#34;history-历史&#34;&gt;History 历史&lt;/h2&gt;
 
 &lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《半小时漫画中国史1、2、3》  2019.4.9&lt;/label&gt;&lt;/li&gt;
 &lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《中国历代政治得失》 2019.2.23  👍&lt;/label&gt;&lt;/li&gt;
 &lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; disabled class=&#34;task-list-item&#34;&gt; 《巨流河 台版》&lt;/label&gt;&lt;/li&gt;
 &lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《紫禁城的黄昏》&lt;/label&gt;&lt;/li&gt;
