@@ -538,6 +538,7 @@ expr match {
 &lt;h2 id=&#34;thinking-思维&#34;&gt;Thinking 思维&lt;/h2&gt;
 
 &lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《学习之道》 2019.4.13&lt;/label&gt;&lt;/li&gt;
 &lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; 《如何阅读一本书》 👍&lt;/label&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
