@@ -1,4 +1,6 @@
-# 编程之路 - Build Your Programming Culture
+
+<img src="https://github.com/vonzhou/Blog/blob/master/content/images/Wechat.jpeg" height="400" width="400">
+
 
 ##  [====> 最新文章](https://github.com/vonzhou/Blog/issues)
 
